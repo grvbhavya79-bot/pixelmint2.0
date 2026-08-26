@@ -1,0 +1,143 @@
+import type { ToolDefinition } from "../types";
+
+export const FILE_TOOLS: ToolDefinition[] = [
+  {
+    slug: "zip-creator",
+    name: "ZIP Creator",
+    category: "file",
+    description: "Bundle multiple files into a single ZIP archive.",
+    longDescription:
+      "Select any files, review the list, name your archive and compress it with the level you choose — from store-fast to maximum compression — all inside your browser.",
+    tags: ["zip", "archive", "compress", "bundle", "create"],
+    component: "ZipTool",
+    props: { mode: "create" },
+    icon: "Package",
+    process: "local",
+  },
+  {
+    slug: "zip-extractor",
+    name: "ZIP Extractor",
+    category: "file",
+    description: "Safely open ZIP archives and download the files inside.",
+    longDescription:
+      "Inspect and extract ZIP archives with path-traversal protection built in. Browse contents, pick individual files or download everything at once.",
+    tags: ["zip", "extract", "unzip", "open", "decompress", "archive"],
+    component: "ZipTool",
+    props: { mode: "extract" },
+    icon: "FolderDown",
+    process: "local",
+  },
+  {
+    slug: "file-compressor",
+    name: "File Compressor",
+    category: "file",
+    description: "Compress any supported files into smaller ZIP archives.",
+    longDescription:
+      "Drop documents, images or folders of files and compress them in one pass. Choose the compression level, compare sizes and download the compacted archive.",
+    tags: ["compress", "file", "zip", "reduce", "size"],
+    component: "FileCompressTool",
+    icon: "Archive",
+    process: "local",
+  },
+  {
+    slug: "batch-file-renamer",
+    name: "Batch File Renamer",
+    category: "file",
+    description: "Rename many files at once with patterns, numbering, case and find-replace.",
+    longDescription:
+      "Build a rename pattern from parts: base name, sequence numbers, dates, extensions. Preview every new filename before applying, then download the renamed set as a ZIP.",
+    tags: ["rename", "batch", "files", "bulk", "pattern", "numbering"],
+    component: "BatchRenameTool",
+    icon: "SquarePen",
+    process: "local",
+  },
+  {
+    slug: "file-size-checker",
+    name: "File Size Checker",
+    category: "file",
+    description: "See file sizes in bytes, KB, MB and GB at a glance.",
+    longDescription:
+      "Drop any files and instantly get their exact sizes in bytes plus human-readable KB, MB and GB, with a grand total for the whole batch — useful before uploads with size limits.",
+    tags: ["file size", "bytes", "kb", "mb", "gb", "check", "size"],
+    component: "FileInspectorTool",
+    props: { mode: "size" },
+    icon: "HardDrive",
+    process: "local",
+  },
+  {
+    slug: "mime-type-checker",
+    name: "MIME Type Checker",
+    category: "file",
+    description: "Detect the real MIME type of files from their content, not extension.",
+    longDescription:
+      "File signatures (magic bytes) are read locally to reveal what a file truly is — catching renamed or mislabeled files before they cause trouble.",
+    tags: ["mime", "type", "detect", "magic bytes", "content type"],
+    component: "FileInspectorTool",
+    props: { mode: "mime" },
+    icon: "FileSearch",
+    process: "local",
+  },
+  {
+    slug: "file-extension-checker",
+    name: "File Extension Checker",
+    category: "file",
+    description: "Look up file extensions and the formats and applications behind them.",
+    longDescription:
+      "Search a built-in database of common extensions to see the format name, category, MIME type and which programs typically open it.",
+    tags: ["extension", "file type", "format", "lookup", "check"],
+    component: "FileInspectorTool",
+    props: { mode: "extension" },
+    icon: "FileQuestion",
+    process: "local",
+  },
+  {
+    slug: "base64-encoder",
+    name: "Base64 Encoder",
+    category: "file",
+    description: "Encode text or files into Base64 — including data URLs for images.",
+    longDescription:
+      "Encode any text or file to standard Base64, URL-safe Base64, or a ready-to-use data URL with correct MIME prefix. Output is chunked for easy copying.",
+    tags: ["base64", "encode", "data url", "btoa"],
+    popular: true,
+    component: "Base64Tool",
+    props: { mode: "encode" },
+    icon: "Binary",
+    process: "local",
+  },
+  {
+    slug: "base64-decoder",
+    name: "Base64 Decoder",
+    category: "file",
+    description: "Decode Base64 text back into readable text or downloadable files.",
+    longDescription:
+      "Paste Base64 — with or without a data-URL prefix — and get back the original text or a downloadable binary file with the correct extension detected from its MIME type.",
+    tags: ["base64", "decode", "atob"],
+    component: "Base64Tool",
+    props: { mode: "decode" },
+    icon: "FileDigit",
+    process: "local",
+  },
+  {
+    slug: "qr-code-generator",
+    name: "QR Code Generator",
+    category: "file",
+    description: "Create QR codes for URLs, text, email, phone and Wi-Fi — as PNG or SVG.",
+    longDescription:
+      "Generate crisp QR codes with adjustable size, colors and error-correction level. Dedicated modes build correctly formatted payloads for links, vCards, Wi-Fi credentials, email and phone numbers.",
+    tags: ["qr", "qrcode", "generator", "scan", "wifi", "link"],
+    popular: true,
+    component: "QrGeneratorTool",
+    icon: "QrCode",
+    process: "local",
+    faqs: [
+      {
+        q: "What size should I choose for printing?",
+        a: "A rule of thumb: the QR code should be at least one-tenth of the scanning distance. For a poster scanned from 2 meters, use 512px or larger and export SVG for perfectly sharp printing.",
+      },
+      {
+        q: "Which error correction level should I pick?",
+        a: "Level M (15%) is a good default. Choose H (30%) if the code may get dirty, partially covered by a logo, or printed on fabric.",
+      },
+    ],
+  },
+];

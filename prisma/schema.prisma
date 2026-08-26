@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Anonymous, aggregate-only analytics: which tool ran and when.
+model ToolUsage {
+  id        String   @id @default(cuid())
+  slug      String
+  status    String   @default("success") // success | error
+  createdAt DateTime @default(now())
+
+  @@index([slug, createdAt])
+  @@index([createdAt])
+}
+
+// URL shortener
+model ShortUrl {
+  id             String          @id @default(cuid())
+  shortCode      String          @unique
+  destinationUrl String
+  clickCount     Int             @default(0)
+  isActive       Boolean         @default(true)
+  expiresAt      DateTime?
+  createdAt      DateTime        @default(now())
+  clicks         ShortUrlClick[]
+
+  @@index([createdAt])
+}
+
+model ShortUrlClick {
+  id         String   @id @default(cuid())
+  shortUrlId String
+  referrer   String?
+  createdAt  DateTime @default(now())
+  shortUrl   ShortUrl @relation(fields: [shortUrlId], references: [id], onDelete: Cascade)
+
+  @@index([shortUrlId, createdAt])
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model SystemSetting {
+  key   String @id
+  value String
+}
