@@ -185,3 +185,20 @@ Stage Summary:
 - Full originality audit passed: brand, logo, design system, blog, legal pages, all 103 tool descriptions/FAQs are original writing.
 - All generic example-domain demo content replaced with self-branded Pixelmint.fun content.
 - Site is 100% original content end to end.
+
+---
+Task ID: 9
+Agent: Super Z (main agent)
+Task: Add Support Pixelmint page with UPI (grvbhavya55@axl) QR code and more.
+
+Work Log:
+- Generated UPI payment QR (scripts/generate-upi-qr.mjs, qrcode pkg) encoding standard deep link upi://pay?pa=grvbhavya55@axl&pn=Pixelmint&cu=INR → public/images/upi-qr.png (512px, dark-green on white). Round-trip verified by decoding with jsQR — exact link match.
+- Built /support page: hero ("Keep 100+ tools free for everyone"), UPI card (QR in white tile + scan hint "GPay · PhonePe · Paytm · BHIM", UPI ID display, Copy UPI ID button with clipboard API + fallback + Copied! state, "Open in UPI app" deep-link button), 3 free-ways cards (Share, Favorite, Feedback), "Where your support goes" mint panel, contact link. SEO metadata + canonical + OG.
+- Created UpiCopyButton client component (clipboard + execCommand fallback, 2s feedback).
+- Wired links: footer Company column "Support Us ❤", About page CTA row "Support Pixelmint ❤", sitemap entry (now 145 pages).
+- Rebuilt production (33.4s, 145/145 pages), restarted server.
+- Browser-verified: QR image loads (256px natural), Copy button works (Copied! state + aria-label update), UPI ID visible, scan hint renders, no horizontal overflow at 375px, footer link → /support, zero console/page errors. VLM confirms clean scannable QR, all sections present, professional design.
+
+Stage Summary:
+- /support page live with scannable UPI QR (grvbhavya55@axl), copy + deep-link buttons, free-support options.
+- Linked from footer + About, in sitemap. bun test 83/83 pass, ESLint + tsc clean.

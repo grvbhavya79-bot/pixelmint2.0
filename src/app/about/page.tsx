@@ -161,6 +161,12 @@ export default function AboutPage() {
             Contact us
           </Link>
           <Link
+            href="/support"
+            className="focus-ring inline-flex items-center gap-1.5 rounded-xl border bg-card px-5 py-2.5 text-sm font-semibold text-foreground shadow-card hover:shadow-card-hover"
+          >
+            Support Pixelmint ❤
+          </Link>
+          <Link
             href="/tools"
             className="focus-ring inline-flex items-center gap-1.5 rounded-xl border bg-card px-5 py-2.5 text-sm font-semibold text-foreground shadow-card hover:shadow-card-hover"
           >

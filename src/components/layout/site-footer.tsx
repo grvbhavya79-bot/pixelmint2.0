@@ -81,6 +81,7 @@ export function SiteFooter() {
               {[
                 { href: "/about", label: "About Us" },
                 { href: "/contact", label: "Contact" },
+                { href: "/support", label: "Support Us ❤" },
                 { href: "/blog", label: "Blog" },
                 { href: "/privacy", label: "Privacy Policy" },
                 { href: "/terms", label: "Terms of Service" },
