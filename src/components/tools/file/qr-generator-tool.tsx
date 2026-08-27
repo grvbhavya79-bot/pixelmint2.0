@@ -146,7 +146,7 @@ export default function QrGeneratorTool() {
         </div>
 
         <div className="space-y-3 rounded-xl border bg-card p-4">
-          {mode === "url" && field("url", "Website URL", { placeholder: "https://example.com" })}
+          {mode === "url" && field("url", "Website URL", { placeholder: "https://pixelmint.fun" })}
           {mode === "text" && (
             <div className="space-y-1.5">
               <Label htmlFor="qr-text" className="text-[13px] font-medium">Text content</Label>
@@ -161,7 +161,7 @@ export default function QrGeneratorTool() {
           )}
           {mode === "email" && (
             <>
-              {field("email", "Email address", { type: "email", placeholder: "hello@example.com" })}
+              {field("email", "Email address", { type: "email", placeholder: "hello@pixelmint.fun" })}
               {field("emailSubject", "Subject (optional)")}
               {field("emailBody", "Body (optional)")}
             </>

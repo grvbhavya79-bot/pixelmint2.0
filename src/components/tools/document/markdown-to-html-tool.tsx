@@ -60,7 +60,7 @@ ${html}
             id="md-input"
             value={markdown}
             onChange={(e) => setMarkdown(e.target.value)}
-            placeholder={"# Heading\n\n**Bold** and *italic* text\n\n- List item\n\n[Link](https://example.com)\n\n```js\ncode block\n```"}
+            placeholder={"# Heading\n\n**Bold** and *italic* text\n\n- List item\n\n[Link](https://pixelmint.fun)\n\n```js\ncode block\n```"}
             className="focus-ring min-h-72 w-full resize-y rounded-xl border bg-card p-4 font-mono text-[13px] leading-relaxed placeholder:font-sans placeholder:text-muted-foreground scrollbar-thin"
           />
         </div>

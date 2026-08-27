@@ -77,7 +77,7 @@ export function ContactForm() {
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="cf-email">Email</Label>
-          <Input id="cf-email" type="email" value={form.email} onChange={set("email")} required maxLength={200} placeholder="you@example.com" autoComplete="email" />
+          <Input id="cf-email" type="email" value={form.email} onChange={set("email")} required maxLength={200} placeholder="you@gmail.com" autoComplete="email" />
         </div>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">

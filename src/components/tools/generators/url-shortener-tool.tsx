@@ -67,7 +67,7 @@ export default function UrlShortenerTool() {
             type="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://example.com/a/very/long/link?with=parameters"
+            placeholder="https://pixelmint.fun/a/very/long/link?with=parameters"
           />
         </div>
         <div className="grid gap-3 sm:grid-cols-2">

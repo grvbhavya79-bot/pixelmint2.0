@@ -14,7 +14,7 @@ type Scope = "component" | "uri" | "file";
 export default function UrlCodecTool() {
   const [mode, setMode] = useState<Mode>("encode");
   const [scope, setScope] = useState<Scope>("component");
-  const [input, setInput] = useState("https://example.com/search?q=hello world&lang=en");
+  const [input, setInput] = useState("https://pixelmint.fun/tools?q=merge pdf&sort=newest");
   const [output, setOutput] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -82,7 +82,7 @@ export default function UrlCodecTool() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             spellCheck={false}
-            placeholder="https://example.com/path with spaces?q=hello & world"
+            placeholder="https://pixelmint.fun/path with spaces?q=hello & world"
             className="focus-ring min-h-36 w-full resize-y rounded-xl border bg-card p-4 font-mono text-[13px] leading-relaxed placeholder:font-sans placeholder:text-muted-foreground scrollbar-thin"
           />
         </div>
