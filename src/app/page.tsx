@@ -4,7 +4,6 @@ import {
   Smartphone, Sparkles, Star, Upload, WifiOff, Zap,
 } from "lucide-react";
 import { HeroSearch } from "@/components/layout/hero-search";
-import { SmartDropzone } from "@/components/layout/smart-dropzone";
 import { ToolBrowser } from "@/components/tools/tool-browser";
 import { ToolCard } from "@/components/tools/tool-card";
 import { ToolIcon } from "@/components/tools/tool-icon";
@@ -70,7 +69,7 @@ const WHY = [
 const STEPS = [
   {
     title: "Choose a tool",
-    text: "Search, browse categories or drop a file — however you find it, it takes seconds.",
+    text: "Search or browse categories — with 100+ tools, you are seconds away from the right one.",
   },
   {
     title: "Upload, paste or enter your content",
@@ -148,10 +147,6 @@ export default function HomePage() {
 
           <div className="mt-8 w-full max-w-2xl">
             <HeroSearch />
-          </div>
-
-          <div className="mt-6 w-full max-w-2xl">
-            <SmartDropzone />
           </div>
 
           <ul className="mt-6 flex flex-wrap justify-center gap-2">

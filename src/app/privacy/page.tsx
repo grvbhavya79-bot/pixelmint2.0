@@ -74,7 +74,7 @@ const SECTIONS: { title: string; paragraphs: string[] }[] = [
   {
     title: "Contact",
     paragraphs: [
-      "Questions about privacy? Email grvbhavya79@gmail.com or use the contact form. Owner: Grv Bhavya, Madhubani, Bihar, India — 847226.",
+      "Questions about privacy? Email grvbhavya79@gmail.com or use the contact form. Owner: Gaurav Bhavya, Madhubani, Bihar, India — 847226.",
     ],
   },
 ];

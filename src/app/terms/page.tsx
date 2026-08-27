@@ -11,7 +11,7 @@ const SECTIONS: { title: string; paragraphs: string[] }[] = [
   {
     title: "1. Acceptance of terms",
     paragraphs: [
-      "By accessing or using Pixelmint.fun (the “service”), you agree to these terms. If you do not agree, please do not use the service. The service is owned and operated by Grv Bhavya (“we”, “us”), Madhubani, Bihar, India.",
+      "By accessing or using Pixelmint.fun (the “service”), you agree to these terms. If you do not agree, please do not use the service. The service is owned and operated by Gaurav Bhavya (“we”, “us”), Madhubani, Bihar, India.",
     ],
   },
   {
@@ -63,7 +63,7 @@ const SECTIONS: { title: string; paragraphs: string[] }[] = [
   {
     title: "9. Contact",
     paragraphs: [
-      "Questions about these terms? Contact Grv Bhavya at grvbhavya79@gmail.com, or write to Madhubani, Bihar, India — 847226.",
+      "Questions about these terms? Contact Gaurav Bhavya at grvbhavya79@gmail.com, or write to Madhubani, Bihar, India — 847226.",
     ],
   },
 ];

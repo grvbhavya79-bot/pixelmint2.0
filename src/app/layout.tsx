@@ -40,8 +40,8 @@ export const metadata: Metadata = {
     "AI tools",
     "Pixelmint",
   ],
-  authors: [{ name: "Grv Bhavya" }],
-  creator: "Grv Bhavya",
+  authors: [{ name: "Gaurav Bhavya" }],
+  creator: "Gaurav Bhavya",
   applicationName: "Pixelmint.fun",
   manifest: "/manifest.webmanifest",
   icons: {
@@ -91,7 +91,7 @@ const jsonLd = {
       slogan: "Every tool. One smart place.",
       description:
         "Pixelmint.fun offers 100+ free online tools for PDFs, images, files, text, productivity, developers and more.",
-      founder: { "@type": "Person", name: "Grv Bhavya" },
+      founder: { "@type": "Person", name: "Gaurav Bhavya" },
       email: "Grvbhavya79@gmail.com",
       address: {
         "@type": "PostalAddress",

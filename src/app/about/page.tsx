@@ -100,7 +100,7 @@ export default function AboutPage() {
       <section className="mt-12 space-y-4 text-sm leading-relaxed text-muted-foreground sm:text-base">
         <h2 className="font-display text-xl font-bold tracking-tight text-foreground">Our story</h2>
         <p>
-          Pixelmint.fun was created by <span className="font-semibold text-foreground">Grv Bhavya</span> from Madhubani,
+          Pixelmint.fun was created by <span className="font-semibold text-foreground">Gaurav Bhavya</span> from Madhubani,
           Bihar, India. The idea came from a simple frustration: everyday digital tasks — merging a few PDFs, resizing
           an image, formatting some JSON — always meant hopping between a dozen different websites, each with its own
           ads, sign-up walls and upload queues.
@@ -124,7 +124,7 @@ export default function AboutPage() {
             <Globe size={15} className="text-primary" aria-hidden="true" /> The maker
           </h2>
           <dl className="mt-3 space-y-2 text-sm">
-            <div className="flex gap-2"><dt className="text-muted-foreground">Owner:</dt><dd className="font-medium text-foreground">Grv Bhavya</dd></div>
+            <div className="flex gap-2"><dt className="text-muted-foreground">Owner:</dt><dd className="font-medium text-foreground">Gaurav Bhavya</dd></div>
             <div className="flex gap-2"><dt className="text-muted-foreground">Location:</dt><dd className="font-medium text-foreground">Madhubani, Bihar, India</dd></div>
             <div className="flex gap-2"><dt className="text-muted-foreground">Email:</dt><dd><a className="font-medium text-primary hover:underline" href="mailto:Grvbhavya79@gmail.com">Grvbhavya79@gmail.com</a></dd></div>
           </dl>

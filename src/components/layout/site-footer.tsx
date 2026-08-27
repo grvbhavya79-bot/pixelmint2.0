@@ -31,13 +31,13 @@ export function SiteFooter() {
             </p>
             <a
               href="mailto:Grvbhavya79@gmail.com"
-              className="focus-ring mt-3 inline-flex items-center gap-1.5 rounded-lg text-sm font-medium text-primary transition-colors hover:underline"
+              className="focus-ring mt-3 flex w-fit items-center gap-1.5 rounded-lg text-sm font-medium text-primary transition-colors hover:underline"
             >
               Grvbhavya79@gmail.com
             </a>
             <Link
               href="/tools"
-              className="focus-ring mt-5 inline-flex rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-mint transition-all hover:bg-primary/90"
+              className="focus-ring mt-6 flex w-fit rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-mint transition-all hover:bg-primary/90"
             >
               Explore all tools →
             </Link>
@@ -99,7 +99,7 @@ export function SiteFooter() {
         <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t pt-6 sm:flex-row sm:items-center">
           <p className="text-xs text-muted-foreground">© 2026 Pixelmint.fun. All rights reserved.</p>
           <p className="text-xs text-muted-foreground">
-            Independent platform by Grv Bhavya · Files are processed in your browser whenever possible.
+            Independent platform by Gaurav Bhavya · Files are processed in your browser whenever possible.
           </p>
         </div>
       </div>
