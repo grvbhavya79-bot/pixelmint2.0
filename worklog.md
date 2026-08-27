@@ -119,3 +119,21 @@ Stage Summary:
 - Owner email Grvbhavya79@gmail.com live in 5 locations (contact, about, footer, cookies, JSON-LD).
 - Google Map of Madhubani, Bihar 847226 embedded on contact page under CSP.
 - Gates: ESLint clean on changed files, bun test 83/83, tsc --noEmit clean; routes 200.
+
+---
+Task ID: 6
+Agent: Super Z (main agent)
+Task: Add About Us & Contact to visible header nav; fix slow page loads.
+
+Work Log:
+- Header: promoted About + Contact into PRIMARY_NAV with short labels ("About", "Contact") — now 7 primary links + "More" dropdown; dropdown now holds only the 4 remaining categories (File Converters, Text Tools, Developer, Productivity). Mobile Browse group extended with About Us + Contact. Fixed double-semicolon typo.
+- Diagnosed slowness root cause: server ran `next dev` — every route compiled on first visit (5-10s) with unminified payloads; tool code-splitting was already correct (all 103 tools lazy() in registry-components.tsx), so architecture wasn't the issue.
+- Killed dev server (freed 2.7GB), ran production build: compiled in 34.4s, 144 pages pre-rendered (103 tool pages SSG + categories + static).
+- Started production server (`next start -p 3000`, setsid detached) on :3000.
+- Measured: dev warm 0.3-1.0s / cold 5-10s per route → production 3-13ms per route (100x faster). Memory now 652MB used (was 2.7GB), no OOM risk.
+- Verified in production: all routes 200 (/, tools, categories, blog post, admin, sitemap, robots, manifest, sw.js); APIs live (shortener creates links, currency fetches rates); browser check — header shows All Tools/PDF/Image/AI/Blog/About/Contact/More, VLM rates it "clean and uncluttered, good spacing"; Contact nav works (797ms DOM ready incl. resources); EMI calculator computes ₹12,667.58; mobile menu has About Us/Contact; zero console errors; no overflow at 375px.
+
+Stage Summary:
+- About + Contact now always visible in header (desktop + mobile), More dropdown holds categories only.
+- Site switched from dev mode to production build: 144 static pages, 100x faster page loads (ms-level), 4x lower memory.
+- Gates: ESLint clean, bun test 83/83 pass, tsc clean (pre-build), routes/APIs verified.

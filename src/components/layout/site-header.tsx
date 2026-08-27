@@ -8,7 +8,6 @@ import {
   ChevronDown,
   Code2,
   FolderOutput,
-  Mail,
   Menu,
   Monitor,
   Moon,
@@ -17,7 +16,6 @@ import {
   Star,
   Sun,
   Type,
-  UserRound,
   X,
 } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
@@ -37,6 +35,8 @@ const PRIMARY_NAV = [
   { href: "/categories/image-tools", label: "Image" },
   { href: "/categories/ai-tools", label: "AI" },
   { href: "/blog", label: "Blog" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
 
 /** Secondary nav — grouped inside the "More" dropdown. */
@@ -65,18 +65,6 @@ const MORE_NAV = [
     description: "Generators & everyday utilities",
     icon: Sparkles,
   },
-  {
-    href: "/about",
-    label: "About Us",
-    description: "The story behind Pixelmint",
-    icon: UserRound,
-  },
-  {
-    href: "/contact",
-    label: "Contact",
-    description: "Support, feedback & requests",
-    icon: Mail,
-  },
 ];
 
 const MOBILE_GROUPS = [
@@ -87,6 +75,8 @@ const MOBILE_GROUPS = [
       { href: "/popular", label: "Popular Tools" },
       { href: "/favorites", label: "Favorites" },
       { href: "/blog", label: "Blog" },
+      { href: "/about", label: "About Us" },
+      { href: "/contact", label: "Contact" },
     ],
   },
   {
@@ -99,13 +89,6 @@ const MOBILE_GROUPS = [
       { href: "/categories/document-tools", label: "Text Tools" },
       { href: "/categories/developer-tools", label: "Developer" },
       { href: "/categories/generators-and-utilities", label: "Productivity" },
-    ],
-  },
-  {
-    title: "Company",
-    items: [
-      { href: "/about", label: "About Us" },
-      { href: "/contact", label: "Contact" },
     ],
   },
 ];
