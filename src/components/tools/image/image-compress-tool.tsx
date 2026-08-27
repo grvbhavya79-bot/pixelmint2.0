@@ -105,11 +105,11 @@ export default function ImageCompressTool() {
           {error && <ErrorPanel message={error} onDismiss={() => setError(null)} />}
           {files.length > 0 && (
             <>
-              <ul className="space-y-2">
+              <div className="space-y-2">
                 {files.map((f) => (
                   <FileListRow key={f.id} item={f} onRemove={() => removeFile(f.id)} />
                 ))}
-              </ul>
+              </div>
               <div className="grid gap-4 rounded-xl border bg-card p-4 sm:grid-cols-2">
                 <OptionSelect label="Quality" value={quality} onValueChange={setQuality} options={QUALITY_PRESETS} id="ic-quality" />
                 <OptionSelect

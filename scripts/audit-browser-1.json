@@ -1,0 +1,147 @@
+[
+  {
+    "tool": "Merge PDF",
+    "status": "FAIL",
+    "detail": "page.waitForSelector: Timeout 90000ms exceeded.\nCall log:\n  - waiting for locator('text=Your file is ready') to be visible\n"
+  },
+  {
+    "tool": "Split PDF",
+    "status": "FAIL",
+    "detail": "page.waitForSelector: Timeout 90000ms exceeded.\nCall log:\n  - waiting for locator('text=Your file is ready') to be visible\n"
+  },
+  {
+    "tool": "Compress PDF",
+    "status": "FAIL",
+    "detail": "page.waitForSelector: Timeout 90000ms exceeded.\nCall log:\n  - waiting for locator('text=Your file is ready') to be visible\n"
+  },
+  {
+    "tool": "PDF to JPG",
+    "status": "FAIL",
+    "detail": "page.waitForSelector: Timeout 90000ms exceeded.\nCall log:\n  - waiting for locator('text=Your file is ready') to be visible\n"
+  },
+  {
+    "tool": "JPG to PDF",
+    "status": "FAIL",
+    "detail": "page.waitForSelector: Timeout 90000ms exceeded.\nCall log:\n  - waiting for locator('text=Your file is ready') to be visible\n"
+  },
+  {
+    "tool": "PDF to Word",
+    "status": "FAIL",
+    "detail": "page.waitForSelector: Timeout 90000ms exceeded.\nCall log:\n  - waiting for locator('text=Your file is ready') to be visible\n"
+  },
+  {
+    "tool": "Word to PDF",
+    "status": "FAIL",
+    "detail": "locator.waitFor: Target page, context or browser has been closed\nCall log:\n  - waiting for getByRole('button', { name: /convert/i }).first() to be visible\n"
+  },
+  {
+    "tool": "Excel to PDF",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Protocol error (Target.createTarget): Not supported"
+  },
+  {
+    "tool": "PowerPoint to PDF",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed\nBrowser logs:\n\n<launching> /home/z/.cache/ms-playwright/chromium_headless_shell-1234/chr"
+  },
+  {
+    "tool": "Rotate PDF",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "Protect PDF",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "Unlock PDF",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "PDF Watermark",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "PDF Page Numbers",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "Delete PDF Pages",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "Extract PDF Pages",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "Image Compressor",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "Image Resizer",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "Image Converter",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "Background Remover",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "Image Cropper",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "Image Grayscale",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "Image Metadata Remover",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "ZIP Creator",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "ZIP Extractor",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "QR Code Generator",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "QR Code Reader",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "Invalid-file rejection",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  },
+  {
+    "tool": "Corrupt-file handling",
+    "status": "FAIL",
+    "detail": "browserContext.newPage: Target page, context or browser has been closed"
+  }
+]

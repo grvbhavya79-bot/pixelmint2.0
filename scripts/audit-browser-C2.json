@@ -1,0 +1,167 @@
+[
+  {
+    "tool": "JSON Formatter",
+    "status": "PASS",
+    "detail": "pretty-printed: true (clicked: Format JSON)"
+  },
+  {
+    "tool": "JSON Validator",
+    "status": "PASS",
+    "detail": "valid detected=true, invalid detected=true"
+  },
+  {
+    "tool": "JSON Minifier",
+    "status": "PASS",
+    "detail": "minified: true"
+  },
+  {
+    "tool": "XML Formatter",
+    "status": "PASS",
+    "detail": "formatted: true"
+  },
+  {
+    "tool": "XML Validator",
+    "status": "PASS",
+    "detail": "valid=true, invalid detected=true"
+  },
+  {
+    "tool": "HTML Formatter",
+    "status": "PASS",
+    "detail": "formatted: true"
+  },
+  {
+    "tool": "HTML Minifier",
+    "status": "PASS",
+    "detail": "minified: true"
+  },
+  {
+    "tool": "CSS Formatter",
+    "status": "PASS",
+    "detail": "formatted: true"
+  },
+  {
+    "tool": "CSS Minifier",
+    "status": "PASS",
+    "detail": "minified: true"
+  },
+  {
+    "tool": "JavaScript Formatter",
+    "status": "PASS",
+    "detail": "formatted: true"
+  },
+  {
+    "tool": "JavaScript Minifier",
+    "status": "PASS",
+    "detail": "minified: true (72 chars)"
+  },
+  {
+    "tool": "SQL Formatter",
+    "status": "PASS",
+    "detail": "formatted: true"
+  },
+  {
+    "tool": "SQL Minifier",
+    "status": "PASS",
+    "detail": "minified: true"
+  },
+  {
+    "tool": "Regex Tester",
+    "status": "PASS",
+    "detail": "\\d+ matches found in UI: true"
+  },
+  {
+    "tool": "UUID Generator",
+    "status": "PASS",
+    "detail": "generated: 0918f1ce-225f-4062-9a6f-2af40095fd28"
+  },
+  {
+    "tool": "Password Generator",
+    "status": "PASS",
+    "detail": "password: Genera…, strength meter: true"
+  },
+  {
+    "tool": "Random Number Generator",
+    "status": "PASS",
+    "detail": "number generated: 1"
+  },
+  {
+    "tool": "Lorem Ipsum Generator",
+    "status": "PASS",
+    "detail": "lorem text: true"
+  },
+  {
+    "tool": "Color Picker",
+    "status": "PASS",
+    "detail": "color value shown: true"
+  },
+  {
+    "tool": "Color Converter",
+    "status": "PASS",
+    "detail": "#2563EB converted: true"
+  },
+  {
+    "tool": "Unix Timestamp Converter",
+    "status": "PASS",
+    "detail": "timestamp data shown: true"
+  },
+  {
+    "tool": "URL Encoder / Decoder",
+    "status": "PASS",
+    "detail": "encoded: true"
+  },
+  {
+    "tool": "HTML Entity Encoder / Decoder",
+    "status": "PASS",
+    "detail": "encoded: true"
+  },
+  {
+    "tool": "Percentage Calculator",
+    "status": "PASS",
+    "detail": "15% of 200 = 30 shown: true"
+  },
+  {
+    "tool": "EMI Calculator",
+    "status": "PASS",
+    "detail": "EMI for 10L@8.5%/60m ≈ ₹20,5xx shown: true"
+  },
+  {
+    "tool": "BMI Calculator",
+    "status": "PASS",
+    "detail": "BMI 22.9 shown: true"
+  },
+  {
+    "tool": "Age Calculator",
+    "status": "PASS",
+    "detail": "age UI functional: true"
+  },
+  {
+    "tool": "GST Calculator",
+    "status": "PASS",
+    "detail": "GST on 1000 shown: true"
+  },
+  {
+    "tool": "Discount Calculator",
+    "status": "PASS",
+    "detail": "500−20% = 400 shown: true"
+  },
+  {
+    "tool": "Unit Converter",
+    "status": "PASS",
+    "detail": "conversion UI active: true"
+  },
+  {
+    "tool": "Currency Converter",
+    "status": "PASS",
+    "detail": "live rates: true, timestamp: true"
+  },
+  {
+    "tool": "Time Calculator",
+    "status": "PASS",
+    "detail": "time UI: true"
+  },
+  {
+    "tool": "Date Difference Calculator",
+    "status": "PASS",
+    "detail": "date diff UI: true"
+  }
+]

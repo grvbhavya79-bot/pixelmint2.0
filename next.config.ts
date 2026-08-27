@@ -13,18 +13,35 @@ const nextConfig: NextConfig = {
     // dev server grow unbounded when many routes compile in one session.
     turbopackMemoryLimit: 2048,
   },
-  turbopack: {
-    memoryLimit: 2048,
-  },
   async headers() {
     return [
       {
         source: "/:path*",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-DNS-Prefetch-Control", value: "on" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              // Next.js requires inline bootstrap scripts; tesseract.js loads its
+              // WASM core + language models from the jsdelivr CDN inside a worker
+              "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net",
+              "style-src 'self' 'unsafe-inline'",
+              "img-src 'self' data: blob:",
+              "font-src 'self' data:",
+              "connect-src 'self' blob: data: https://cdn.jsdelivr.net https://api.frankfurter.dev https://open.er-api.com",
+              "worker-src 'self' blob:",
+              "child-src 'self' blob:",
+              "frame-ancestors 'none'",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+            ].join("; "),
+          },
         ],
       },
       {

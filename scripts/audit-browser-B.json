@@ -1,0 +1,142 @@
+[
+  {
+    "tool": "PDF to Excel",
+    "status": "PASS",
+    "detail": "button=\"Convert to XLSX\", valid XLSX=true (6639B)"
+  },
+  {
+    "tool": "Excel to PDF",
+    "status": "PASS",
+    "detail": "button=\"Convert to PDF\", 1 page(s)"
+  },
+  {
+    "tool": "PDF to PowerPoint",
+    "status": "PASS",
+    "detail": "button=\"Convert to PPTX\", valid PPTX=true (113160B)"
+  },
+  {
+    "tool": "PowerPoint to PDF",
+    "status": "PASS",
+    "detail": "button=\"Convert to PDF\", 1 page(s)"
+  },
+  {
+    "tool": "Delete PDF Pages",
+    "status": "PASS",
+    "detail": "button=\"Delete Pages\", 3 pages (expect 3)"
+  },
+  {
+    "tool": "Extract PDF Pages",
+    "status": "PASS",
+    "detail": "button=\"Extract Pages\", 2 pages (expect 2)"
+  },
+  {
+    "tool": "PDF Watermark",
+    "status": "PASS",
+    "detail": "button=\"Add Watermark\", 4 pages"
+  },
+  {
+    "tool": "PDF Page Numbers",
+    "status": "PASS",
+    "detail": "button=\"Add Page Numbers\", 4 pages"
+  },
+  {
+    "tool": "PDF Metadata Editor",
+    "status": "PASS",
+    "detail": "button=\"Save Metadata\", title=\"Audit Title\""
+  },
+  {
+    "tool": "Repair PDF",
+    "status": "PASS",
+    "detail": "button=\"Attempt Repair\", repaired to 4 page(s)"
+  },
+  {
+    "tool": "Sign PDF",
+    "status": "PASS",
+    "detail": "button=\"Sign & Download PDF\", signed 2 page(s), 9271B"
+  },
+  {
+    "tool": "PDF OCR",
+    "status": "PASS",
+    "detail": "button=\"Run OCR\", OCR text 204 chars: \"===== Page 1 =====\n\nToolBox100 Audit Test — Page O\""
+  },
+  {
+    "tool": "Image Compressor",
+    "status": "PASS",
+    "detail": "button=\"Compress 1 Image\", 3517→1654B, 400x300 webp"
+  },
+  {
+    "tool": "Image Resizer",
+    "status": "PASS",
+    "detail": "button=\"Resize 1 Image\", 200x150"
+  },
+  {
+    "tool": "Image Cropper",
+    "status": "PASS",
+    "detail": "button=\"Crop Image\", cropped 240x180"
+  },
+  {
+    "tool": "Image Converter",
+    "status": "PASS",
+    "detail": "button=\"Convert to PNG (1)\", output format=png"
+  },
+  {
+    "tool": "JPG to PNG",
+    "status": "PASS",
+    "detail": "button=\"Convert to PNG (1)\", format=png"
+  },
+  {
+    "tool": "PNG to JPG",
+    "status": "PASS",
+    "detail": "button=\"Convert to JPEG (1)\", format=jpeg"
+  },
+  {
+    "tool": "WEBP to PNG",
+    "status": "PASS",
+    "detail": "button=\"Convert to PNG (1)\", format=png"
+  },
+  {
+    "tool": "Background Remover",
+    "status": "PASS",
+    "detail": "button=download, 77.0% transparent px (300x300)"
+  },
+  {
+    "tool": "Image Blur",
+    "status": "PASS",
+    "detail": "button=\"Apply Blur\", png 8325B"
+  },
+  {
+    "tool": "Image Grayscale",
+    "status": "PASS",
+    "detail": "button=\"Convert to Grayscale\", png 5592B"
+  },
+  {
+    "tool": "Image Metadata Viewer",
+    "status": "PASS",
+    "detail": "metadata shown: true"
+  },
+  {
+    "tool": "Image Metadata Remover",
+    "status": "PASS",
+    "detail": "button=\"Remove Metadata\", clean jpeg 5822B"
+  },
+  {
+    "tool": "Favicon Generator",
+    "status": "WARN",
+    "detail": "button=\"Generate Favicons\", single file 18458B"
+  },
+  {
+    "tool": "PNG to PDF",
+    "status": "PASS",
+    "detail": "button=\"Convert to PDF (1 image)\", 1 page(s)"
+  },
+  {
+    "tool": "Images to PDF",
+    "status": "PASS",
+    "detail": "button=\"Convert to PDF (2 images)\", 2 page(s) (expect 2)"
+  },
+  {
+    "tool": "PDF to PNG",
+    "status": "PASS",
+    "detail": "button=\"Convert to PNG\", valid PNG 72821B"
+  }
+]

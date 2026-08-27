@@ -1,0 +1,77 @@
+[
+  {
+    "tool": "Image Rotator",
+    "status": "PASS",
+    "detail": "button=\"Rotate Image\", 300x400 (expect 300x400)"
+  },
+  {
+    "tool": "Image Flipper",
+    "status": "PASS",
+    "detail": "button=\"Flip Image\", 400x300"
+  },
+  {
+    "tool": "Image Sharpen",
+    "status": "PASS",
+    "detail": "button=\"Apply Sharpen\", png"
+  },
+  {
+    "tool": "Image Filters",
+    "status": "PASS",
+    "detail": "button=\"Apply Filters\", png"
+  },
+  {
+    "tool": "jpg-to-webp",
+    "status": "PASS",
+    "detail": "button=\"Convert to WEBP (1)\", format=webp (expect webp)"
+  },
+  {
+    "tool": "png-to-webp",
+    "status": "PASS",
+    "detail": "button=\"Convert to WEBP (1)\", format=webp (expect webp)"
+  },
+  {
+    "tool": "webp-to-jpg",
+    "status": "PASS",
+    "detail": "button=\"Convert to JPEG (1)\", format=jpeg (expect jpeg)"
+  },
+  {
+    "tool": "Negative: PDF→image tool rejected",
+    "status": "PASS",
+    "detail": "friendly rejection: true"
+  },
+  {
+    "tool": "Negative: corrupt PDF handling",
+    "status": "PASS",
+    "detail": "error panel shown: true"
+  },
+  {
+    "tool": "Negative: empty JSON input",
+    "status": "PASS",
+    "detail": "Format button disabled on empty input: true"
+  },
+  {
+    "tool": "Negative: invalid JSON error",
+    "status": "PASS",
+    "detail": "friendly error: true"
+  },
+  {
+    "tool": "Negative: calculator invalid input",
+    "status": "PASS",
+    "detail": "page survives invalid input: true"
+  },
+  {
+    "tool": "Mobile responsive (375px)",
+    "status": "PASS",
+    "detail": "horizontal overflow: none"
+  },
+  {
+    "tool": "Tablet responsive (768px)",
+    "status": "PASS",
+    "detail": "overflow: none"
+  },
+  {
+    "tool": "Homepage console errors",
+    "status": "PASS",
+    "detail": "clean console"
+  }
+]

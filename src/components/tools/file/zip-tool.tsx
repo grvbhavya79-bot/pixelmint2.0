@@ -130,11 +130,11 @@ export default function ZipTool({ mode = "create" }: { mode?: string }) {
           {error && <ErrorPanel message={error} onDismiss={() => setError(null)} />}
           {files.length > 0 && (
             <>
-              <ul className="space-y-2">
+              <div className="space-y-2">
                 {files.map((f) => (
                   <FileListRow key={f.id} item={f} onRemove={() => removeFile(f.id)} />
                 ))}
-              </ul>
+              </div>
               {isCreate && (
                 <div className="grid gap-4 rounded-xl border bg-card p-4 sm:grid-cols-2">
                   <OptionInput label="Archive name" value={zipName} onValueChange={setZipName} placeholder="archive" id="zip-name" />

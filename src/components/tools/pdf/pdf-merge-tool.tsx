@@ -59,7 +59,7 @@ export default function PdfMergeTool() {
           {error && <ErrorPanel message={error} onDismiss={() => setError(null)} />}
           {files.length > 0 && (
             <>
-              <ul className="space-y-2">
+              <div className="space-y-2">
                 {files.map((f, i) => (
                   <FileListRow
                     key={f.id}
@@ -69,7 +69,7 @@ export default function PdfMergeTool() {
                     onMoveDown={i < files.length - 1 ? () => moveFile(f.id, 1) : undefined}
                   />
                 ))}
-              </ul>
+              </div>
               <Button
                 onClick={() => void run().catch((e) => { setError(friendlyError(e)); toast.error(friendlyError(e)); })}
                 disabled={wf.busy || files.length < 2}

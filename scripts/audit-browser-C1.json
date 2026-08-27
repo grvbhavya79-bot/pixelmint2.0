@@ -1,0 +1,107 @@
+[
+  {
+    "tool": "ZIP Creator",
+    "status": "PASS",
+    "detail": "button=\"Create ZIP (3 files)\", ZIP: test-a.pdf, sample.md, sample.json"
+  },
+  {
+    "tool": "ZIP Extractor",
+    "status": "PASS",
+    "detail": "button=\"Extract Archive\", re-zipped 2 files, content intact=true"
+  },
+  {
+    "tool": "File Compressor",
+    "status": "PASS",
+    "detail": "button=\"Compress 1 File\", ZIP 1 file(s)"
+  },
+  {
+    "tool": "Batch File Renamer",
+    "status": "PASS",
+    "detail": "preview/rename UI active: true"
+  },
+  {
+    "tool": "File Size Checker",
+    "status": "PASS",
+    "detail": "inspected file info: true"
+  },
+  {
+    "tool": "MIME Type Checker",
+    "status": "PASS",
+    "detail": "inspected file info: true"
+  },
+  {
+    "tool": "File Extension Checker",
+    "status": "PASS",
+    "detail": ".pdf info shown: true"
+  },
+  {
+    "tool": "Base64 Encoder",
+    "status": "PASS",
+    "detail": "encoded round-trip: true (\"SGVsbG8gVG9vbEJveDEwMA==\")"
+  },
+  {
+    "tool": "Base64 Decoder",
+    "status": "PASS",
+    "detail": "decoded: \"Audit 42 test\""
+  },
+  {
+    "tool": "QR Code Generator",
+    "status": "PASS",
+    "detail": "QR rendered=true, downloaded=true"
+  },
+  {
+    "tool": "QR Code Reader",
+    "status": "PASS",
+    "detail": "decoded URL found"
+  },
+  {
+    "tool": "Word Counter",
+    "status": "PASS",
+    "detail": "counted 5 words: true"
+  },
+  {
+    "tool": "Character Counter",
+    "status": "PASS",
+    "detail": "counted 5 chars: true"
+  },
+  {
+    "tool": "Case Converter",
+    "status": "PASS",
+    "detail": "uppercase output: true (clicked: UPPERCASE)"
+  },
+  {
+    "tool": "Remove Duplicate Lines",
+    "status": "PASS",
+    "detail": "unique lines: a/b/c"
+  },
+  {
+    "tool": "Sort Lines",
+    "status": "PASS",
+    "detail": "sorted: apple/banana/cherry"
+  },
+  {
+    "tool": "Remove Extra Spaces",
+    "status": "PASS",
+    "detail": "cleaned: \"hello world foo\""
+  },
+  {
+    "tool": "Text to PDF",
+    "status": "PASS",
+    "detail": "button=\"Convert to PDF\", 1 page(s)"
+  },
+  {
+    "tool": "Text to DOCX",
+    "status": "PASS",
+    "detail": "button=\"Create DOCX\", valid DOCX=true"
+  },
+  {
+    "tool": "Markdown to HTML",
+    "status": "PASS",
+    "detail": "HTML output: true (clicked: Convert Markdown to HTML)"
+  },
+  {
+    "tool": "HTML to PDF",
+    "status": "PASS",
+    "detail": "1 page(s), 1114B"
+  }
+]

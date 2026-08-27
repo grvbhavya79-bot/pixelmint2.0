@@ -106,7 +106,7 @@ export default function ImagesToPdfTool({ accept = ["png", "jpeg", "webp", "bmp"
           {error && <ErrorPanel message={error} onDismiss={() => setError(null)} />}
           {files.length > 0 && (
             <>
-              <ul className="space-y-2">
+              <div className="space-y-2">
                 {files.map((f, i) => (
                   <FileListRow
                     key={f.id}
@@ -116,7 +116,7 @@ export default function ImagesToPdfTool({ accept = ["png", "jpeg", "webp", "bmp"
                     onMoveDown={i < files.length - 1 ? () => moveFile(f.id, 1) : undefined}
                   />
                 ))}
-              </ul>
+              </div>
               <div className="grid gap-4 rounded-xl border bg-card p-4 sm:grid-cols-2">
                 <OptionSelect
                   label="Page size"

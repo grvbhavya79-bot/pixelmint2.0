@@ -89,11 +89,11 @@ export default function BatchRenameTool() {
           {error && <ErrorPanel message={error} onDismiss={() => setError(null)} />}
           {files.length > 0 && (
             <>
-              <ul className="space-y-2">
+              <div className="space-y-2">
                 {files.map((f) => (
                   <FileListRow key={f.id} item={f} onRemove={() => removeFile(f.id)} />
                 ))}
-              </ul>
+              </div>
 
               <div className="space-y-4 rounded-xl border bg-card p-4">
                 <OptionInput

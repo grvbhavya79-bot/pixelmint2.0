@@ -1,0 +1,52 @@
+[
+  {
+    "tool": "Merge PDF",
+    "status": "PASS",
+    "detail": "button=\"Merge PDF (2 files)\", merged → 3 pages (expect 3)"
+  },
+  {
+    "tool": "Split PDF",
+    "status": "PASS",
+    "detail": "button=\"Split PDF\", single PDF with 2 page(s)"
+  },
+  {
+    "tool": "Compress PDF",
+    "status": "PASS",
+    "detail": "button=\"Compress PDF\", 4 pages, 47726B"
+  },
+  {
+    "tool": "PDF to JPG",
+    "status": "PASS",
+    "detail": "button=\"Convert to JPG\", single JPG 40774B (valid JPEG magic)"
+  },
+  {
+    "tool": "JPG to PDF",
+    "status": "PASS",
+    "detail": "button=\"Convert to PDF (1 image)\", 1 page(s), 12829B"
+  },
+  {
+    "tool": "PDF to Word",
+    "status": "PASS",
+    "detail": "button=\"Convert to DOCX\", valid DOCX=true, text extracted=true"
+  },
+  {
+    "tool": "Word to PDF",
+    "status": "PASS",
+    "detail": "button=\"Convert to PDF\", 1 page(s)"
+  },
+  {
+    "tool": "Rotate PDF",
+    "status": "PASS",
+    "detail": "button=\"Rotate PDF\", 4 pages"
+  },
+  {
+    "tool": "Protect PDF",
+    "status": "PASS",
+    "detail": "button=\"Protect PDF\", encrypted=true"
+  },
+  {
+    "tool": "Unlock PDF",
+    "status": "PASS",
+    "detail": "button=\"Unlock PDF\", decrypted 4 pages"
+  }
+]

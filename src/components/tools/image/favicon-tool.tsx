@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Copy, Download } from "lucide-react";
+import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FileDropzone } from "@/components/tools/shared/file-dropzone";
 import { ErrorPanel, FileListRow, ProcessingStatus, ResultPanel, friendlyError, useFileQueue, useToolWorkflow } from "@/components/tools/shared/tool-runner";
 import { OptionSlider } from "@/components/tools/shared/option-controls";
 import { ACCEPT } from "@/lib/file-validate";
 import { loadImageFile } from "@/lib/imaging";
-import { copyText, saveZip } from "@/lib/download";
+import { copyText } from "@/lib/download";
 
 /** Build a multi-size .ico file (PNG-embedded ICO entries). */
 function buildIco(sizes: number[], pngs: Record<number, Uint8Array>): Uint8Array {
@@ -55,7 +55,6 @@ export default function FaviconTool() {
   const wf = useToolWorkflow("favicon-generator");
   const [padding, setPadding] = useState(4);
   const [bg, setBg] = useState("transparent");
-  const [zipEntries, setZipEntries] = useState<{ name: string; blob: Blob }[] | null>(null);
   const [previews, setPreviews] = useState<Record<number, string>>({});
 
   const run = async () => {
@@ -97,24 +96,23 @@ export default function FaviconTool() {
       const icoBlob = new Blob([ico as unknown as BlobPart], { type: "image/x-icon" });
 
       setPreviews(urls);
-      setZipEntries([
-        { name: "favicon.ico", blob: icoBlob },
-        ...sizes.map((s) => ({
-          name:
-            s === 180
-              ? "apple-touch-icon.png"
-              : s === 192
-                ? "android-chrome-192x192.png"
-                : `favicon-${s}x${s}.png`,
-          blob: blobs[s],
-        })),
-      ]);
+
+      const pngOutputs = sizes.map((s) => ({
+        name:
+          s === 180
+            ? "apple-touch-icon.png"
+            : s === 192
+              ? "android-chrome-192x192.png"
+              : `favicon-${s}x${s}.png`,
+        blob: blobs[s],
+      }));
 
       return {
-        filename: "favicon.ico",
-        blob: icoBlob,
-        originalSize: files[0].file.size,
-        extra: (
+        result: {
+          filename: "favicon.ico",
+          blob: icoBlob,
+          originalSize: files[0].file.size,
+          extra: (
           <div className="mt-4 space-y-3">
             <p className="text-xs font-semibold text-foreground">Generated icon set</p>
             <div className="flex flex-wrap gap-3">
@@ -135,12 +133,10 @@ export default function FaviconTool() {
               </div>
               <pre className="mt-2 overflow-x-auto scrollbar-thin text-[11px] leading-relaxed text-muted-foreground">{FAVICON_HTML}</pre>
             </div>
-            {zipEntries !== null ? null : null}
-            <Button variant="outline" size="sm" onClick={() => zipEntries && void saveZip(zipEntries, "favicon-pack.zip")}>
-              <Download size={13} className="mr-1" /> Download all as ZIP
-            </Button>
           </div>
         ),
+        },
+        additional: pngOutputs,
       };
     });
   };
@@ -148,7 +144,6 @@ export default function FaviconTool() {
   const reset = () => {
     clear();
     wf.reset();
-    setZipEntries(null);
     setPreviews({});
   };
 
@@ -182,7 +177,7 @@ export default function FaviconTool() {
       )}
       <ProcessingStatus status={wf.status} stepLabel="Generating icon set…" />
       {wf.error && !wf.result && <ErrorPanel message={wf.error} onDismiss={() => wf.setError(null)} />}
-      {wf.result && wf.status === "done" && <ResultPanel result={wf.result} onReset={reset} />}
+      {wf.result && wf.status === "done" && <ResultPanel result={wf.result} additionalResults={wf.additional} onReset={reset} />}
     </div>
   );
 }

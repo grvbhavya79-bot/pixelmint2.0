@@ -131,7 +131,7 @@ export default function FileInspectorTool({ mode = "size" }: { mode?: string }) 
           {error && <ErrorPanel message={error} onDismiss={() => setError(null)} />}
           {files.length > 0 && (
             <>
-              <ul className="space-y-2">
+              <div className="space-y-2">
                 {files.map((f) => {
                   const sniff = sniffed[f.file.name + f.file.size];
                   const ext = f.file.name.includes(".") ? f.file.name.split(".").pop()!.toLowerCase() : "";
@@ -174,7 +174,7 @@ export default function FileInspectorTool({ mode = "size" }: { mode?: string }) 
                     </li>
                   );
                 })}
-              </ul>
+              </div>
               {mode === "size" && files.length > 1 && (
                 <div className="rounded-xl border bg-card p-4 text-center">
                   <p className="text-sm text-muted-foreground">Total for {files.length} files</p>

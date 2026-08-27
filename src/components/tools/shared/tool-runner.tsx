@@ -95,7 +95,7 @@ export function FileListRow({
   showOrder?: boolean;
 }) {
   return (
-    <li className="flex items-center gap-3 rounded-xl border bg-card px-3 py-2.5">
+    <div className="flex items-center gap-3 rounded-xl border bg-card px-3 py-2.5">
       {item.previewUrl ? (
          
         <img src={item.previewUrl} alt="" className="h-10 w-10 shrink-0 rounded-md object-cover" />
@@ -129,7 +129,7 @@ export function FileListRow({
           <X size={14} />
         </button>
       </div>
-    </li>
+    </div>
   );
 }
 
