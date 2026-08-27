@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — ToolBox100",
+  title: "Privacy Policy — Pixelmint.fun",
   description:
-    "How ToolBox100 handles your data: local file processing, anonymous usage analytics, cookies, third-party APIs and your rights — explained honestly.",
+    "How Pixelmint.fun handles your data: local file processing, anonymous usage analytics, cookies, third-party APIs and your rights — explained honestly.",
   alternates: { canonical: "/privacy" },
 };
 
@@ -11,7 +11,7 @@ const SECTIONS: { title: string; paragraphs: string[] }[] = [
   {
     title: "Overview",
     paragraphs: [
-      "This policy explains, honestly and in plain language, what information ToolBox100 collects and how it is handled. The short version: most of what you do on this site never reaches our servers at all, because the majority of our tools process files locally inside your own browser.",
+      "This policy explains, honestly and in plain language, what information Pixelmint.fun collects and how it is handled. The short version: most of what you do on this site never reaches our servers at all, because the majority of our tools process files locally inside your own browser.",
     ],
   },
   {
@@ -34,7 +34,7 @@ const SECTIONS: { title: string; paragraphs: string[] }[] = [
   {
     title: "Cookies",
     paragraphs: [
-      "ToolBox100 sets no advertising or tracking cookies. The site uses local storage for your theme preference (light/dark/system) and your favorites/recents, and a signed, httpOnly session cookie only if you sign in to the admin dashboard.",
+      "Pixelmint.fun sets no advertising or tracking cookies. The site uses local storage for your theme preference (light/dark/system) and your favorites/recents, and a signed, httpOnly session cookie only if you sign in to the admin dashboard.",
     ],
   },
   {

@@ -4,8 +4,9 @@ import { CATEGORIES } from "@/lib/tools/categories";
 import { TOOL_COMPONENTS } from "@/components/tools/registry-components";
 
 describe("tool registry integrity", () => {
-  test("contains exactly 100 tools", () => {
-    expect(ALL_TOOLS.length).toBe(100);
+  test("contains more than 100 tools", () => {
+    expect(ALL_TOOLS.length).toBeGreaterThanOrEqual(100);
+    expect(ALL_TOOLS.length).toBe(103);
   });
 
   test("has unique slugs", () => {
@@ -22,6 +23,7 @@ describe("tool registry integrity", () => {
       developer: 15,
       generators: 10,
       calculators: 10,
+      ai: 3,
     };
     for (const [id, expected] of Object.entries(counts)) {
       const actual = ALL_TOOLS.filter((t) => t.category === id).length;
@@ -84,7 +86,7 @@ describe("tool registry integrity", () => {
   });
 
   test("categories match registry counts", () => {
-    expect(CATEGORIES.length).toBe(7);
+    expect(CATEGORIES.length).toBe(8);
     expect(CATEGORIES.map((c) => c.slug)).toEqual([
       "pdf-tools",
       "image-tools",
@@ -93,6 +95,17 @@ describe("tool registry integrity", () => {
       "developer-tools",
       "generators-and-utilities",
       "calculators",
+      "ai-tools",
     ]);
+  });
+
+  test("AI tools resolve to the shared AI component and server processing", () => {
+    const aiTools = ALL_TOOLS.filter((t) => t.category === "ai");
+    expect(aiTools.length).toBe(3);
+    for (const tool of aiTools) {
+      expect(tool.component).toBe("AiTool");
+      expect(tool.process).toBe("server");
+      expect(tool.props?.task).toMatch(/^(summarize|improve|ideas)$/);
+    }
   });
 });

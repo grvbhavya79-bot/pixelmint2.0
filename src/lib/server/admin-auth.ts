@@ -8,7 +8,7 @@ import { createHmac, timingSafeEqual, randomBytes } from "crypto";
 export const ADMIN_COOKIE = "tb100_admin";
 
 function secret(): string {
-  return process.env.ADMIN_SECRET || process.env.ADMIN_PASSWORD || "toolbox100-dev-secret";
+  return process.env.ADMIN_SECRET || process.env.ADMIN_PASSWORD || "pixelmint-dev-secret";
 }
 
 function expectedPassword(): string {

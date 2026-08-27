@@ -61,7 +61,7 @@ export default function ImagesToPdfTool({ accept = ["png", "jpeg", "webp", "bmp"
     await wf.run(async () => {
       // Convert every input to PNG (canvas handles all decode), embed as PNG
       const doc = await PDFDocument.create();
-      doc.setProducer("ToolBox100");
+      doc.setProducer("Pixelmint.fun");
 
       for (const item of files) {
         const image = await loadImageFile(item.file);

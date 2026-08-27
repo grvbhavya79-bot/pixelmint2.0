@@ -7,15 +7,20 @@ import { useTheme } from "next-themes";
 import { Menu, Monitor, Moon, Search, Star, Sun, X } from "lucide-react";
 import { Logo } from "@/components/layout/logo";
 import { SearchDialog } from "@/components/layout/search-dialog";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { href: "/tools", label: "Tools" },
-  { href: "/categories", label: "Categories" },
-  { href: "/popular", label: "Popular" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
+  { href: "/tools", label: "All Tools" },
+  { href: "/categories/pdf-tools", label: "PDF Tools" },
+  { href: "/categories/image-tools", label: "Image Tools" },
+  { href: "/categories/ai-tools", label: "AI Tools" },
+  { href: "/blog", label: "Blog", hideBelow: "lg" },
+  { href: "/categories/file-tools", label: "File Converters", hideBelow: "xl" },
+  { href: "/categories/developer-tools", label: "Developer", hideBelow: "xl" },
+  { href: "/categories/document-tools", label: "Text Tools", hideBelow: "2xl" },
+  { href: "/categories/generators-and-utilities", label: "Productivity", hideBelow: "2xl" },
+  { href: "/about", label: "About Us", hideBelow: "2xl" },
+  { href: "/contact", label: "Contact", hideBelow: "2xl" },
 ];
 
 function ThemeToggle() {
@@ -79,20 +84,30 @@ export function SiteHeader() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-lg supports-[backdrop-filter]:bg-background/70">
-      <div className="container-page flex h-16 items-center gap-4">
-        <Link href="/" className="focus-ring rounded-lg" aria-label="ToolBox100 home">
-          <Logo size={32} />
+    <header className="sticky top-0 z-50 w-full border-b bg-background/85 backdrop-blur-lg supports-[backdrop-filter]:bg-background/75">
+      <div className="container-page flex h-16 items-center gap-3 lg:gap-4">
+        <Link href="/" className="focus-ring rounded-lg" aria-label="Pixelmint.fun home">
+          <Logo size={34} />
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
+        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main navigation">
           {NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "focus-ring rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                "focus-ring rounded-lg px-2.5 py-2 text-[13px] font-medium transition-colors",
+                item.hideBelow === "2xl" && "hidden 2xl:inline-block",
+                item.hideBelow === "xl" && "hidden xl:inline-block",
+                item.hideBelow === "lg" && "hidden lg:inline-block",
                 pathname.startsWith(item.href) && item.href !== "/"
                   ? "bg-secondary text-secondary-foreground"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -108,11 +123,20 @@ export function SiteHeader() {
             type="button"
             onClick={() => setSearchOpen(true)}
             aria-label="Search tools"
-            className="focus-ring group flex h-9 items-center gap-2 rounded-lg border bg-card px-3 text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+            className="focus-ring group hidden h-9 items-center gap-2 rounded-full border bg-card px-3.5 text-muted-foreground transition-all hover:border-primary/50 hover:shadow-mint sm:flex md:w-48 xl:w-56"
           >
-            <Search size={15} />
-            <span className="hidden text-sm md:inline">Search tools…</span>
-            <kbd className="hidden rounded border bg-muted px-1.5 font-mono text-[10px] text-muted-foreground md:inline">Ctrl K</kbd>
+            <Search size={15} className="shrink-0 text-primary" />
+            <span className="hidden truncate text-sm md:inline">What do you want to do today?</span>
+            <kbd className="ml-auto hidden rounded border bg-muted px-1.5 font-mono text-[10px] text-muted-foreground lg:inline">Ctrl K</kbd>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            aria-label="Search tools"
+            className="focus-ring flex h-9 w-9 items-center justify-center rounded-lg border bg-card text-muted-foreground transition-colors hover:text-foreground sm:hidden"
+          >
+            <Search size={16} />
           </button>
 
           <Link
@@ -125,19 +149,12 @@ export function SiteHeader() {
 
           <ThemeToggle />
 
-          <Button
-            asChild
-            size="sm"
-            className="hidden bg-primary text-primary-foreground hover:bg-primary/90 lg:inline-flex"
-          >
-            <Link href="/tools">Explore Tools</Link>
-          </Button>
-
           <button
             type="button"
             onClick={() => setMobileOpen((v) => !v)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
+            aria-controls="mobile-nav"
             className="focus-ring flex h-9 w-9 items-center justify-center rounded-lg border bg-card text-muted-foreground lg:hidden"
           >
             {mobileOpen ? <X size={17} /> : <Menu size={17} />}
@@ -146,9 +163,13 @@ export function SiteHeader() {
       </div>
 
       {mobileOpen && (
-        <nav aria-label="Mobile navigation" className="border-t bg-background lg:hidden">
-          <div className="container-page flex flex-col gap-1 py-3">
-            {[...NAV, { href: "/favorites", label: "Favorites" }].map((item) => (
+        <nav
+          id="mobile-nav"
+          aria-label="Mobile navigation"
+          className="border-t bg-background lg:hidden"
+        >
+          <div className="container-page flex max-h-[calc(100dvh-4rem)] flex-col gap-1 overflow-y-auto py-3">
+            {NAV.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -157,6 +178,18 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
+            <Link
+              href="/favorites"
+              className="focus-ring rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+            >
+              Favorites
+            </Link>
+            <Link
+              href="/popular"
+              className="focus-ring rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+            >
+              Popular Tools
+            </Link>
           </div>
         </nav>
       )}

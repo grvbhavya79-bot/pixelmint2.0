@@ -31,7 +31,7 @@ export function HeroSearch() {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search tools… (e.g. compress, jpg, merge)"
+            placeholder="What do you want to do today? (e.g. compress, jpg, merge)"
             className="h-13 w-full bg-transparent px-3.5 py-4 text-sm outline-none placeholder:text-muted-foreground sm:text-base"
             autoComplete="off"
           />

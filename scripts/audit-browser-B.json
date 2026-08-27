@@ -2,7 +2,7 @@
   {
     "tool": "PDF to Excel",
     "status": "PASS",
-    "detail": "button=\"Convert to XLSX\", valid XLSX=true (6639B)"
+    "detail": "button=\"Convert to XLSX\", valid XLSX=true (6641B)"
   },
   {
     "tool": "Excel to PDF",
@@ -12,7 +12,7 @@
   {
     "tool": "PDF to PowerPoint",
     "status": "PASS",
-    "detail": "button=\"Convert to PPTX\", valid PPTX=true (113160B)"
+    "detail": "button=\"Convert to PPTX\", valid PPTX=true (113166B)"
   },
   {
     "tool": "PowerPoint to PDF",

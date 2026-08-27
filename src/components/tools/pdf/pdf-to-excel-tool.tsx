@@ -38,7 +38,7 @@ export default function PdfToExcelTool() {
       const base = stripExtension(files[0].file.name);
 
       const workbook = new ExcelJS.Workbook();
-      workbook.creator = "ToolBox100";
+      workbook.creator = "Pixelmint.fun";
       const sheet = workbook.addWorksheet("Extracted");
 
       let totalRows = 0;

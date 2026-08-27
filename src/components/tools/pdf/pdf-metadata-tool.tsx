@@ -56,7 +56,7 @@ export default function PdfMetadataTool() {
         doc.setAuthor(meta.author);
         doc.setSubject(meta.subject);
         doc.setKeywords(meta.keywords.split(/[,;]\s*/).filter(Boolean));
-        doc.setCreator(meta.creator || "ToolBox100");
+        doc.setCreator(meta.creator || "Pixelmint.fun");
       }
       if (dates.created) doc.setCreationDate(dates.created);
       if (dates.modified) doc.setModificationDate(new Date());

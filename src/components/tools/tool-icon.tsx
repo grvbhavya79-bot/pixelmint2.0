@@ -13,6 +13,7 @@ import {
   Sheet, ShieldCheck, Shrink, SlidersHorizontal, SquarePen, Table, Tag, TextCursorInput, Timer,
   Type, Unlock, Wand2, WholeWord, Wrench, Zap, RotateCw, RotateCcw, Type as TypeIcon,
   Layers3, Wrench as WrenchIcon, FolderOutput, FileJson, Boxes,
+  Sparkles, Lightbulb, Bot,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -28,7 +29,7 @@ const ICONS: Record<string, LucideIcon> = {
   Package, Paintbrush, Palette, PenLine, Percent, Pipette, Presentation, QrCode, Receipt, Regex,
   RemoveFormatting, Ruler, Scaling, ScanLine, Scissors, Sheet, ShieldCheck, Shrink, SlidersHorizontal,
   SquarePen, Table, Tag, TextCursorInput, Timer, Type, Unlock, Wand2, WholeWord, Wrench, Zap,
-  RotateCw, RotateCcw, Layers3, FolderOutput, FileJson, Boxes,
+  RotateCw, RotateCcw, Layers3, FolderOutput, FileJson, Boxes, Sparkles, Lightbulb, Bot,
 };
 
 export function ToolIcon({

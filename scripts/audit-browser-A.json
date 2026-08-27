@@ -12,7 +12,7 @@
   {
     "tool": "Compress PDF",
     "status": "PASS",
-    "detail": "button=\"Compress PDF\", 4 pages, 47726B"
+    "detail": "button=\"Compress PDF\", 4 pages, 47732B"
   },
   {
     "tool": "PDF to JPG",
@@ -22,7 +22,7 @@
   {
     "tool": "JPG to PDF",
     "status": "PASS",
-    "detail": "button=\"Convert to PDF (1 image)\", 1 page(s), 12829B"
+    "detail": "button=\"Convert to PDF (1 image)\", 1 page(s), 12835B"
   },
   {
     "tool": "PDF to Word",

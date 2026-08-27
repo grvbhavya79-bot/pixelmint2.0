@@ -6,7 +6,7 @@ import { getPopularTools } from "@/lib/tools/registry";
 export const metadata: Metadata = {
   title: "Popular Tools — Most Used Free Online Utilities",
   description:
-    "The most popular ToolBox100 utilities: merge and compress PDFs, resize images, format JSON, generate passwords and more — all free.",
+    "The most popular Pixelmint.fun utilities: merge and compress PDFs, resize images, format JSON, generate passwords and more — all free.",
   alternates: { canonical: "/popular" },
 };
 

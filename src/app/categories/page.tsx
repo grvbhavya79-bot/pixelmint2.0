@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 export const metadata: Metadata = {
   title: "Tool Categories — PDF, Image, Document, Developer & More",
   description:
-    "Explore ToolBox100's seven tool categories: PDF tools, image tools, document & text tools, file tools, developer tools, generators and calculators.",
+    "Explore Pixelmint.fun's tool categories: PDF tools, image tools, document & text tools, file tools, developer tools, AI tools, generators and calculators.",
   alternates: { canonical: "/categories" },
 };
 
@@ -19,7 +19,7 @@ export default function CategoriesPage() {
       <header className="mb-8 text-center">
         <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">Categories</h1>
         <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
-          Seven focused collections that make up the full {ALL_TOOLS.length}-tool workspace.
+          {CATEGORIES.length} focused collections that make up the full {ALL_TOOLS.length}-tool workspace.
         </p>
       </header>
 

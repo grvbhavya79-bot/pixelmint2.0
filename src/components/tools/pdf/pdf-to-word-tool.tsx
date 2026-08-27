@@ -46,7 +46,7 @@ export default function PdfToWordTool() {
       await doc.destroy();
 
       const docx = new Document({
-        creator: "ToolBox100",
+        creator: "Pixelmint.fun",
         title: base,
         sections: [{ children }],
       });

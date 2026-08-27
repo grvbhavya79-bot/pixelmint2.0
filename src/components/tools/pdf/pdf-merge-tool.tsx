@@ -23,7 +23,7 @@ export default function PdfMergeTool() {
     }
     await wf.run(async () => {
       const merged = await PDFDocument.create();
-      merged.setProducer("ToolBox100");
+      merged.setProducer("Pixelmint.fun");
       for (const item of files) {
         const src = await loadPdfLib(await item.file.arrayBuffer());
         const copied = await merged.copyPages(src, src.getPageIndices());

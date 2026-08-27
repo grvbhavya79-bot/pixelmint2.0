@@ -11,7 +11,26 @@ const nextConfig: NextConfig = {
   experimental: {
     // Gracefully recycle the Turbopack compiler instead of letting the
     // dev server grow unbounded when many routes compile in one session.
-    turbopackMemoryLimit: 2048,
+    // 1536 keeps total process RSS safely under the container's 4GB limit.
+    turbopackMemoryLimit: 1536,
+  },
+  async redirects() {
+    // Category-prefixed tool URL aliases (e.g. /pdf-tools/merge-pdf → /tools/merge-pdf)
+    const categorySlugs = [
+      "pdf-tools",
+      "image-tools",
+      "document-tools",
+      "file-tools",
+      "developer-tools",
+      "generators-and-utilities",
+      "calculators",
+      "ai-tools",
+    ];
+    return categorySlugs.map((slug) => ({
+      source: `/${slug}/:toolSlug`,
+      destination: `/tools/:toolSlug`,
+      permanent: true,
+    }));
   },
   async headers() {
     return [

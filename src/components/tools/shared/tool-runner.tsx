@@ -224,7 +224,7 @@ export function ResultPanel({
   const downloadAll = async () => {
     const entries: ZipEntry[] = [{ name: result.filename, blob: result.blob }];
     for (const extra of additionalResults ?? []) entries.push({ name: extra.name, blob: extra.blob });
-    await saveZip(entries, zipName ?? "toolbox100-files.zip");
+    await saveZip(entries, zipName ?? "pixelmint-files.zip");
   };
 
   return (

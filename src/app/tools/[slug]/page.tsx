@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ChevronRight, CircleCheck } from "lucide-react";
 import { ALL_TOOLS, getTool, getFaqs, getRelatedTools } from "@/lib/tools/registry";
 import { CATEGORY_BY_ID } from "@/lib/tools/categories";
+import { POSTS } from "@/lib/blog/posts";
 import { ToolWorkspace } from "@/components/tools/tool-workspace";
 import { ToolIcon } from "@/components/tools/tool-icon";
 import { ToolCard } from "@/components/tools/tool-card";
@@ -28,14 +29,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const tool = getTool(slug);
   if (!tool) return {};
-  const title = `${tool.name} Online Free — ToolBox100`;
+  const title = `${tool.name} Online Free — Easy & Secure`;
   const description = tool.longDescription
     ? `${tool.longDescription.slice(0, 155).trim()}. Free, no sign-up.`
-    : `${tool.description} Free online tool by ToolBox100 — fast, simple and easy to use.`;
+    : `${tool.description} Free online tool by Pixelmint.fun — fast, simple and easy to use.`;
   return {
     title,
     description,
-    keywords: [tool.name.toLowerCase(), ...tool.tags, "online free tool", "toolbox100"],
+    keywords: [tool.name.toLowerCase(), ...tool.tags, "online free tool", "pixelmint"],
     alternates: { canonical: `/tools/${tool.slug}` },
     openGraph: {
       title,
@@ -64,17 +65,33 @@ export default async function ToolPage({ params }: Props) {
   const faqs = getFaqs(tool);
   const related = getRelatedTools(tool, 4);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  // Blog suggestions: posts that feature this exact tool, else posts matching the tool's keywords
+  const blogPosts = POSTS.filter((p) => p.relatedTools.includes(tool.slug)).slice(0, 2);
+  const fallbackPosts =
+    blogPosts.length === 0
+      ? POSTS.filter((p) => p.tags.some((tag) => tool.tags.some((t) => t.includes(tag) || tag.includes(t)))).slice(0, 2)
+      : [];
 
   const jsonLd = [
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
-      name: `${tool.name} — ToolBox100`,
+      name: `${tool.name} — Pixelmint.fun`,
       applicationCategory: "UtilityApplication",
       operatingSystem: "Any (web browser)",
       url: `${siteUrl}/tools/${tool.slug}`,
       description: tool.description,
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+        { "@type": "ListItem", position: 2, name: "Tools", item: `${siteUrl}/tools` },
+        { "@type": "ListItem", position: 3, name: category.name, item: `${siteUrl}/categories/${category.slug}` },
+        { "@type": "ListItem", position: 4, name: tool.name, item: `${siteUrl}/tools/${tool.slug}` },
+      ],
     },
     {
       "@context": "https://schema.org",
@@ -179,6 +196,27 @@ export default async function ToolPage({ params }: Props) {
           ))}
         </div>
       </section>
+
+      {/* From the blog */}
+      {(blogPosts.length > 0 || fallbackPosts.length > 0) && (
+        <section className="mt-10" aria-labelledby="blog-heading">
+          <h2 id="blog-heading" className="text-lg font-bold text-foreground">From the blog</h2>
+          <p className="mt-1 text-xs text-muted-foreground">Guides and tips that feature this tool.</p>
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {[...blogPosts, ...fallbackPosts].map((post) => (
+              <Link
+                key={post.slug}
+                href={`/blog/${post.slug}`}
+                className="focus-ring card-lift group rounded-xl border bg-card p-4 shadow-card hover:border-primary/30 hover:shadow-card-hover"
+              >
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-primary">{post.category}</p>
+                <p className="mt-1 font-semibold leading-snug text-foreground group-hover:text-primary">{post.title}</p>
+                <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">{post.description}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

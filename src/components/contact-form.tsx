@@ -6,9 +6,26 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const CATEGORIES = [
+  { value: "General question", placeholder: "General question" },
+  { value: "Tool feedback", placeholder: "Tool feedback" },
+  { value: "Bug report", placeholder: "Bug report" },
+  { value: "Partnership", placeholder: "Partnership" },
+  { value: "Privacy request", placeholder: "Privacy request" },
+];
 
 export function ContactForm() {
-  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "", honeypot: "" });
+  const [form, setForm] = useState({
+    name: "", email: "", subject: "", message: "", category: "", honeypot: "",
+  });
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [feedback, setFeedback] = useState<string | null>(null);
 
@@ -31,7 +48,7 @@ export function ContactForm() {
       }
       setStatus("sent");
       setFeedback(data.message ?? "Message sent — we'll reply soon.");
-      setForm({ name: "", email: "", subject: "", message: "", honeypot: "" });
+      setForm({ name: "", email: "", subject: "", message: "", category: "", honeypot: "" });
     } catch (err) {
       setStatus("error");
       setFeedback(err instanceof Error ? err.message : "Something went wrong. Please try again.");
@@ -41,7 +58,7 @@ export function ContactForm() {
   if (status === "sent") {
     return (
       <div className="rounded-2xl border border-success/30 bg-success/5 p-8 text-center" role="status">
-        <CheckCircle2 className="mx-auto text-success" size={36} aria-hidden="true" />
+        <CheckCircle2 className="pm-check-pop mx-auto text-success" size={36} aria-hidden="true" />
         <h3 className="mt-3 text-lg font-semibold text-foreground">Message sent</h3>
         <p className="mt-1.5 text-sm text-muted-foreground">{feedback}</p>
         <Button variant="outline" className="mt-5" onClick={() => setStatus("idle")}>
@@ -63,9 +80,24 @@ export function ContactForm() {
           <Input id="cf-email" type="email" value={form.email} onChange={set("email")} required maxLength={200} placeholder="you@example.com" autoComplete="email" />
         </div>
       </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="cf-subject">Subject</Label>
-        <Input id="cf-subject" value={form.subject} onChange={set("subject")} required minLength={3} maxLength={150} placeholder="What is this about?" />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-1.5">
+          <Label htmlFor="cf-category">Category</Label>
+          <Select value={form.category} onValueChange={(v) => setForm((f) => ({ ...f, category: v }))}>
+            <SelectTrigger id="cf-category" aria-label="Message category">
+              <SelectValue placeholder="Choose a category" />
+            </SelectTrigger>
+            <SelectContent>
+              {CATEGORIES.map((cat) => (
+                <SelectItem key={cat.value} value={cat.value}>{cat.placeholder}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="cf-subject">Subject</Label>
+          <Input id="cf-subject" value={form.subject} onChange={set("subject")} required minLength={3} maxLength={150} placeholder="What is this about?" />
+        </div>
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="cf-message">Message</Label>

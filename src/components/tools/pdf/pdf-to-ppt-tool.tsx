@@ -22,7 +22,7 @@ export default function PdfToPptTool() {
       const base = stripExtension(files[0].file.name);
 
       const pptx = new pptxgen();
-      pptx.author = "ToolBox100";
+      pptx.author = "Pixelmint.fun";
       pptx.title = base;
 
       for (let p = 1; p <= doc.numPages; p++) {

@@ -5,7 +5,8 @@ export type ToolCategoryId =
   | "file"
   | "developer"
   | "generators"
-  | "calculators";
+  | "calculators"
+  | "ai";
 
 export interface ToolFaq {
   q: string;

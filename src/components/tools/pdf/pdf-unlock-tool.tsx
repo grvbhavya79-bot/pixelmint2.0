@@ -36,7 +36,7 @@ export default function PdfUnlockTool() {
       }
       // Rebuild into a fresh unencrypted document
       const out = await PDFDocument.create();
-      out.setProducer("ToolBox100");
+      out.setProducer("Pixelmint.fun");
       const copied = await out.copyPages(src, src.getPageIndices());
       copied.forEach((p) => out.addPage(p));
       const bytes = await out.save({ useObjectStreams: true });

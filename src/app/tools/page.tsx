@@ -3,9 +3,9 @@ import { ToolBrowser } from "@/components/tools/tool-browser";
 import { ALL_TOOLS } from "@/lib/tools/registry";
 
 export const metadata: Metadata = {
-  title: "All Tools — 100 Free Online Utilities",
+  title: "All Tools — 100+ Free Online Utilities",
   description:
-    "Browse all 100 free online tools: PDF, image, document, file, developer, generator and calculator utilities. Fast, private and free — no sign-up.",
+    "Browse all 100+ free online tools: PDF, image, document, file, developer, generator and calculator utilities. Fast, private and free — no sign-up.",
   alternates: { canonical: "/tools" },
 };
 

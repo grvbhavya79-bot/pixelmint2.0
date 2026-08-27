@@ -78,6 +78,17 @@ export const CATEGORIES: CategoryInfo[] = [
     gradient: "from-cyan-500 to-sky-600",
     chip: "bg-cyan-50 text-cyan-700 dark:bg-cyan-950/50 dark:text-cyan-300",
   },
+  {
+    id: "ai",
+    slug: "ai-tools",
+    name: "AI Tools",
+    shortName: "AI",
+    description:
+      "Summarize long text, polish your writing and brainstorm fresh ideas with fast, free AI helpers — 3 smart utilities.",
+    icon: "Sparkles",
+    gradient: "from-emerald-400 to-teal-500",
+    chip: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300",
+  },
 ];
 
 export const CATEGORY_BY_ID: Record<ToolCategoryId, CategoryInfo> = Object.fromEntries(

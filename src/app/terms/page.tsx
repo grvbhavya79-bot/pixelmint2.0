@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — ToolBox100",
+  title: "Terms of Service — Pixelmint.fun",
   description:
-    "The terms for using ToolBox100: acceptable use, your responsibilities, file processing, third-party services, availability and liability.",
+    "The terms for using Pixelmint.fun: acceptable use, your responsibilities, file processing, third-party services, availability and liability.",
   alternates: { canonical: "/terms" },
 };
 
@@ -11,7 +11,7 @@ const SECTIONS: { title: string; paragraphs: string[] }[] = [
   {
     title: "1. Acceptance of terms",
     paragraphs: [
-      "By accessing or using ToolBox100 (the “service”), you agree to these terms. If you do not agree, please do not use the service. The service is owned and operated by Grv Bhavya (“we”, “us”), Madhubani, Bihar, India.",
+      "By accessing or using Pixelmint.fun (the “service”), you agree to these terms. If you do not agree, please do not use the service. The service is owned and operated by Grv Bhavya (“we”, “us”), Madhubani, Bihar, India.",
     ],
   },
   {
@@ -51,7 +51,7 @@ const SECTIONS: { title: string; paragraphs: string[] }[] = [
   {
     title: "7. Limitation of liability",
     paragraphs: [
-      "To the maximum extent permitted by law, ToolBox100 and its owner shall not be liable for any indirect, incidental, special or consequential damages, or for any data loss arising from use of the service. Your exclusive remedy for dissatisfaction with the service is to stop using it.",
+      "To the maximum extent permitted by law, Pixelmint.fun and its owner shall not be liable for any indirect, incidental, special or consequential damages, or for any data loss arising from use of the service. Your exclusive remedy for dissatisfaction with the service is to stop using it.",
     ],
   },
   {

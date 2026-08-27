@@ -39,7 +39,7 @@ export default function TextToDocxTool() {
       });
 
       const doc = new Document({
-        creator: "ToolBox100",
+        creator: "Pixelmint.fun",
         title: title || "Document",
         sections: [{ children }],
       });

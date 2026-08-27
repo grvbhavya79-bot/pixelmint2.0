@@ -20,7 +20,7 @@ interface MatchRow {
 export default function RegexTesterTool() {
   const [pattern, setPattern] = useState("(\\w+)@(\\w+\\.\\w+)");
   const [flags, setFlags] = useState<Set<string>>(new Set(["g"]));
-  const [testText, setTestText] = useState("Contact us at hello@toolbox100.com or support@example.io — we reply within a day.");
+  const [testText, setTestText] = useState("Contact us at hello@pixelmint.fun or support@example.io — we reply within a day.");
 
   const { regex, error } = useMemo(() => {
     if (!pattern) return { regex: null, error: null as string | null };

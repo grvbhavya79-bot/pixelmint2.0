@@ -84,6 +84,9 @@ export const TOOL_COMPONENTS: Record<string, ToolComponent> = {
   HtmlEntityTool: lazy(() => import("@/components/tools/generators/html-entity-tool")),
   UrlShortenerTool: lazy(() => import("@/components/tools/generators/url-shortener-tool")),
 
+  // AI
+  AiTool: lazy(() => import("@/components/tools/generators/ai-tool")),
+
   // Calculators
   PercentageCalc: lazy(() => import("@/components/tools/calculators/percentage-calc")),
   AgeCalc: lazy(() => import("@/components/tools/calculators/age-calc")),

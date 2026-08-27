@@ -50,7 +50,7 @@ export default function PdfCompressTool() {
 
       const src = await loadPdfDocument(buffer.slice(0));
       const out = await PDFDocument.create();
-      out.setProducer("ToolBox100");
+      out.setProducer("Pixelmint.fun");
       for (let p = 1; p <= src.numPages; p++) {
         const { canvas } = await renderPdfPage(src, p, settings.scale);
         const jpegBlob = await canvasToBlob(canvas, "jpeg", settings.quality);

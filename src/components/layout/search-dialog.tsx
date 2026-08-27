@@ -32,7 +32,7 @@ export function SearchDialog({ open, onOpenChange }: { open: boolean; onOpenChan
 
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
-      <CommandInput placeholder="Search tools… (e.g. compress, jpg, merge)" value={query} onValueChange={setQuery} />
+      <CommandInput placeholder="What do you want to do today? (e.g. compress, jpg, merge)" value={query} onValueChange={setQuery} />
       <CommandList className="scrollbar-thin">
         <CommandEmpty>
           {query ? <span>No tools match “{query}”. Try “pdf”, “image”, “json”…</span> : null}

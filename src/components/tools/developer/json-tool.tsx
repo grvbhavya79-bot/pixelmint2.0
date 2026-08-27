@@ -89,7 +89,7 @@ export default function JsonTool({ mode = "format" }: { mode?: string }) {
             value={input}
             onChange={(e) => { setInput(e.target.value); setResult(""); }}
             spellCheck={false}
-            placeholder={'{"name": "ToolBox100", "tools": 100, "free": true}'}
+            placeholder={'{"name": "Pixelmint.fun", "tools": 100, "free": true}'}
             className={`focus-ring min-h-72 w-full resize-y rounded-xl border bg-card p-4 font-mono text-[13px] leading-relaxed placeholder:text-muted-foreground scrollbar-thin ${input.trim() && error ? "border-destructive/60" : ""}`}
           />
           {error && (

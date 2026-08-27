@@ -3,16 +3,19 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { rateLimit, getClientIp, RATE_LIMITS } from "@/lib/server/rate-limit";
 
+const CATEGORIES = ["General question", "Tool feedback", "Bug report", "Partnership", "Privacy request"] as const;
+
 const schema = z.object({
   name: z.string().trim().min(2, "Please enter your name.").max(80),
   email: z.string().trim().email("Please enter a valid email address.").max(200),
   subject: z.string().trim().min(3, "Subject must be at least 3 characters.").max(150),
   message: z.string().trim().min(10, "Message must be at least 10 characters.").max(5000),
+  category: z.enum(CATEGORIES).optional(),
   honeypot: z.string().max(0).optional(), // spam trap: must stay empty
 });
 
 /** Send the notification email through the configured provider (Resend-compatible). */
-async function sendNotificationEmail(fields: { name: string; email: string; subject: string; message: string }): Promise<boolean> {
+async function sendNotificationEmail(fields: { name: string; email: string; subject: string; message: string; category?: string }): Promise<boolean> {
   const apiKey = process.env.EMAIL_API_KEY;
   const from = process.env.EMAIL_FROM;
   const to = process.env.CONTACT_TO_EMAIL || "grvbhavya79@gmail.com";
@@ -29,7 +32,7 @@ async function sendNotificationEmail(fields: { name: string; email: string; subj
         from,
         to,
         reply_to: fields.email,
-        subject: `[ToolBox100 Contact] ${fields.subject}`,
+        subject: `[Pixelmint Contact]${fields.category ? ` [${fields.category}]` : ""} ${fields.subject}`,
         text: `From: ${fields.name} <${fields.email}>\n\n${fields.message}`,
       }),
       signal: AbortSignal.timeout(8000),
@@ -74,7 +77,7 @@ export async function POST(request: Request) {
       data: {
         name: parsed.data.name,
         email: parsed.data.email,
-        subject: parsed.data.subject,
+        subject: parsed.data.category ? `[${parsed.data.category}] ${parsed.data.subject}` : parsed.data.subject,
         message: parsed.data.message,
       },
     });

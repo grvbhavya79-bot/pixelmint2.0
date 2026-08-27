@@ -41,7 +41,7 @@ export default function PdfPagesTool({ mode = "delete" }: { mode?: string }) {
       if (isDelete && selected.length === total) throw new Error("You can't delete every page — keep at least one.");
 
       const out = await PDFDocument.create();
-      out.setProducer("ToolBox100");
+      out.setProducer("Pixelmint.fun");
       const keep = isDelete
         ? Array.from({ length: total }, (_, i) => i + 1).filter((p) => !selected.includes(p))
         : selected;

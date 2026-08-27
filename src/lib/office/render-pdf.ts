@@ -86,8 +86,8 @@ export class PdfLayoutBuilder {
     this.page = this.doc.addPage(this.pageSize);
     this.y = this.pageSize[1] - this.margin;
     if (options.title) this.doc.setTitle(options.title);
-    this.doc.setProducer("ToolBox100");
-    this.doc.setCreator("ToolBox100");
+    this.doc.setProducer("Pixelmint.fun");
+    this.doc.setCreator("Pixelmint.fun");
   }
 
   get contentWidth(): number {

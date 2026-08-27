@@ -5,13 +5,14 @@ import { FILE_TOOLS } from "./data/file";
 import { DEVELOPER_TOOLS } from "./data/developer";
 import { GENERATOR_TOOLS } from "./data/generators";
 import { CALCULATOR_TOOLS } from "./data/calculators";
+import { AI_TOOLS } from "./data/ai";
 import { CATEGORY_BY_ID, CATEGORIES } from "./categories";
 import type { ToolCategoryId, ToolDefinition, ToolFaq } from "./types";
 
 export * from "./types";
 export { CATEGORIES, CATEGORY_BY_ID, CATEGORY_BY_SLUG } from "./categories";
 
-/** All 100 tools, in canonical order. */
+/** All tools, in canonical order. */
 export const ALL_TOOLS: ToolDefinition[] = [
   ...PDF_TOOLS,
   ...IMAGE_TOOLS,
@@ -20,6 +21,7 @@ export const ALL_TOOLS: ToolDefinition[] = [
   ...DEVELOPER_TOOLS,
   ...GENERATOR_TOOLS,
   ...CALCULATOR_TOOLS,
+  ...AI_TOOLS,
 ];
 
 const BY_SLUG = new Map<string, ToolDefinition>(ALL_TOOLS.map((t) => [t.slug, t]));
@@ -115,7 +117,7 @@ export function getFaqs(tool: ToolDefinition): ToolFaq[] {
     },
     {
       q: `Is ${tool.name} free to use?`,
-      a: `Yes. ${tool.name} is one of the 100 tools on ToolBox100 and it is completely free, with no sign-up, no watermarks and no usage quotas on the tool itself.`,
+      a: `Yes. ${tool.name} is one of the 100+ free tools on Pixelmint.fun and it is completely free, with no sign-up, no watermarks and no usage quotas on the tool itself.`,
     },
     {
       q: local
@@ -127,7 +129,7 @@ export function getFaqs(tool: ToolDefinition): ToolFaq[] {
     },
     {
       q: `Can I use ${tool.name} on my phone?`,
-      a: `Yes. ToolBox100 is fully responsive — this ${cat.toLowerCase()} tool works on phones, tablets and desktops, and client-side tools even work without an internet connection once loaded.`,
+      a: `Yes. Pixelmint.fun is fully responsive — this ${cat.toLowerCase()} tool works on phones, tablets and desktops, and client-side tools even work without an internet connection once loaded.`,
     },
   ];
   // Merge custom FAQs first; top up with generated ones so every tool has >= 3.

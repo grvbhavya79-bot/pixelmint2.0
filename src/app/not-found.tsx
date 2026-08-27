@@ -16,7 +16,7 @@ export default function NotFound() {
         href="/tools"
         className="focus-ring mt-6 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-card hover:bg-primary/90"
       >
-        <Search size={15} aria-hidden="true" /> Browse all 100 tools
+        <Search size={15} aria-hidden="true" /> Browse all tools
       </Link>
       <div className="mt-10 grid w-full max-w-3xl grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {suggestions.map((tool) => (
