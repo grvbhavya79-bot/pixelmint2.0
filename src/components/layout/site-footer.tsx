@@ -29,6 +29,12 @@ export function SiteFooter() {
             <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
               {ALL_TOOLS.length}+ free online tools for PDFs, images, files, text, productivity, developers and more — fast, private and easy.
             </p>
+            <a
+              href="mailto:Grvbhavya79@gmail.com"
+              className="focus-ring mt-3 inline-flex items-center gap-1.5 rounded-lg text-sm font-medium text-primary transition-colors hover:underline"
+            >
+              Grvbhavya79@gmail.com
+            </a>
             <Link
               href="/tools"
               className="focus-ring mt-5 inline-flex rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow-mint transition-all hover:bg-primary/90"

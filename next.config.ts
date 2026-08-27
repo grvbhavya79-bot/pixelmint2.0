@@ -55,6 +55,8 @@ const nextConfig: NextConfig = {
               "connect-src 'self' blob: data: https://cdn.jsdelivr.net https://api.frankfurter.dev https://open.er-api.com",
               "worker-src 'self' blob:",
               "child-src 'self' blob:",
+              // Google Maps embeds on the contact page
+              "frame-src 'self' https://www.google.com https://maps.google.com",
               "frame-ancestors 'none'",
               "object-src 'none'",
               "base-uri 'self'",

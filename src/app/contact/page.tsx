@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { Clock3, Cookie, Mail, MapPin, ShieldCheck } from "lucide-react";
+import { Clock3, Cookie, ExternalLink, Mail, MapPin, ShieldCheck } from "lucide-react";
 import { ContactForm } from "@/components/contact-form";
+
+const SUPPORT_EMAIL = "Grvbhavya79@gmail.com";
 
 export const metadata: Metadata = {
   title: "Contact Pixelmint.fun — Support, Feedback & Bug Reports",
@@ -34,9 +36,9 @@ export default function ContactPage() {
             <ul className="mt-3 space-y-3 text-sm">
               <li className="flex items-start gap-2.5">
                 <Mail size={15} className="mt-0.5 shrink-0 text-primary" aria-hidden="true" />
-                <div>
+                <div className="min-w-0">
                   <p className="font-medium text-foreground">Support email</p>
-                  <a href="mailto:hello@pixelmint.fun" className="text-primary hover:underline">hello@pixelmint.fun</a>
+                  <a href={`mailto:${SUPPORT_EMAIL}`} className="break-all text-primary hover:underline">{SUPPORT_EMAIL}</a>
                 </div>
               </li>
               <li className="flex items-start gap-2.5">
@@ -79,6 +81,34 @@ export default function ContactPage() {
           </div>
         </aside>
       </div>
+
+      <section className="mt-6 overflow-hidden rounded-2xl border bg-card shadow-card" aria-label="Our location on the map">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4">
+          <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <MapPin size={15} className="text-primary" aria-hidden="true" />
+            Where to find us
+          </h2>
+          <a
+            href="https://maps.google.com/?q=Madhubani%2C+Bihar+847226%2C+India"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="focus-ring inline-flex items-center gap-1.5 rounded-lg text-xs font-medium text-primary hover:underline"
+          >
+            Open in Google Maps
+            <ExternalLink size={12} aria-hidden="true" />
+          </a>
+        </div>
+        <iframe
+          src="https://maps.google.com/maps?q=Madhubani%2C%20Bihar%20847226%2C%20India&z=13&output=embed"
+          title="Map showing the Pixelmint.fun location in Madhubani, Bihar, India"
+          width="100%"
+          height="340"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          allowFullScreen
+          className="block h-[340px] w-full border-0"
+        />
+      </section>
     </div>
   );
 }

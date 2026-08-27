@@ -32,7 +32,7 @@ const SECTIONS = [
     title: "Managing cookies",
     body: [
       "You can clear local storage and cookies at any time through your browser settings — look for 'Clear browsing data' and include 'Cookies and other site data'. Doing this will reset your favorites and theme preference, but every tool will keep working exactly as before.",
-      "Questions about this policy? Contact us at hello@pixelmint.fun and we will answer plainly.",
+      "Questions about this policy? Contact us at Grvbhavya79@gmail.com and we will answer plainly.",
     ],
   },
 ];

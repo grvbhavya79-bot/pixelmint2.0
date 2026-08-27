@@ -92,7 +92,7 @@ const jsonLd = {
       description:
         "Pixelmint.fun offers 100+ free online tools for PDFs, images, files, text, productivity, developers and more.",
       founder: { "@type": "Person", name: "Grv Bhavya" },
-      email: "hello@pixelmint.fun",
+      email: "Grvbhavya79@gmail.com",
       address: {
         "@type": "PostalAddress",
         addressLocality: "Madhubani",

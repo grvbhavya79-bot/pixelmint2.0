@@ -126,7 +126,7 @@ export default function AboutPage() {
           <dl className="mt-3 space-y-2 text-sm">
             <div className="flex gap-2"><dt className="text-muted-foreground">Owner:</dt><dd className="font-medium text-foreground">Grv Bhavya</dd></div>
             <div className="flex gap-2"><dt className="text-muted-foreground">Location:</dt><dd className="font-medium text-foreground">Madhubani, Bihar, India</dd></div>
-            <div className="flex gap-2"><dt className="text-muted-foreground">Email:</dt><dd><a className="font-medium text-primary hover:underline" href="mailto:hello@pixelmint.fun">hello@pixelmint.fun</a></dd></div>
+            <div className="flex gap-2"><dt className="text-muted-foreground">Email:</dt><dd><a className="font-medium text-primary hover:underline" href="mailto:Grvbhavya79@gmail.com">Grvbhavya79@gmail.com</a></dd></div>
           </dl>
         </div>
         <div className="rounded-2xl border bg-card p-5 shadow-card">

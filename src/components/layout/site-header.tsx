@@ -4,24 +4,115 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { Menu, Monitor, Moon, Search, Star, Sun, X } from "lucide-react";
+import {
+  ChevronDown,
+  Code2,
+  FolderOutput,
+  Mail,
+  Menu,
+  Monitor,
+  Moon,
+  Search,
+  Sparkles,
+  Star,
+  Sun,
+  Type,
+  UserRound,
+  X,
+} from "lucide-react";
 import { Logo } from "@/components/layout/logo";
 import { SearchDialog } from "@/components/layout/search-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-const NAV = [
+/** Primary nav — short labels, always visible on desktop. */
+const PRIMARY_NAV = [
   { href: "/tools", label: "All Tools" },
-  { href: "/categories/pdf-tools", label: "PDF Tools" },
-  { href: "/categories/image-tools", label: "Image Tools" },
-  { href: "/categories/ai-tools", label: "AI Tools" },
-  { href: "/blog", label: "Blog", hideBelow: "lg" },
-  { href: "/categories/file-tools", label: "File Converters", hideBelow: "xl" },
-  { href: "/categories/developer-tools", label: "Developer", hideBelow: "xl" },
-  { href: "/categories/document-tools", label: "Text Tools", hideBelow: "2xl" },
-  { href: "/categories/generators-and-utilities", label: "Productivity", hideBelow: "2xl" },
-  { href: "/about", label: "About Us", hideBelow: "2xl" },
-  { href: "/contact", label: "Contact", hideBelow: "2xl" },
+  { href: "/categories/pdf-tools", label: "PDF" },
+  { href: "/categories/image-tools", label: "Image" },
+  { href: "/categories/ai-tools", label: "AI" },
+  { href: "/blog", label: "Blog" },
 ];
+
+/** Secondary nav — grouped inside the "More" dropdown. */
+const MORE_NAV = [
+  {
+    href: "/categories/file-tools",
+    label: "File Converters",
+    description: "Archive, encode & convert files",
+    icon: FolderOutput,
+  },
+  {
+    href: "/categories/document-tools",
+    label: "Text Tools",
+    description: "Case, count, format & clean text",
+    icon: Type,
+  },
+  {
+    href: "/categories/developer-tools",
+    label: "Developer",
+    description: "Formatters, minifiers & testers",
+    icon: Code2,
+  },
+  {
+    href: "/categories/generators-and-utilities",
+    label: "Productivity",
+    description: "Generators & everyday utilities",
+    icon: Sparkles,
+  },
+  {
+    href: "/about",
+    label: "About Us",
+    description: "The story behind Pixelmint",
+    icon: UserRound,
+  },
+  {
+    href: "/contact",
+    label: "Contact",
+    description: "Support, feedback & requests",
+    icon: Mail,
+  },
+];
+
+const MOBILE_GROUPS = [
+  {
+    title: "Browse",
+    items: [
+      { href: "/tools", label: "All Tools" },
+      { href: "/popular", label: "Popular Tools" },
+      { href: "/favorites", label: "Favorites" },
+      { href: "/blog", label: "Blog" },
+    ],
+  },
+  {
+    title: "Categories",
+    items: [
+      { href: "/categories/pdf-tools", label: "PDF Tools" },
+      { href: "/categories/image-tools", label: "Image Tools" },
+      { href: "/categories/ai-tools", label: "AI Tools" },
+      { href: "/categories/file-tools", label: "File Converters" },
+      { href: "/categories/document-tools", label: "Text Tools" },
+      { href: "/categories/developer-tools", label: "Developer" },
+      { href: "/categories/generators-and-utilities", label: "Productivity" },
+    ],
+  },
+  {
+    title: "Company",
+    items: [
+      { href: "/about", label: "About Us" },
+      { href: "/contact", label: "Contact" },
+    ],
+  },
+];
+
+function isActive(pathname: string, href: string) {
+  return href !== "/" && pathname.startsWith(href);
+}
 
 function ThemeToggle() {
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -91,24 +182,23 @@ export function SiteHeader() {
     };
   }, [mobileOpen]);
 
+  const moreActive = MORE_NAV.some((item) => isActive(pathname, item.href));
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/85 backdrop-blur-lg supports-[backdrop-filter]:bg-background/75">
-      <div className="container-page flex h-16 items-center gap-3 lg:gap-4">
-        <Link href="/" className="focus-ring rounded-lg" aria-label="Pixelmint.fun home">
+      <div className="container-page flex h-16 items-center gap-2 lg:gap-3">
+        <Link href="/" className="focus-ring shrink-0 rounded-lg" aria-label="Pixelmint.fun home">
           <Logo size={34} />
         </Link>
 
-        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main navigation">
-          {NAV.map((item) => (
+        <nav className="ml-2 hidden items-center gap-1 lg:flex" aria-label="Main navigation">
+          {PRIMARY_NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "focus-ring rounded-lg px-2.5 py-2 text-[13px] font-medium transition-colors",
-                item.hideBelow === "2xl" && "hidden 2xl:inline-block",
-                item.hideBelow === "xl" && "hidden xl:inline-block",
-                item.hideBelow === "lg" && "hidden lg:inline-block",
-                pathname.startsWith(item.href) && item.href !== "/"
+                "focus-ring rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                isActive(pathname, item.href)
                   ? "bg-secondary text-secondary-foreground"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
@@ -116,6 +206,50 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
+
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              className={cn(
+                "focus-ring group flex h-9 items-center gap-1 rounded-lg px-3 text-sm font-medium transition-colors data-[state=open]:bg-muted",
+                moreActive
+                  ? "bg-secondary text-secondary-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+            >
+              More
+              <ChevronDown
+                size={14}
+                className="transition-transform group-data-[state=open]:rotate-180"
+                aria-hidden="true"
+              />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-72 rounded-xl p-2 shadow-lg">
+              {MORE_NAV.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <DropdownMenuItem key={item.href} asChild>
+                    <Link
+                      href={item.href}
+                      className={cn(
+                        "group/item flex w-full items-center gap-3 rounded-lg px-2.5 py-2",
+                        isActive(pathname, item.href) && "bg-secondary",
+                      )}
+                    >
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        <Icon size={15} aria-hidden="true" />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-sm font-medium text-foreground">{item.label}</span>
+                        <span className="block truncate text-xs text-muted-foreground">
+                          {item.description}
+                        </span>
+                      </span>
+                    </Link>
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
@@ -123,18 +257,20 @@ export function SiteHeader() {
             type="button"
             onClick={() => setSearchOpen(true)}
             aria-label="Search tools"
-            className="focus-ring group hidden h-9 items-center gap-2 rounded-full border bg-card px-3.5 text-muted-foreground transition-all hover:border-primary/50 hover:shadow-mint sm:flex md:w-48 xl:w-56"
+            className="focus-ring group hidden h-9 items-center gap-2 rounded-full border bg-card px-3.5 text-muted-foreground transition-all hover:border-primary/50 hover:shadow-mint md:flex md:w-44 xl:w-52"
           >
             <Search size={15} className="shrink-0 text-primary" />
-            <span className="hidden truncate text-sm md:inline">What do you want to do today?</span>
-            <kbd className="ml-auto hidden rounded border bg-muted px-1.5 font-mono text-[10px] text-muted-foreground lg:inline">Ctrl K</kbd>
+            <span className="hidden truncate text-sm md:inline">Search tools…</span>
+            <kbd className="ml-auto hidden rounded border bg-muted px-1.5 font-mono text-[10px] text-muted-foreground lg:inline">
+              Ctrl K
+            </kbd>
           </button>
 
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
             aria-label="Search tools"
-            className="focus-ring flex h-9 w-9 items-center justify-center rounded-lg border bg-card text-muted-foreground transition-colors hover:text-foreground sm:hidden"
+            className="focus-ring flex h-9 w-9 items-center justify-center rounded-lg border bg-card text-muted-foreground transition-colors hover:text-foreground md:hidden"
           >
             <Search size={16} />
           </button>
@@ -168,28 +304,28 @@ export function SiteHeader() {
           aria-label="Mobile navigation"
           className="border-t bg-background lg:hidden"
         >
-          <div className="container-page flex max-h-[calc(100dvh-4rem)] flex-col gap-1 overflow-y-auto py-3">
-            {NAV.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="focus-ring rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
-              >
-                {item.label}
-              </Link>
+          <div className="container-page max-h-[calc(100dvh-4rem)] space-y-4 overflow-y-auto py-4">
+            {MOBILE_GROUPS.map((group) => (
+              <div key={group.title}>
+                <p className="px-3 pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  {group.title}
+                </p>
+                <div className="grid grid-cols-2 gap-1">
+                  {group.items.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        "focus-ring rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted",
+                        isActive(pathname, item.href) && "bg-secondary",
+                      )}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
             ))}
-            <Link
-              href="/favorites"
-              className="focus-ring rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
-            >
-              Favorites
-            </Link>
-            <Link
-              href="/popular"
-              className="focus-ring rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
-            >
-              Popular Tools
-            </Link>
           </div>
         </nav>
       )}

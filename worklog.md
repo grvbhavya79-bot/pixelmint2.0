@@ -99,3 +99,23 @@ Stage Summary:
 - Pixelmint.fun platform confirmed fully operational: 103 working tools, blog, AI tools, admin, SEO (126-URL sitemap), all quality gates green.
 - Earlier test "failures" this session were caller-side mistakes (wrong field name `action` vs `task` for AI API; wrong category slug prefix for redirect test) — no product defects found.
 - No code changes required this session; state is committed and stable.
+
+---
+Task ID: 5
+Agent: Super Z (main agent)
+Task: Fix messy header; add owner email Grvbhavya79@gmail.com; embed Google Map on contact page.
+
+Work Log:
+- Diagnosed header messiness via VLM analysis of 1366/1920px screenshots: 11 flat nav links = "wall of text", truncated search placeholder ("What do you wa…"), uneven gaps.
+- Rewrote site-header.tsx: 5 short primary links (All Tools, PDF, Image, AI, Blog) + "More" dropdown (shadcn DropdownMenu) holding File Converters, Text Tools, Developer, Productivity, About Us, Contact — each with mint icon tile + label + one-line description. Search placeholder shortened to "Search tools…". Mobile menu regrouped into Browse / Categories / Company sections (2-col grid).
+- Active-state logic: primary links and the More trigger highlight via pathname.startsWith; verified PDF→ACTIVE on /categories/pdf-tools and More→ACTIVE on /about.
+- Email: replaced hello@pixelmint.fun with Grvbhavya79@gmail.com in contact page (mailto), about page maker card, cookies policy, layout.tsx Organization JSON-LD; added mailto link line in footer brand column (regex-tester sample text left as demo data).
+- Google Map: added "Where to find us" card below contact grid — iframe embed https://maps.google.com/maps?q=Madhubani,+Bihar+847226,+India&z=13&output=embed (lazy, 340px, a11y title) + "Open in Google Maps" external link; added CSP frame-src 'self' https://www.google.com https://maps.google.com to next.config.ts.
+- Infra: dev server was OOM-killed repeatedly (Turbopack 2.8GB RSS on 4GB box, confirmed via dmesg); restarted detached with setsid double-fork; killed stale chrome to free memory.
+- Verified in browser: VLM rates new header "clean/uncluttered, balanced" at 1366px; dropdown opens with all 6 items, navigates correctly; map renders real tiles (Jainagar, Bihar 847226 pin, bilingual labels) with zero CSP violations; email visible on contact/about/footer; no console/page errors; no horizontal overflow at 375px.
+
+Stage Summary:
+- Header redesigned from 11 cramped links to 5+More tiered nav — clean at all breakpoints (375/768/1366/1920).
+- Owner email Grvbhavya79@gmail.com live in 5 locations (contact, about, footer, cookies, JSON-LD).
+- Google Map of Madhubani, Bihar 847226 embedded on contact page under CSP.
+- Gates: ESLint clean on changed files, bun test 83/83, tsc --noEmit clean; routes 200.
