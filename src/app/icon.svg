@@ -1,17 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
-  <defs>
-    <linearGradient id="bg" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#3B82F6"/>
-      <stop offset="0.55" stop-color="#2563EB"/>
-      <stop offset="1" stop-color="#1D4ED8"/>
-    </linearGradient>
-    <linearGradient id="dot" x1="32" y1="32" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#67E8F9"/>
-      <stop offset="1" stop-color="#2DD4BF"/>
-    </linearGradient>
-  </defs>
-  <rect x="2" y="2" width="44" height="44" rx="12" fill="url(#bg)"/>
-  <rect x="12" y="12.5" width="24" height="5.5" rx="2.75" fill="#ffffff"/>
-  <rect x="21.25" y="12.5" width="5.5" height="24" rx="2.75" fill="#ffffff"/>
-  <circle cx="36.5" cy="36.5" r="4" fill="url(#dot)" stroke="#1E40AF" stroke-width="1.5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <rect width="40" height="40" rx="9" fill="#0D1211"/>
+  <rect x="9" y="9" width="10" height="10" fill="#67F5B4"/>
+  <rect x="21" y="9" width="10" height="10" fill="#67F5B4" opacity="0.5"/>
+  <rect x="9" y="21" width="10" height="10" fill="#67F5B4" opacity="0.5"/>
+  <rect x="21" y="21" width="10" height="10" fill="#D6FF4B"/>
 </svg>
