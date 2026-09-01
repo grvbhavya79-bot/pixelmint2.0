@@ -202,3 +202,23 @@ Work Log:
 Stage Summary:
 - /support page live with scannable UPI QR (grvbhavya55@axl), copy + deep-link buttons, free-support options.
 - Linked from footer + About, in sitemap. bun test 83/83 pass, ESLint + tsc clean.
+
+---
+Task ID: 5
+Agent: Super Z (main agent)
+Task: Premium UI/UX improvement pass on Pixelmint.fun — audit, design-system motion, staggered hero, scroll-reveal choreography; verify Support section (UPI grvbhavya55@axl) intact.
+
+Work Log:
+- Audited existing state: dev server healthy, all routes 200, Support page + UPI QR (upi-qr.png, 200) + copy button + upi:// deep link already complete and linked from footer/about/sitemap.
+- Extended design system (globals.css): pm-rise / pm-rise-text entrance keyframes (fade + slide-up + subtle de-blur for text), 7 stagger delay utilities, pm-pop-in for floating layers, scroll-reveal utilities (html.js gated — progressive enhancement via inline script in layout body, set before first paint), pm-stagger variant using animation-play-state (paused→running) so children stagger without polluting card hover transitions.
+- Added inline `document.documentElement.classList.add('js')` script to root layout for graceful no-JS degradation.
+- Built Reveal component (src/components/layout/reveal.tsx): IntersectionObserver-based, once-only, polymorphic `as` prop (div/ol/ul/section/li) for semantic lists, reduced-motion + no-IO fallback shows content instantly.
+- Redesigned homepage hero: 7-step staggered entrance choreography (badge → 2-line headline with gradient → subtext → search → shortcuts → trust stats), new trust stats strip (103+ Free tools / 8 Categories / 100% Browser-based / 0 Sign-ups) as semantic <dl>, text-balance on headline, refined subtext copy ("right in your browser").
+- Applied scroll-reveal choreography to all below-fold homepage sections: section headers via Reveal, card grids via stagger variant (categories 8, featured 13, why 6, how 3 as <ol>), FAQ accordion reveal, final CTA card reveal.
+- Hero search dropdown now uses pm-pop-in animation.
+- Fixed during verification: TS polymorphic ref error (cast Tag to ElementType), invalid <li>-outside-<ol> markup in How-it-works (Reveal as="ol").
+
+Stage Summary:
+- Quality gates: bun test 83/83 pass, ESLint clean, tsc --noEmit clean, all 16 swept routes 200.
+- Browser-verified (agent-browser): hero renders with stats, 7 entrance animations animate to opacity 1; 12 scroll reveals fire progressively on scroll (5 visible mid-scroll, 12/12 at bottom); search dropdown pop-in + navigation to /tools/merge-pdf works; mobile 375px zero horizontal overflow, hamburger menu opens/closes with body scroll lock; dark mode bg #0c1310; sticky footer exact (footer bottom = viewport bottom on short page, zero gap); Support page QR loads, UPI copy button transitions to "Copied!", upi:// deep link correct (pa=grvbhavya55@axl).
+- Zero console/page errors across all tested flows.

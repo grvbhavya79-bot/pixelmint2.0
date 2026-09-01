@@ -1,0 +1,2030 @@
+Yes. Since you already have **PixelMint.fun running**, the prompt should tell Z.ai to **upgrade the existing project rather than rebuild it from zero**. Also explicitly prevent it from breaking the existing 103+ tools.
+
+Copy-paste this entire prompt:
+
+```text
+PIXELMINT.FUN — COMPLETE PRODUCTION UPGRADE PROMPT
+
+You are working on an EXISTING live project called:
+
+PixelMint.fun
+
+IMPORTANT:
+Do NOT rebuild the website from scratch.
+Do NOT remove existing working tools.
+Do NOT replace working functionality with fake/demo functionality.
+First inspect the existing codebase, architecture, routes, components, tools, dependencies and current UI.
+
+Your job is to upgrade the existing PixelMint project into a polished, fast, professional, SEO-friendly online tools platform similar in usability to products such as iLovePDF, Smallpdf and other professional utility platforms, while maintaining PixelMint's own identity.
+
+The final result must be production-ready.
+
+==================================================
+1. FIRST: AUDIT THE EXISTING PROJECT
+==================================================
+
+Before changing anything, inspect:
+
+- Existing framework
+- Folder structure
+- Routes
+- Components
+- Tool implementations
+- APIs
+- Dependencies
+- State management
+- File-processing logic
+- PDF processing
+- Image processing
+- AI functionality
+- Responsive behavior
+- SEO implementation
+- Metadata
+- Sitemap
+- robots.txt
+- Existing analytics
+- Existing storage
+- Existing deployment configuration
+
+Create an internal understanding of the architecture.
+
+DO NOT unnecessarily change technologies.
+
+Reuse existing working components whenever possible.
+
+Do not rewrite functioning tools unless there is a genuine technical reason.
+
+==================================================
+2. ABSOLUTE RULE — NO FAKE FUNCTIONALITY
+==================================================
+
+This is extremely important.
+
+Every visible feature must actually work.
+
+NEVER create:
+
+- Fake buttons
+- Fake upload systems
+- Fake processing
+- Fake progress bars
+- Fake download buttons
+- Fake statistics
+- Fake API responses
+- Fake AI responses
+- Fake tool results
+- "Coming Soon" buttons pretending to work
+- Hardcoded processing results
+- Placeholder data presented as real data
+
+If a feature cannot be implemented properly, do not pretend that it works.
+
+Existing tools must continue working after the upgrade.
+
+After every major modification, test the affected functionality.
+
+==================================================
+3. PRESERVE EXISTING TOOLS
+==================================================
+
+PixelMint already contains a large collection of tools.
+
+DO NOT delete existing tools simply to redesign the UI.
+
+Create an inventory of every existing tool.
+
+For each tool verify:
+
+- Route works
+- Page loads
+- Upload works
+- Input validation works
+- Processing works
+- Output is generated correctly
+- Download works
+- Error handling works
+- Mobile UI works
+- Desktop UI works
+- Metadata exists
+- Related tools exist
+
+If an existing tool is broken, FIX IT.
+
+Do not hide broken tools just to make the website appear functional.
+
+==================================================
+4. GLOBAL DESIGN SYSTEM
+==================================================
+
+Create a consistent PixelMint design system.
+
+The website should feel:
+
+- Premium
+- Modern
+- Clean
+- Fast
+- Minimal
+- Professional
+- Trustworthy
+- SaaS-quality
+
+Do NOT copy another company's branding.
+
+PixelMint must have its own visual identity.
+
+Use consistent:
+
+- Typography
+- Spacing
+- Border radius
+- Shadows
+- Buttons
+- Cards
+- Icons
+- Form controls
+- Upload areas
+- Alerts
+- Toasts
+- Modal dialogs
+- Empty states
+- Loading states
+- Error states
+
+Avoid unnecessary visual clutter.
+
+Avoid excessive animations.
+
+Animations should be subtle and purposeful.
+
+==================================================
+5. HEADER
+==================================================
+
+Improve the global header.
+
+Desktop:
+
+PixelMint logo
+Tools
+PDF
+Images
+Documents
+AI
+Developer
+Pricing/About if applicable
+Search
+Theme toggle
+Menu
+
+Mobile:
+
+Logo
+Search
+Menu
+
+Header must remain responsive.
+
+Do not make the header too tall.
+
+==================================================
+6. HOMEPAGE
+==================================================
+
+Redesign the homepage around user intent.
+
+Hero section:
+
+H1:
+
+"Free Online Tools for PDF, Images, Documents & More"
+
+Use a strong supporting description.
+
+Add a prominent search box:
+
+"Search for a tool..."
+
+Examples:
+
+Merge PDF
+Compress PDF
+JPG to PDF
+Resize Image
+PDF to Word
+
+Add popular tool shortcuts.
+
+Example:
+
+[Merge PDF]
+[Compress PDF]
+[JPG to PDF]
+[PDF to Word]
+[Image Compressor]
+
+Add a clear privacy/value statement.
+
+Example:
+
+"Fast, simple and privacy-focused tools — no complicated software required."
+
+Do not make unsupported privacy claims.
+
+Only state that processing is local when the implementation actually processes locally.
+
+==================================================
+7. TOOL DISCOVERY
+==================================================
+
+The current platform has many tools.
+
+Make discovery easier.
+
+Homepage sections:
+
+Popular Tools
+PDF Tools
+Image Tools
+Document Tools
+AI Tools
+Developer Tools
+Other Utilities
+Recently Used
+
+Each section should have:
+
+Tool icon
+Tool name
+Short description
+Category
+Open button
+
+Add:
+
+"View all tools"
+
+==================================================
+8. TOOL CATEGORIES
+==================================================
+
+Create clean category pages.
+
+Examples:
+
+/tools
+/pdf-tools
+/image-tools
+/document-tools
+/ai-tools
+/developer-tools
+
+If equivalent routes already exist, improve them instead of creating duplicates.
+
+Each category page needs:
+
+- SEO title
+- H1
+- Description
+- Search
+- Tool grid
+- Filters where useful
+- Related categories
+- FAQ where appropriate
+
+==================================================
+9. INDIVIDUAL TOOL LANDING PAGES
+==================================================
+
+THIS IS ONE OF THE MOST IMPORTANT REQUIREMENTS.
+
+Every major tool should have a dedicated SEO-friendly route.
+
+Examples:
+
+/merge-pdf
+/compress-pdf
+/split-pdf
+/pdf-to-word
+/pdf-to-jpg
+/jpg-to-pdf
+/image-compressor
+/image-resizer
+
+Use clean URLs.
+
+Each tool page should contain:
+
+1. H1
+2. Short description
+3. Actual working tool interface
+4. Supported formats
+5. Key features
+6. How to use
+7. Privacy/security information
+8. FAQ
+9. Related tools
+
+The actual tool interface should appear near the top of the page.
+
+Do not force users to scroll through huge marketing content before using the tool.
+
+==================================================
+10. TOOL PAGE STRUCTURE
+==================================================
+
+Use a consistent structure.
+
+Example:
+
+--------------------------------------------------
+Merge PDF Online
+Combine multiple PDF files into one PDF.
+
+[ Upload / Drop PDF Files ]
+
+Supported: PDF
+Maximum size: configured limit
+
+Selected files:
+1. document1.pdf
+2. document2.pdf
+3. document3.pdf
+
+[ Merge PDF ]
+
+Processing...
+
+[ Download Merged PDF ]
+--------------------------------------------------
+
+Allow drag and drop where supported.
+
+Provide file picker fallback on mobile.
+
+==================================================
+11. UNIVERSAL FILE UPLOAD COMPONENT
+==================================================
+
+Create a reusable upload component.
+
+It should support:
+
+- Drag & drop
+- File picker
+- Multiple files where required
+- File validation
+- File size validation
+- File type validation
+- Remove file
+- Replace file
+- File preview where applicable
+- Upload progress
+- Error messages
+
+Do not show progress if actual progress cannot be measured.
+
+Use honest status messaging.
+
+==================================================
+12. PROCESSING EXPERIENCE
+==================================================
+
+Make processing clear.
+
+Example:
+
+Uploading
+✓
+Reading file
+✓
+Processing
+●
+Generating result
+○
+Complete
+○
+
+For actual measurable progress, show percentage.
+
+For operations where percentage cannot be accurately determined, use an indeterminate loading state.
+
+Never fake a percentage.
+
+==================================================
+13. RESULT EXPERIENCE
+==================================================
+
+After processing:
+
+Show success state.
+
+Example:
+
+"Your PDF is ready."
+
+Show:
+
+File name
+File size
+Preview if possible
+
+Buttons:
+
+[ Download ]
+[ Process Another File ]
+
+Optional:
+
+[ Share ]
+[ Delete ]
+
+Do not expose private storage URLs unnecessarily.
+
+==================================================
+14. ERROR EXPERIENCE
+==================================================
+
+Replace generic errors with useful messages.
+
+Bad:
+
+"Something went wrong."
+
+Better:
+
+"Unable to process this PDF."
+
+Then:
+
+Possible reasons:
+- File is corrupted
+- File is password protected
+- File type is unsupported
+
+Button:
+
+[ Try Another File ]
+
+Errors must be understandable to normal users.
+
+==================================================
+15. PDF EXPERIENCE
+==================================================
+
+Make PixelMint's PDF section especially strong.
+
+Create a unified PDF toolkit.
+
+Categories:
+
+ORGANIZE PDF
+
+- Merge PDF
+- Split PDF
+- Delete Pages
+- Extract Pages
+- Rotate PDF
+- Rearrange PDF
+
+COMPRESS PDF
+
+- Compress PDF
+
+CONVERT PDF
+
+- PDF to Word
+- PDF to Excel
+- PDF to JPG
+- JPG to PDF
+- PDF to PNG
+- Other supported conversions
+
+EDIT PDF
+
+- Add Text
+- Add Images
+- Watermark
+- Page Numbers
+- Annotate where supported
+
+SECURITY
+
+- Protect PDF
+- Unlock PDF where legally/technically supported
+- Remove password where authorized
+
+OCR
+
+- OCR PDF
+- Image to Text
+
+Only show tools that are genuinely implemented.
+
+==================================================
+16. IMAGE TOOLS
+==================================================
+
+Create a strong image toolkit.
+
+Examples:
+
+- Image Compressor
+- Image Resizer
+- Image Cropper
+- JPG to PNG
+- PNG to JPG
+- WebP Converter
+- Image to PDF
+- PDF to Image
+- Image Metadata
+- Image Optimizer
+
+Maintain high-quality output.
+
+Allow users to configure:
+
+- Width
+- Height
+- Quality
+- Format
+- Compression
+- Aspect ratio where applicable
+
+==================================================
+17. AI TOOLS
+==================================================
+
+Keep AI tools separate from traditional utilities.
+
+Create:
+
+AI Tools
+
+Examples where actually supported:
+
+- AI Text Summarizer
+- Writing Improver
+- Idea Generator
+- PDF AI
+- Ask PDF
+- Resume Analyzer
+- Text Rewriter
+
+IMPORTANT:
+
+Do not add AI features just as UI placeholders.
+
+Every AI tool must use a real configurable provider/API.
+
+API keys must remain server-side.
+
+Create environment variables.
+
+Allow AI provider configuration.
+
+==================================================
+18. COMMAND PALETTE
+==================================================
+
+Improve the existing command/search functionality.
+
+Keyboard shortcut:
+
+Ctrl + K
+
+Search:
+
+"Search tools..."
+
+Results should include:
+
+- Tool name
+- Description
+- Category
+- Shortcut if available
+
+Example:
+
+Merge PDF
+PDF
+Combine multiple PDF files
+
+Compress PDF
+PDF
+Reduce PDF file size
+
+Allow keyboard navigation.
+
+Enter opens selected tool.
+
+Escape closes.
+
+==================================================
+19. GLOBAL SEARCH
+==================================================
+
+Implement fast tool search.
+
+Search across:
+
+- Tool name
+- Description
+- Category
+- Keywords
+
+Examples:
+
+"pdf merge"
+"reduce pdf"
+"convert image"
+"resize photo"
+
+Search should return relevant results.
+
+Show:
+
+Tool
+Category
+Description
+
+==================================================
+20. FAVORITES
+==================================================
+
+Allow users to favorite tools.
+
+Use local storage initially if no authentication system exists.
+
+Example:
+
+♡ Merge PDF
+
+Favorites page/section:
+
+"My Favorite Tools"
+
+Do not require account creation just for favorites.
+
+==================================================
+21. RECENTLY USED TOOLS
+==================================================
+
+Track recent tools locally.
+
+Example:
+
+Recently Used
+
+1. Compress PDF
+2. JPG to PDF
+3. Image Compressor
+
+Allow clearing history.
+
+Do not collect unnecessary personal information.
+
+==================================================
+22. RELATED TOOLS
+==================================================
+
+Every tool page should recommend relevant tools.
+
+Example:
+
+On Compress PDF:
+
+You may also need:
+
+Merge PDF
+Split PDF
+PDF to Word
+PDF to JPG
+Protect PDF
+
+Use actual existing routes.
+
+Do not link to nonexistent pages.
+
+==================================================
+23. TOOL WORKFLOW SUGGESTIONS
+==================================================
+
+Where useful, suggest workflows.
+
+Example:
+
+Working with PDFs?
+
+1. Merge
+2. Compress
+3. Convert
+4. Sign
+
+Example:
+
+Working with images?
+
+1. Resize
+2. Compress
+3. Convert
+4. Convert to PDF
+
+This should improve navigation without overwhelming users.
+
+==================================================
+24. MOBILE OPTIMIZATION
+==================================================
+
+This is mandatory.
+
+Test every major page on:
+
+- Desktop
+- Laptop
+- Tablet
+- Android mobile
+- iPhone-sized viewport
+
+Fix:
+
+- Overflow
+- Horizontal scrolling
+- Broken tables
+- Tiny buttons
+- Upload issues
+- Modal overflow
+- Navigation problems
+- Tool settings
+- PDF viewer
+- Download buttons
+
+Mobile upload must work properly.
+
+==================================================
+25. PWA
+==================================================
+
+If compatible with the current architecture, make PixelMint installable as a Progressive Web App.
+
+Include:
+
+- Web manifest
+- App icon
+- Proper theme
+- Install support
+- Offline support only for pages/tools that genuinely support offline operation
+
+Do not claim all tools work offline unless they actually do.
+
+==================================================
+26. SEO FOUNDATION
+==================================================
+
+Implement proper technical SEO.
+
+Every important page must have:
+
+- Unique title
+- Unique meta description
+- Canonical URL
+- Open Graph metadata
+- Social sharing metadata
+- Proper H1
+- Proper H2 hierarchy
+- Descriptive URLs
+- Breadcrumbs where appropriate
+- Structured data where appropriate
+
+Generate:
+
+sitemap.xml
+
+robots.txt
+
+Make sure important pages are indexable.
+
+Do not index internal/private pages.
+
+==================================================
+27. TOOL SEO
+==================================================
+
+Each tool should target meaningful search intent.
+
+Example:
+
+Title:
+
+"Merge PDF Online — Free PDF Merger | PixelMint"
+
+H1:
+
+"Merge PDF Online"
+
+Description:
+
+"Combine multiple PDF files into one document quickly with PixelMint's free PDF merger."
+
+Do not keyword stuff.
+
+Every tool needs unique content.
+
+Do not generate hundreds of identical SEO pages.
+
+==================================================
+28. STRUCTURED DATA
+==================================================
+
+Implement appropriate Schema.org structured data.
+
+Possible types:
+
+- WebSite
+- WebApplication
+- SoftwareApplication
+- BreadcrumbList
+- FAQPage where genuinely appropriate
+
+Only use structured data that accurately represents visible page content.
+
+==================================================
+29. INTERNAL LINKING
+==================================================
+
+Build intelligent internal linking.
+
+Homepage
+→ Categories
+→ Tools
+→ Related tools
+
+Example:
+
+Compress PDF
+→ Merge PDF
+→ Split PDF
+→ PDF to Word
+→ PDF to JPG
+
+Avoid orphan pages.
+
+==================================================
+30. PERFORMANCE
+==================================================
+
+Optimize heavily.
+
+Goals:
+
+Fast initial load
+Fast navigation
+Low JavaScript where possible
+Lazy load heavy components
+Lazy load previews
+Optimize images
+Use code splitting
+Avoid unnecessary dependencies
+Avoid unnecessary API calls
+
+Do not load every tool's processing library on the homepage.
+
+Load heavy libraries only when required.
+
+==================================================
+31. CORE WEB VITALS
+==================================================
+
+Optimize for:
+
+LCP
+CLS
+INP
+
+Avoid:
+
+- Huge JavaScript bundles
+- Layout shifts
+- Unoptimized images
+- Blocking scripts
+- Excessive animations
+
+==================================================
+32. ACCESSIBILITY
+==================================================
+
+Implement:
+
+- Keyboard navigation
+- Focus states
+- ARIA labels where required
+- Proper semantic HTML
+- Accessible buttons
+- Accessible forms
+- Accessible dialogs
+- Screen-reader friendly labels
+- Sufficient contrast
+
+Do not use icons as the only indication of important actions.
+
+==================================================
+33. DARK MODE
+==================================================
+
+If the existing project supports dark mode, improve it.
+
+If not, add it only if it can be implemented cleanly.
+
+Every component must remain readable in both themes.
+
+==================================================
+34. FOOTER
+==================================================
+
+Create a professional footer.
+
+Include:
+
+PixelMint logo
+Short description
+Tools
+PDF Tools
+Image Tools
+AI Tools
+Developer Tools
+
+Company:
+
+About
+Contact
+Privacy Policy
+Terms of Service
+
+Resources:
+
+All Tools
+Popular Tools
+FAQ
+
+Social links only if real accounts exist.
+
+Do NOT create fake social links.
+
+==================================================
+35. LEGAL PAGES
+==================================================
+
+Create or improve:
+
+Privacy Policy
+Terms of Service
+Cookie Policy if applicable
+Contact
+
+Legal content must accurately describe actual data processing.
+
+Do not make false claims about file deletion, encryption, local processing or data storage.
+
+==================================================
+36. ANALYTICS
+==================================================
+
+If analytics are already configured, preserve them.
+
+If analytics are not configured, structure the project so analytics can be added safely through environment variables.
+
+Track useful anonymous events such as:
+
+- Tool opened
+- Tool completed
+- Tool failed
+- Category viewed
+
+Do not collect unnecessary personal information.
+
+Do not expose analytics credentials to the client unnecessarily.
+
+==================================================
+37. TOOL RELIABILITY
+==================================================
+
+Create a tool health checklist.
+
+For each file-processing tool test:
+
+1. Open page
+2. Select file
+3. Validate file
+4. Process
+5. Generate output
+6. Validate output
+7. Download output
+
+Test multiple realistic file types.
+
+Do not test only the UI.
+
+==================================================
+38. AUTOMATED TESTING
+==================================================
+
+Add automated tests where practical.
+
+Test:
+
+- Homepage
+- Navigation
+- Search
+- Tool routing
+- Upload
+- File validation
+- Processing
+- Download
+- Error handling
+- Mobile layout
+- SEO metadata
+
+For critical tools, test real processing logic.
+
+==================================================
+39. SECURITY
+==================================================
+
+Implement appropriate security.
+
+Protect against:
+
+- XSS
+- Injection
+- Malicious file uploads
+- Oversized uploads
+- Unsupported file types
+- Path traversal
+- Unauthorized API access
+- Credential exposure
+
+Never trust client-side validation alone.
+
+Validate files server-side where server processing is used.
+
+==================================================
+40. FILE LIMITS
+==================================================
+
+Do not arbitrarily advertise unlimited processing.
+
+Configure:
+
+Maximum file size
+Maximum number of files
+Processing timeout
+Supported formats
+
+These should be configurable.
+
+Display the actual limits to users.
+
+==================================================
+41. FILE PRIVACY
+==================================================
+
+Use secure handling.
+
+If files are processed server-side:
+
+- Do not expose private filesystem paths
+- Do not expose database credentials
+- Use secure temporary storage
+- Delete temporary files according to actual configured policy
+- Prevent unauthorized access
+
+If a tool processes locally in browser:
+
+Clearly identify that tool as local processing.
+
+Do not claim local processing for server-side tools.
+
+==================================================
+42. ERROR LOGGING
+==================================================
+
+Implement proper error logging for development/production.
+
+Do not expose stack traces to normal users.
+
+Users should see friendly errors.
+
+Developers should have enough information to diagnose failures.
+
+==================================================
+43. 404 PAGE
+==================================================
+
+Create a professional 404 page.
+
+Example:
+
+"Tool not found"
+
+Search for another tool.
+
+[Search Tools]
+
+Show popular tools.
+
+==================================================
+44. EMPTY STATES
+==================================================
+
+Every list should have a proper empty state.
+
+Example:
+
+"No favorite tools yet."
+
+"Your recently used tools will appear here."
+
+==================================================
+45. LOADING STATES
+==================================================
+
+Use proper skeleton/loading states.
+
+Do not freeze the page while processing.
+
+==================================================
+46. DOWNLOAD EXPERIENCE
+==================================================
+
+Downloads must have meaningful filenames.
+
+Examples:
+
+pixelmint-merged.pdf
+pixelmint-compressed.pdf
+pixelmint-converted.jpg
+
+Avoid:
+
+download.pdf
+output.pdf
+
+unless technically necessary.
+
+==================================================
+47. NO UNNECESSARY LOGIN
+==================================================
+
+Do not force users to create an account simply to use basic tools unless there is a genuine product requirement.
+
+The core utility experience should remain frictionless.
+
+==================================================
+48. PRICING / MONETIZATION
+==================================================
+
+Do NOT add fake pricing or fake subscription functionality.
+
+If monetization is not implemented, do not display fake upgrade buttons.
+
+Keep architecture ready for future:
+
+Free
+Pro
+Business/API
+
+But only show actual working features.
+
+==================================================
+49. ADMIN/CONFIGURATION ARCHITECTURE
+==================================================
+
+Where practical, make these configurable:
+
+- Tool categories
+- Tool visibility
+- Tool ordering
+- Tool descriptions
+- Tool limits
+- Supported file types
+- Homepage featured tools
+- Popular tools
+- Related tools
+- Branding
+- Theme
+- SEO metadata
+- Footer links
+
+Do not hardcode values that need frequent business changes.
+
+==================================================
+50. TOOL REGISTRY
+==================================================
+
+Create or improve a centralized tool registry if the architecture allows.
+
+Each tool should have structured metadata:
+
+id
+name
+slug
+description
+category
+icon
+route
+keywords
+supportedFormats
+featured
+popular
+enabled
+seoTitle
+seoDescription
+order
+
+The UI should consume this registry rather than duplicating tool definitions everywhere.
+
+IMPORTANT:
+
+Do not use the registry to pretend a tool works.
+
+A tool should be marked enabled only if its implementation actually exists.
+
+==================================================
+51. ADMIN TOOL CONTROL
+==================================================
+
+If an admin system exists, allow:
+
+Enable/disable tool
+Change category
+Change order
+Change description
+Change SEO title
+Change SEO description
+Mark featured
+Mark popular
+
+Do not allow disabling a critical system route in a way that breaks the application.
+
+==================================================
+52. IMAGE OPTIMIZATION
+==================================================
+
+Optimize all website images.
+
+Use modern formats where appropriate.
+
+Add:
+
+- Width/height attributes
+- Lazy loading
+- Proper alt text
+
+Do not use huge images for small UI elements.
+
+==================================================
+53. FONTS
+==================================================
+
+Avoid unnecessary font loading.
+
+Use a professional readable font system.
+
+Minimize font requests.
+
+==================================================
+54. NAVIGATION
+==================================================
+
+Navigation should be predictable.
+
+Desktop:
+
+Logo
+Tools
+Categories
+Search
+Theme
+Other relevant actions
+
+Mobile:
+
+Compact menu.
+
+Do not create confusing nested menus.
+
+==================================================
+55. TOOL CARD DESIGN
+==================================================
+
+Each tool card:
+
+[Icon]
+
+Tool Name
+
+Short description
+
+[Open Tool]
+
+Optional:
+
+Popular
+New
+AI
+PDF
+
+Do not overcrowd cards with badges.
+
+==================================================
+56. HOMEPAGE FEATURED SECTION
+==================================================
+
+Feature only genuinely useful tools.
+
+Recommended initial featured tools:
+
+Merge PDF
+Compress PDF
+PDF to Word
+JPG to PDF
+PDF to JPG
+Image Compressor
+Image Resizer
+
+Use actual available implementations.
+
+==================================================
+57. "ALL TOOLS" PAGE
+==================================================
+
+Create a comprehensive All Tools page.
+
+Include:
+
+Search
+Category filters
+Tool cards
+
+Sort options if useful:
+
+Popular
+Alphabetical
+Category
+
+Show accurate tool count based on actual enabled tools.
+
+Do not hardcode "103+" if the real enabled count changes.
+
+==================================================
+58. TRUST SECTION
+==================================================
+
+Add a simple trust/value section.
+
+Examples:
+
+Fast processing
+Easy to use
+Privacy-focused
+Works across devices
+
+Only make claims that are technically accurate.
+
+==================================================
+59. FAQ
+==================================================
+
+Create useful FAQs.
+
+Example:
+
+What is PixelMint?
+Are PixelMint tools free?
+What file formats are supported?
+Is my file uploaded?
+How long does processing take?
+Can I use PixelMint on mobile?
+
+Answers must reflect the actual implementation.
+
+Do not write generic SEO spam.
+
+==================================================
+60. NO FAKE DATA
+==================================================
+
+Do not populate production UI with fake statistics.
+
+Examples:
+
+Do NOT display:
+
+"1M+ files processed"
+
+unless the backend actually tracks that number.
+
+Do NOT display:
+
+"99.9% uptime"
+
+unless this can be substantiated.
+
+Do NOT display:
+
+"10 million users"
+
+unless true.
+
+Use real values or remove the claim.
+
+==================================================
+61. BROWSER LOCAL PROCESSING
+==================================================
+
+Where existing tools use browser-side processing, preserve and improve them.
+
+Examples:
+
+Image resizing
+Image compression
+Simple conversions
+Client-side utilities
+
+Avoid sending files to a server unnecessarily.
+
+But do not force browser processing when it is technically unsuitable.
+
+==================================================
+62. SERVER-SIDE PROCESSING
+==================================================
+
+For tools that require server-side processing:
+
+Use secure APIs.
+
+Validate:
+
+- Authentication if required
+- File type
+- File size
+- Request body
+- Processing limits
+
+Clean up temporary files.
+
+Return proper errors.
+
+==================================================
+63. API ARCHITECTURE
+==================================================
+
+Keep APIs modular.
+
+Example:
+
+/api/pdf/merge
+/api/pdf/compress
+/api/pdf/split
+
+or equivalent architecture appropriate to the current framework.
+
+Do not expose internal implementation details.
+
+==================================================
+64. DEPENDENCY CLEANUP
+==================================================
+
+Inspect package dependencies.
+
+Remove unused dependencies only if safe.
+
+Do not upgrade major packages blindly.
+
+Before upgrading:
+
+Check compatibility.
+
+Do not introduce unnecessary libraries.
+
+==================================================
+65. CODE QUALITY
+==================================================
+
+Use:
+
+- TypeScript types
+- Reusable components
+- Clean functions
+- Modular services
+- Error boundaries where appropriate
+- Proper naming
+- No duplicated business logic
+
+Avoid massive components.
+
+==================================================
+66. ENVIRONMENT VARIABLES
+==================================================
+
+Create/update:
+
+.env.example
+
+Never put secrets directly in source code.
+
+Examples:
+
+DATABASE_URL
+AUTH_SECRET
+AI_API_KEY
+STORAGE_ENDPOINT
+STORAGE_ACCESS_KEY
+STORAGE_SECRET_KEY
+SMTP_HOST
+SMTP_USER
+SMTP_PASSWORD
+
+Only add variables actually needed by the implementation.
+
+==================================================
+67. DEPLOYMENT
+==================================================
+
+Make the project deployment-ready.
+
+Verify:
+
+npm install
+npm run build
+npm run start
+
+or the equivalent commands for the existing project.
+
+Fix all build errors.
+
+Fix all TypeScript errors.
+
+Fix all lint errors that affect production.
+
+Make sure environment variables are documented.
+
+==================================================
+68. VERCEL COMPATIBILITY
+==================================================
+
+If the existing project is deployed on Vercel:
+
+Do not introduce functionality incompatible with Vercel without a valid alternative.
+
+Be careful with:
+
+- Serverless execution limits
+- Large file processing
+- Temporary filesystem
+- Function duration
+- Memory limits
+
+For heavy processing, use appropriate external processing infrastructure if necessary.
+
+Do not pretend serverless functions can perform unlimited heavy processing.
+
+==================================================
+69. SEO URL STRUCTURE
+==================================================
+
+Use clean URLs.
+
+Preferred:
+
+/merge-pdf
+/compress-pdf
+/split-pdf
+/pdf-to-word
+/jpg-to-pdf
+
+Avoid unnecessary:
+
+/tools/tool?id=123
+
+Keep existing URLs if they already have SEO value, and use redirects when changing routes.
+
+Do not create duplicate URLs for the same content.
+
+==================================================
+70. CANONICALIZATION
+==================================================
+
+Make sure each tool has one canonical URL.
+
+Avoid duplicate content caused by:
+
+Query parameters
+Multiple category paths
+Duplicate routes
+
+==================================================
+71. SITEMAP
+==================================================
+
+Generate sitemap dynamically from actual enabled/indexable routes.
+
+Do not manually type every URL if the application can generate them dynamically.
+
+Exclude:
+
+Admin
+Internal APIs
+Private pages
+Temporary pages
+
+==================================================
+72. ROBOTS
+==================================================
+
+Configure robots.txt correctly.
+
+Allow search engines to crawl public tool pages.
+
+Block private/admin/API routes where appropriate.
+
+==================================================
+73. SOCIAL SHARING
+==================================================
+
+Create proper Open Graph metadata.
+
+Tool pages should have:
+
+Title
+Description
+Image
+
+Use PixelMint branding.
+
+==================================================
+74. SECURITY HEADERS
+==================================================
+
+Where compatible, configure appropriate headers.
+
+Examples:
+
+Content Security Policy where practical
+X-Content-Type-Options
+Referrer Policy
+Frame protection
+Strict Transport Security when appropriate
+
+Do not configure a CSP that breaks legitimate functionality.
+
+==================================================
+75. ACCESSIBLE FILE INPUT
+==================================================
+
+File upload must work with:
+
+Mouse
+Keyboard
+Mobile touch
+
+Provide accessible labels.
+
+==================================================
+76. MULTIPLE FILE TOOLS
+==================================================
+
+For Merge PDF and similar tools:
+
+Allow:
+
+- Multiple file selection
+- Drag/drop
+- Reordering
+- Remove
+- Replace
+
+Use actual file order for processing.
+
+==================================================
+77. IMAGE TOOLS UX
+==================================================
+
+For image tools, provide visual previews where useful.
+
+Example:
+
+Original
+vs
+Result
+
+Show:
+
+Original size
+Result size
+Dimensions
+Format
+
+Only show values that are actually calculated.
+
+==================================================
+78. PDF PREVIEW
+==================================================
+
+Where practical, provide PDF preview.
+
+Include:
+
+Page navigation
+Zoom
+Fullscreen
+Download
+
+Do not load huge PDFs unnecessarily.
+
+==================================================
+79. ACCESSIBILITY OF PROCESSING STATES
+==================================================
+
+Use accessible status announcements where appropriate.
+
+Example:
+
+"PDF processing started."
+
+"PDF processing completed."
+
+"PDF processing failed."
+
+==================================================
+80. FINAL FULL AUDIT
+==================================================
+
+After implementation, do a complete audit.
+
+Check:
+
+HOME
+✓ Homepage loads
+✓ Search works
+✓ Navigation works
+✓ Categories work
+✓ Tool count is accurate
+✓ Featured tools work
+
+TOOLS
+✓ Every enabled tool route works
+✓ Upload works
+✓ Processing works
+✓ Download works
+✓ Errors work
+
+PDF
+✓ PDF tools work
+✓ PDF uploads work
+✓ Output files are valid
+
+IMAGES
+✓ Image tools work
+✓ Preview works
+✓ Output quality is correct
+
+AI
+✓ AI tools use real configured APIs
+✓ API keys are secure
+✓ Errors are handled
+
+SEO
+✓ Titles
+✓ Descriptions
+✓ Canonical
+✓ Sitemap
+✓ Robots
+✓ Structured data
+✓ Internal links
+
+MOBILE
+✓ Header
+✓ Navigation
+✓ Upload
+✓ Tool interface
+✓ Download
+✓ Footer
+
+SECURITY
+✓ No exposed secrets
+✓ File validation
+✓ API protection
+✓ Safe errors
+
+PERFORMANCE
+✓ Build succeeds
+✓ No major console errors
+✓ No unnecessary requests
+✓ Heavy libraries lazy-loaded
+
+==================================================
+81. IMPORTANT: DO NOT BREAK EXISTING FUNCTIONALITY
+==================================================
+
+Before modifying an existing component, understand what depends on it.
+
+Do not replace working functionality simply for visual reasons.
+
+If a visual redesign requires changing architecture, preserve the underlying functionality.
+
+Use backward-compatible changes whenever possible.
+
+==================================================
+82. DEVELOPMENT RULE
+==================================================
+
+Work incrementally.
+
+Do not make hundreds of unrelated changes at once.
+
+Recommended order:
+
+STEP 1
+Audit existing project.
+
+STEP 2
+Fix critical broken functionality.
+
+STEP 3
+Create/standardize design system.
+
+STEP 4
+Improve homepage.
+
+STEP 5
+Improve tool cards/categories.
+
+STEP 6
+Standardize individual tool pages.
+
+STEP 7
+Improve upload/process/download UX.
+
+STEP 8
+Improve PDF section.
+
+STEP 9
+Improve image section.
+
+STEP 10
+Improve search and command palette.
+
+STEP 11
+Add favorites/recent tools.
+
+STEP 12
+Add related tools.
+
+STEP 13
+Implement SEO.
+
+STEP 14
+Implement performance improvements.
+
+STEP 15
+Implement accessibility.
+
+STEP 16
+Test mobile.
+
+STEP 17
+Run production build.
+
+STEP 18
+Fix all errors.
+
+STEP 19
+Perform final end-to-end audit.
+
+==================================================
+83. IMPORTANT DESIGN PRINCIPLE
+==================================================
+
+DO NOT over-design the website.
+
+PixelMint is a utility platform.
+
+Users come to:
+
+"Get a task done quickly."
+
+Therefore prioritize:
+
+Speed
+Clarity
+Simple UI
+Large upload area
+Obvious action button
+Fast result
+Easy download
+
+Do not fill the interface with unnecessary marketing sections.
+
+==================================================
+84. FUTURE-READY ARCHITECTURE
+==================================================
+
+Keep the architecture ready for future features:
+
+- User accounts
+- Cloud history
+- Favorites sync
+- Pro plans
+- Usage limits
+- API access
+- Team accounts
+- Payment integration
+- Admin dashboard
+- Usage analytics
+
+But DO NOT implement fake versions of these features now.
+
+==================================================
+85. FINAL PRODUCT GOAL
+==================================================
+
+The final PixelMint.fun should feel like:
+
+A serious, professional, fast online utility platform.
+
+The user should be able to arrive from Google, immediately understand what PixelMint does, find the required tool within seconds, upload a file, process it, download the result, and move to another related tool without confusion.
+
+The website must be:
+
+FAST
+RELIABLE
+SEO-FRIENDLY
+MOBILE-FRIENDLY
+ACCESSIBLE
+SECURE
+SCALABLE
+EASY TO MAINTAIN
+
+==================================================
+86. FINAL REQUIREMENT
+==================================================
+
+DO NOT declare the project complete just because the UI looks good.
+
+Before completion:
+
+1. Run the production build.
+2. Check every route.
+3. Check every enabled tool.
+4. Check file processing.
+5. Check downloads.
+6. Check mobile layout.
+7. Check SEO metadata.
+8. Check sitemap.
+9. Check robots.txt.
+10. Check console errors.
+11. Check API errors.
+12. Check broken links.
+13. Check security issues.
+14. Check performance.
+15. Fix all issues found.
+
+Only then consider the PixelMint upgrade complete.
+
+MOST IMPORTANT:
+
+Existing functionality > visual redesign.
+
+Real functionality > fake UI.
+
+Performance > unnecessary animations.
+
+User experience > unnecessary complexity.
+
+Accurate information > fake marketing claims.
+
+SEO content > keyword stuffing.
+
+Do not remove working PixelMint features.
+
+Do not invent data.
+
+Do not invent statistics.
+
+Do not invent social links.
+
+Do not invent functionality.
+
+Build a genuinely working production-ready PixelMint.fun.
+```
+
+### मेरी recommendation
+
+**Z.ai को यह पूरा prompt एक ही बार में देने के बजाय**, पहले उसे **audit + Phase 1** करने दो। खासकर तुम्हारे existing 103+ tools हैं, इसलिए एक साथ पूरा code बदलवाने से working tools टूटने का risk रहेगा.
+
+सबसे पहले उससे यह करवाओ:
+
+**1. Existing project audit → 2. Broken tools fix → 3. Design system → 4. Homepage → 5. Tool pages → 6. SEO → 7. Mobile → 8. Performance**
+
+और **अभी नए 100 tools add मत करवाना**। पहले existing tools को genuinely excellent बनाना ज्यादा valuable रहेगा।

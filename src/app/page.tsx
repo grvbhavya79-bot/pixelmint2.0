@@ -11,6 +11,7 @@ import { ALL_TOOLS, getTool } from "@/lib/tools/registry";
 import { CATEGORIES, categoryCount } from "@/lib/tools/categories";
 import { RecentToolsRow } from "@/components/layout/recent-tools-row";
 import { LogoMark } from "@/components/layout/logo";
+import { Reveal } from "@/components/layout/reveal";
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion";
@@ -81,6 +82,13 @@ const STEPS = [
   },
 ];
 
+const HERO_STATS = [
+  { value: `${ALL_TOOLS.length}+`, label: "Free tools" },
+  { value: `${CATEGORIES.length}`, label: "Categories" },
+  { value: "100%", label: "Browser-based" },
+  { value: "0", label: "Sign-ups needed" },
+] as const;
+
 const FAQS = [
   {
     q: "Is Pixelmint.fun free to use?",
@@ -122,7 +130,7 @@ export default function HomePage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
-      {/* ============ Hero ============ */}
+      {/* ============ Hero — staggered entrance choreography ============ */}
       <section className="relative overflow-hidden border-b bg-gradient-to-b from-secondary/70 via-background to-background">
         <div className="bg-grid absolute inset-0" aria-hidden="true" />
         <div className="bg-pixel-grid absolute inset-0 opacity-60" aria-hidden="true" />
@@ -133,23 +141,23 @@ export default function HomePage() {
         <span className="pm-float-soft absolute bottom-[24%] left-[16%] hidden h-2.5 w-2.5 rounded-[3px] bg-primary/20 xl:block" style={{ animationDelay: "2.1s" }} aria-hidden="true" />
 
         <div className="container-page relative flex flex-col items-center py-14 text-center sm:py-20">
-          <span className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3.5 py-1.5 text-xs font-medium text-muted-foreground shadow-card">
+          <span className="pm-rise pm-rise-1 inline-flex items-center gap-1.5 rounded-full border bg-card px-3.5 py-1.5 text-xs font-medium text-muted-foreground shadow-card">
             <Sparkles size={13} className="text-primary" aria-hidden="true" />
             {ALL_TOOLS.length}+ free tools · no sign-up · privacy-friendly
           </span>
-          <h1 className="font-display mt-5 max-w-3xl text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            Every tool.{" "}
-            <span className="text-gradient">One smart place.</span>
+          <h1 className="font-display mt-5 max-w-3xl text-balance text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+            <span className="pm-rise-text pm-rise-2 block">Every tool.</span>
+            <span className="pm-rise-text pm-rise-3 text-gradient block">One smart place.</span>
           </h1>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Convert, edit, compress, create, and organize files with {ALL_TOOLS.length}+ fast, free online tools.
+          <p className="pm-rise pm-rise-4 mt-4 max-w-xl text-balance text-base leading-relaxed text-muted-foreground sm:text-lg">
+            Convert, edit, compress, create, and organize files with {ALL_TOOLS.length}+ fast, free online tools — right in your browser.
           </p>
 
-          <div className="mt-8 w-full max-w-2xl">
+          <div className="pm-rise pm-rise-5 mt-8 w-full max-w-2xl">
             <HeroSearch />
           </div>
 
-          <ul className="mt-6 flex flex-wrap justify-center gap-2">
+          <ul className="pm-rise pm-rise-6 mt-6 flex flex-wrap justify-center gap-2">
             {HERO_SHORTCUTS.map((item) => (
               <li key={item.slug}>
                 <Link
@@ -161,6 +169,18 @@ export default function HomePage() {
               </li>
             ))}
           </ul>
+
+          {/* Trust stats — anchors the hero with at-a-glance proof */}
+          <dl className="pm-rise pm-rise-7 mt-10 flex w-full max-w-2xl flex-wrap items-start justify-center gap-x-10 gap-y-5 border-t border-border/70 pt-7">
+            {HERO_STATS.map((stat) => (
+              <div key={stat.label} className="flex flex-col items-center">
+                <dd className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                  {stat.value}
+                </dd>
+                <dt className="mt-1 text-xs font-medium text-muted-foreground">{stat.label}</dt>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
 
@@ -169,7 +189,7 @@ export default function HomePage() {
 
       {/* ============ Categories ============ */}
       <section className="container-page py-12" aria-labelledby="categories-heading">
-        <div className="flex items-end justify-between">
+        <Reveal className="flex items-end justify-between">
           <div>
             <h2 id="categories-heading" className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">Browse by category</h2>
             <p className="mt-1 text-sm text-muted-foreground">{CATEGORIES.length} categories covering files, documents, code, AI and daily calculations.</p>
@@ -177,8 +197,8 @@ export default function HomePage() {
           <Link href="/categories" className="hidden items-center gap-1 text-sm font-medium text-primary hover:underline sm:inline-flex">
             All categories <ArrowRight size={14} aria-hidden="true" />
           </Link>
-        </div>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        </Reveal>
+        <Reveal stagger className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {CATEGORIES.map((category) => (
             <Link
               key={category.id}
@@ -193,13 +213,13 @@ export default function HomePage() {
               <p className="mt-2.5 text-xs font-semibold text-primary">{categoryCount(category.id, ALL_TOOLS)} tools →</p>
             </Link>
           ))}
-        </div>
+        </Reveal>
       </section>
 
       {/* ============ Featured / Popular ============ */}
       <section className="border-y bg-card/50 py-12" aria-labelledby="featured-heading">
         <div className="container-page">
-          <div className="flex items-end justify-between">
+          <Reveal className="flex items-end justify-between">
             <div>
               <h2 id="featured-heading" className="flex items-center gap-2 font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                 <Star className="text-amber-500" size={22} aria-hidden="true" /> Featured tools
@@ -209,19 +229,21 @@ export default function HomePage() {
             <Link href="/popular" className="hidden items-center gap-1 text-sm font-medium text-primary hover:underline sm:inline-flex">
               See all <ArrowRight size={14} aria-hidden="true" />
             </Link>
-          </div>
-          <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          </Reveal>
+          <Reveal stagger className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {featured.map((tool) => (
               <ToolCard key={tool.slug} tool={tool} />
             ))}
-          </div>
+          </Reveal>
         </div>
       </section>
 
       {/* ============ All tools browser ============ */}
       <section className="container-page py-12" aria-labelledby="all-heading">
-        <h2 id="all-heading" className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">All {ALL_TOOLS.length} tools</h2>
-        <p className="mt-1 text-sm text-muted-foreground">Search or filter to find exactly what you need.</p>
+        <Reveal>
+          <h2 id="all-heading" className="font-display text-2xl font-bold tracking-tight text-foreground sm:text-3xl">All {ALL_TOOLS.length} tools</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Search or filter to find exactly what you need.</p>
+        </Reveal>
         <div className="mt-6">
           <ToolBrowser tools={ALL_TOOLS} />
         </div>
@@ -230,18 +252,18 @@ export default function HomePage() {
       {/* ============ Why Pixelmint.fun ============ */}
       <section className="border-t bg-card/50 py-16" aria-labelledby="why-heading">
         <div className="container-page">
-          <div className="mx-auto max-w-2xl text-center">
+          <Reveal className="mx-auto max-w-2xl text-center">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3.5 py-1.5 text-xs font-semibold text-secondary-foreground">
               <Sparkles size={13} aria-hidden="true" /> Why Pixelmint.fun
             </span>
-            <h2 id="why-heading" className="font-display mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            <h2 id="why-heading" className="font-display mt-4 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Simple tools. Serious results.
             </h2>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
+            <p className="mt-3 text-balance text-sm leading-relaxed text-muted-foreground sm:text-base">
               Built for the things you actually need to get done — and nothing you don't.
             </p>
-          </div>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          </Reveal>
+          <Reveal stagger className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {WHY.map((item) => (
               <div key={item.title} className="card-lift rounded-2xl border bg-card p-5 shadow-card hover:shadow-card-hover sm:p-6">
                 <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-primary">
@@ -251,21 +273,21 @@ export default function HomePage() {
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.text}</p>
               </div>
             ))}
-          </div>
+          </Reveal>
         </div>
       </section>
 
       {/* ============ How it works ============ */}
       <section className="container-page py-16" aria-labelledby="how-heading">
-        <div className="mx-auto max-w-2xl text-center">
+        <Reveal className="mx-auto max-w-2xl text-center">
           <h2 id="how-heading" className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             How it works
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
             Three steps, zero friction — from problem to finished file.
           </p>
-        </div>
-        <ol className="mx-auto mt-10 grid max-w-4xl gap-5 sm:grid-cols-3">
+        </Reveal>
+        <Reveal as="ol" stagger className="mx-auto mt-10 grid max-w-4xl gap-5 sm:grid-cols-3">
           {STEPS.map((step, i) => (
             <li key={step.title} className="card-lift relative rounded-2xl border bg-card p-6 shadow-card hover:shadow-card-hover">
               <span className="font-display flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-base font-bold text-primary-foreground shadow-mint">
@@ -275,71 +297,75 @@ export default function HomePage() {
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.text}</p>
             </li>
           ))}
-        </ol>
+        </Reveal>
       </section>
 
       {/* ============ FAQ ============ */}
       <section className="border-t bg-card/50 py-16" aria-labelledby="faq-heading">
         <div className="container-page max-w-3xl">
-          <div className="text-center">
+          <Reveal className="text-center">
             <h2 id="faq-heading" className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Frequently asked questions
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
               Everything you might want to know before you start.
             </p>
-          </div>
-          <Accordion type="single" collapsible className="mt-8 rounded-2xl border bg-card px-5 shadow-card">
-            {FAQS.map((faq, i) => (
-              <AccordionItem key={i} value={`faq-${i}`} className="border-b last:border-b-0">
-                <AccordionTrigger className="text-left text-sm font-semibold text-foreground hover:no-underline sm:text-base">
-                  {faq.q}
-                </AccordionTrigger>
-                <AccordionContent className="pb-4 text-sm leading-relaxed text-muted-foreground">
-                  {faq.a}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+          </Reveal>
+          <Reveal delay={120} className="mt-8">
+            <Accordion type="single" collapsible className="rounded-2xl border bg-card px-5 shadow-card">
+              {FAQS.map((faq, i) => (
+                <AccordionItem key={i} value={`faq-${i}`} className="border-b last:border-b-0">
+                  <AccordionTrigger className="text-left text-sm font-semibold text-foreground hover:no-underline sm:text-base">
+                    {faq.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-4 text-sm leading-relaxed text-muted-foreground">
+                    {faq.a}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </Reveal>
         </div>
       </section>
 
       {/* ============ Final CTA ============ */}
       <section className="container-page py-16" aria-labelledby="cta-heading">
-        <div className="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-secondary via-card to-secondary/50 px-6 py-14 text-center shadow-card sm:px-12">
-          <div className="bg-pixel-grid absolute inset-0 opacity-50" aria-hidden="true" />
-          <span className="pm-float-soft absolute left-[6%] top-[18%] hidden h-3 w-3 rounded-[3px] bg-primary/20 sm:block" aria-hidden="true" />
-          <span className="pm-float-soft absolute bottom-[16%] right-[7%] hidden h-4 w-4 rounded-[4px] bg-mint/25 sm:block" style={{ animationDelay: "1.4s" }} aria-hidden="true" />
-          <div className="relative">
-            <LogoMark size={44} className="mx-auto" animate={false} />
-            <h2 id="cta-heading" className="font-display mt-5 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Your everyday toolkit is ready.
-            </h2>
-            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-              From quick conversions to creative edits, get more done in less time.
-            </p>
-            <div className="mt-7 flex flex-wrap justify-center gap-3">
-              <Link
-                href="/tools"
-                className="focus-ring inline-flex items-center gap-1.5 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-mint transition-all hover:-translate-y-0.5 hover:bg-primary/90"
-              >
-                <MousePointerClick size={16} aria-hidden="true" />
-                Explore all tools
-              </Link>
-              <Link
-                href="/categories"
-                className="focus-ring inline-flex items-center gap-1.5 rounded-xl border bg-card px-6 py-3 text-sm font-semibold text-foreground shadow-card transition-all hover:-translate-y-0.5 hover:shadow-card-hover"
-              >
-                Browse categories
-              </Link>
+        <Reveal>
+          <div className="relative overflow-hidden rounded-3xl border bg-gradient-to-br from-secondary via-card to-secondary/50 px-6 py-14 text-center shadow-card sm:px-12">
+            <div className="bg-pixel-grid absolute inset-0 opacity-50" aria-hidden="true" />
+            <span className="pm-float-soft absolute left-[6%] top-[18%] hidden h-3 w-3 rounded-[3px] bg-primary/20 sm:block" aria-hidden="true" />
+            <span className="pm-float-soft absolute bottom-[16%] right-[7%] hidden h-4 w-4 rounded-[4px] bg-mint/25 sm:block" style={{ animationDelay: "1.4s" }} aria-hidden="true" />
+            <div className="relative">
+              <LogoMark size={44} className="mx-auto" animate={false} />
+              <h2 id="cta-heading" className="font-display mt-5 text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                Your everyday toolkit is ready.
+              </h2>
+              <p className="mx-auto mt-3 max-w-xl text-balance text-sm leading-relaxed text-muted-foreground sm:text-base">
+                From quick conversions to creative edits, get more done in less time.
+              </p>
+              <div className="mt-7 flex flex-wrap justify-center gap-3">
+                <Link
+                  href="/tools"
+                  className="focus-ring inline-flex items-center gap-1.5 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-mint transition-all hover:-translate-y-0.5 hover:bg-primary/90"
+                >
+                  <MousePointerClick size={16} aria-hidden="true" />
+                  Explore all tools
+                </Link>
+                <Link
+                  href="/categories"
+                  className="focus-ring inline-flex items-center gap-1.5 rounded-xl border bg-card px-6 py-3 text-sm font-semibold text-foreground shadow-card transition-all hover:-translate-y-0.5 hover:shadow-card-hover"
+                >
+                  Browse categories
+                </Link>
+              </div>
+              <p className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
+                <span className="inline-flex items-center gap-1"><Lock size={11} aria-hidden="true" /> Privacy-first</span>
+                <span className="inline-flex items-center gap-1"><WifiOff size={11} aria-hidden="true" /> No install</span>
+                <span className="inline-flex items-center gap-1"><Zap size={11} aria-hidden="true" /> Instant results</span>
+              </p>
             </div>
-            <p className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-muted-foreground">
-              <span className="inline-flex items-center gap-1"><Lock size={11} aria-hidden="true" /> Privacy-first</span>
-              <span className="inline-flex items-center gap-1"><WifiOff size={11} aria-hidden="true" /> No install</span>
-              <span className="inline-flex items-center gap-1"><Zap size={11} aria-hidden="true" /> Instant results</span>
-            </p>
           </div>
-        </div>
+        </Reveal>
       </section>
     </>
   );

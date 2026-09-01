@@ -127,6 +127,11 @@ export default function RootLayout({
       className={`${inter.variable} ${grotesk.variable}`}
     >
       <body className="flex min-h-screen flex-col bg-background font-sans text-foreground antialiased">
+        {/* Progressive enhancement: flags JS availability before first paint so
+            scroll-reveal choreography only applies for JS users (html.js). */}
+        <script
+          dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }}
+        />
         <ThemeProvider>
           <a
             href="#main-content"

@@ -301,3 +301,104 @@
 .pm-float-soft {
   animation: pm-float-soft 5s ease-in-out infinite;
 }
+
+/* ============================================================
+   Premium entrance & scroll-reveal choreography
+   All one-shot, GPU-friendly (opacity/transform only) and
+   automatically neutralised by the global reduced-motion block.
+   ============================================================ */
+
+/* Hero staggered rise-in — fade + slide-up.
+   `backwards` fill keeps elements invisible through their delay,
+   so server-rendered HTML never flashes visible content first. */
+@keyframes pm-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.pm-rise {
+  animation: pm-rise 0.7s cubic-bezier(0.21, 0.47, 0.32, 0.98) backwards;
+}
+
+/* Text variant adds a subtle de-blur for a crisp premium feel. */
+@keyframes pm-rise-text {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+    filter: blur(6px);
+  }
+  60% {
+    filter: blur(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+.pm-rise-text {
+  animation: pm-rise-text 0.85s cubic-bezier(0.21, 0.47, 0.32, 0.98) backwards;
+}
+
+/* Stagger delays (composable with both rise variants). */
+.pm-rise-1 { animation-delay: 0.04s; }
+.pm-rise-2 { animation-delay: 0.12s; }
+.pm-rise-3 { animation-delay: 0.2s; }
+.pm-rise-4 { animation-delay: 0.28s; }
+.pm-rise-5 { animation-delay: 0.36s; }
+.pm-rise-6 { animation-delay: 0.44s; }
+.pm-rise-7 { animation-delay: 0.52s; }
+
+/* Scroll reveal — hidden ONLY when JS is available (html.js is set
+   by an inline script before first paint). No-JS users and crawlers
+   see all content immediately; JS users get the choreography. */
+html.js .pm-reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.65s cubic-bezier(0.21, 0.47, 0.32, 0.98),
+    transform 0.65s cubic-bezier(0.21, 0.47, 0.32, 0.98);
+}
+html.js .pm-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Staggered-children variant — the wrapper stays visible; its direct
+   children rise in sequentially. Animation-based (not transition) so
+   each child's own hover transitions are never delayed afterwards. */
+html.js .pm-stagger > * {
+  animation: pm-rise 0.6s cubic-bezier(0.21, 0.47, 0.32, 0.98) backwards;
+  animation-play-state: paused;
+}
+html.js .pm-stagger.is-visible > * {
+  animation-play-state: running;
+}
+html.js .pm-stagger.is-visible > *:nth-child(2) { animation-delay: 60ms; }
+html.js .pm-stagger.is-visible > *:nth-child(3) { animation-delay: 120ms; }
+html.js .pm-stagger.is-visible > *:nth-child(4) { animation-delay: 180ms; }
+html.js .pm-stagger.is-visible > *:nth-child(5) { animation-delay: 240ms; }
+html.js .pm-stagger.is-visible > *:nth-child(6) { animation-delay: 300ms; }
+html.js .pm-stagger.is-visible > *:nth-child(7) { animation-delay: 360ms; }
+html.js .pm-stagger.is-visible > *:nth-child(8) { animation-delay: 420ms; }
+html.js .pm-stagger.is-visible > *:nth-child(n + 9) { animation-delay: 480ms; }
+
+/* Pop-in for floating layers (search dropdowns, popovers). */
+@keyframes pm-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.pm-pop-in {
+  animation: pm-pop-in 0.18s ease-out;
+}

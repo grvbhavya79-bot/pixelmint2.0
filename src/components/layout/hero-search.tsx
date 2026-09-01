@@ -42,7 +42,7 @@ export function HeroSearch() {
       </form>
 
       {query.trim() !== "" && (
-        <div className="absolute inset-x-0 top-full z-20 mt-2 overflow-hidden rounded-xl border bg-popover shadow-card-hover">
+        <div className="pm-pop-in absolute inset-x-0 top-full z-20 mt-2 overflow-hidden rounded-xl border bg-popover shadow-card-hover">
           {results.length === 0 ? (
             <p className="px-4 py-3 text-sm text-muted-foreground">No tools match “{query}”.</p>
           ) : (
