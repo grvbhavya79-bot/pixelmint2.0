@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { ADMIN_COOKIE, checkAdminPassword, createSessionToken } from "@/lib/server/admin-auth";
+import { ADMIN_COOKIE, checkAdminPassword, createSessionToken, isAdminConfigured } from "@/lib/server/admin-auth";
 import { rateLimit, getClientIp, RATE_LIMITS } from "@/lib/server/rate-limit";
 
 const schema = z.object({ password: z.string().min(1).max(200) });
@@ -12,6 +12,15 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { success: false, error: "Too many attempts — please wait 15 minutes." },
       { status: 429 },
+    );
+  }
+
+  // Fail closed: if no password is configured on this server, admin access
+  // is disabled entirely (no default password exists).
+  if (!isAdminConfigured()) {
+    return NextResponse.json(
+      { success: false, error: "Admin login is disabled on this server." },
+      { status: 503 },
     );
   }
 
@@ -27,10 +36,17 @@ export async function POST(request: Request) {
   }
 
   if (!checkAdminPassword(parsed.data.password)) {
+    console.warn(`[admin] Failed login attempt from ${ip} at ${new Date().toISOString()}`);
     return NextResponse.json({ success: false, error: "Incorrect password." }, { status: 401 });
   }
 
   const token = createSessionToken();
+  if (!token) {
+    return NextResponse.json(
+      { success: false, error: "Server misconfiguration: ADMIN_SECRET missing." },
+      { status: 500 },
+    );
+  }
   const response = NextResponse.json({ success: true });
   response.cookies.set(ADMIN_COOKIE, token, {
     httpOnly: true,

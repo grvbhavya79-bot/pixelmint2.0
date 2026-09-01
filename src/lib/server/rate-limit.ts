@@ -56,5 +56,5 @@ export const RATE_LIMITS = {
   shortenerCreate: { limit: 20, windowMs: 3_600_000 },
   shortenerResolve: { limit: 120, windowMs: 60_000 },
   currency: { limit: 60, windowMs: 60_000 },
-  adminLogin: { limit: 10, windowMs: 15 * 60_000 },
+  adminLogin: { limit: 5, windowMs: 15 * 60_000 },
 } as const;

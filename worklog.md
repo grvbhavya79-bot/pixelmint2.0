@@ -222,3 +222,25 @@ Stage Summary:
 - Quality gates: bun test 83/83 pass, ESLint clean, tsc --noEmit clean, all 16 swept routes 200.
 - Browser-verified (agent-browser): hero renders with stats, 7 entrance animations animate to opacity 1; 12 scroll reveals fire progressively on scroll (5 visible mid-scroll, 12/12 at bottom); search dropdown pop-in + navigation to /tools/merge-pdf works; mobile 375px zero horizontal overflow, hamburger menu opens/closes with body scroll lock; dark mode bg #0c1310; sticky footer exact (footer bottom = viewport bottom on short page, zero gap); Support page QR loads, UPI copy button transitions to "Copied!", upi:// deep link correct (pa=grvbhavya55@axl).
 - Zero console/page errors across all tested flows.
+
+---
+Task ID: 6
+Agent: Super Z (main agent)
+Task: Admin password inquiry + full security hardening audit of Pixelmint.fun.
+
+Work Log:
+- Answered: admin password was the dev default "admin123" (hardcoded fallback in admin-auth.ts, since .env had no ADMIN_PASSWORD).
+- Leak audit performed: client chunks and client source contain NO password/secret; git history of .env contained only DATABASE_URL (never a password); z-ai-web-dev-sdk uses machine credentials (no hardcoded key); only NEXT_PUBLIC_ var is SITE_URL (safe).
+- CRITICAL FIX: .env was tracked in git (committed before gitignore was added) — any future credential added to it would have been committed. Untracked it (git rm --cached .env; file kept on disk, gitignore now effective).
+- Generated strong credentials (openssl): ADMIN_PASSWORD 20-char random, ADMIN_SECRET 64-hex; written to .env.
+- HARDENING (admin-auth.ts rewrite, fail-closed): removed hardcoded "admin123" password fallback — if ADMIN_PASSWORD is unset, login is disabled (503, no default exists); removed "pixelmint-dev-secret" HMAC fallback — tokens can't be forged without env secret; session tokens now include random 16-byte nonce (every login produces a unique token, no deterministic replayable tokens); renamed cookie tb100_admin → pm_admin (old ToolBox100 remnant); strict payload format validation on verify.
+- Login route: fail-closed 503 when unconfigured, null-token handling, failed-login logging with IP + timestamp.
+- Rate limit for admin login tightened 10 → 5 attempts per 15 min.
+- Recreated empty .env.example with full documentation of all 7 env vars (DATABASE_URL, ADMIN_PASSWORD, ADMIN_SECRET, NEXT_PUBLIC_SITE_URL, EMAIL_API_KEY, EMAIL_FROM, CONTACT_TO_EMAIL) with generation commands.
+- Verified Caddy gateway replaces X-Forwarded-For with real client IP (not append) — rate-limiter IP parsing cannot be spoofed through the public gateway.
+- E2E verified: old password admin123 → 401 rejected; new password → 200; cookie is pm_admin; two logins produce different tokens; analytics 401 without cookie, 200 with; 5-attempt lockout enforced (429); browser: sign-in form renders, login succeeds, dashboard loads with stats, sign-out returns to form; zero console errors.
+- Quality gates: ESLint clean, tsc clean, bun test 83/83.
+
+Stage Summary:
+- Admin password now: strong random value stored ONLY in .env (gitignored, untracked). Zero secrets in source or client bundles — fail-closed auth with no defaults.
+- Site security posture: rate-limited admin login (5/15min), HMAC-signed httpOnly session cookies with nonces, timing-safe comparisons, CSP + X-Frame-Options DENY, SSRF/private-IP blocking on shortener, per-IP rate limits on all public APIs.
