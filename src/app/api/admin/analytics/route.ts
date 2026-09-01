@@ -1,15 +1,9 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { ADMIN_COOKIE, verifySessionToken } from "@/lib/server/admin-auth";
-
-async function requireAuth(request: Request): Promise<boolean> {
-  const cookie = request.headers.get("cookie") ?? "";
-  const match = cookie.match(new RegExp(`${ADMIN_COOKIE}=([^;]+)`));
-  return verifySessionToken(match?.[1]);
-}
+import { requireAdminAuth } from "@/lib/server/admin-auth";
 
 export async function GET(request: Request) {
-  if (!(await requireAuth(request))) {
+  if (!requireAdminAuth(request)) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
 
@@ -24,17 +18,22 @@ export async function GET(request: Request) {
     weeklyUses,
     monthlyUses,
     failedUses,
+    distinctTools,
+    totalMessages,
+    unreadMessages,
     popularTools,
     dailyTrafficRaw,
     categoryTrafficRaw,
     urlStats,
-    messageStats,
   ] = await Promise.all([
     db.toolUsage.count(),
     db.toolUsage.count({ where: { createdAt: { gte: dayAgo } } }),
     db.toolUsage.count({ where: { createdAt: { gte: weekAgo } } }),
     db.toolUsage.count({ where: { createdAt: { gte: monthAgo } } }),
     db.toolUsage.count({ where: { status: "error" } }),
+    db.toolUsage.findMany({ select: { slug: true }, distinct: ["slug"] }),
+    db.contactMessage.count(),
+    db.contactMessage.count({ where: { isRead: false } }),
     db.toolUsage.groupBy({ by: ["slug"], _count: { slug: true }, orderBy: { _count: { slug: "desc" } }, take: 10 }),
     db.toolUsage.findMany({
       where: { createdAt: { gte: new Date(now.getTime() - 14 * 86400000) } },
@@ -42,7 +41,6 @@ export async function GET(request: Request) {
     }),
     db.toolUsage.findMany({ where: { createdAt: { gte: monthAgo } }, select: { slug: true } }),
     db.shortUrl.aggregate({ _count: true, _sum: { clickCount: true } }),
-    db.contactMessage.count(),
   ]);
 
   // bucket daily traffic into last 14 days
@@ -76,9 +74,12 @@ export async function GET(request: Request) {
       weeklyUses,
       monthlyUses,
       failedUses,
+      successRate: totalUses > 0 ? Math.round(((totalUses - failedUses) / totalUses) * 100) : null,
+      uniqueToolsUsed: distinctTools.length,
       totalShortUrls: urlStats._count,
       totalShortUrlClicks: urlStats._sum.clickCount ?? 0,
-      unreadMessages: messageStats,
+      totalMessages,
+      unreadMessages,
       popularTools: popularTools.map((p) => ({ slug: p.slug, count: p._count.slug })),
       dailyTraffic: [...trafficMap.entries()].map(([date, count]) => ({ date, count })),
       categoryTraffic: [...catCount.entries()]

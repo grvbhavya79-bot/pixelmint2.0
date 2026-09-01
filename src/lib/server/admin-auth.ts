@@ -24,6 +24,13 @@ export function isAdminConfigured(): boolean {
   return Boolean(process.env.ADMIN_PASSWORD);
 }
 
+/** Shared guard for admin API routes — checks the signed session cookie. */
+export function requireAdminAuth(request: Request): boolean {
+  const cookie = request.headers.get("cookie") ?? "";
+  const match = cookie.match(new RegExp(`${ADMIN_COOKIE}=([^;]+)`));
+  return verifySessionToken(match?.[1]);
+}
+
 export function checkAdminPassword(password: string): boolean {
   const expectedValue = process.env.ADMIN_PASSWORD;
   if (!expectedValue) {

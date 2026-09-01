@@ -1,16 +1,10 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { ADMIN_COOKIE, verifySessionToken } from "@/lib/server/admin-auth";
-
-async function requireAuth(request: Request): Promise<boolean> {
-  const cookie = request.headers.get("cookie") ?? "";
-  const match = cookie.match(new RegExp(`${ADMIN_COOKIE}=([^;]+)`));
-  return verifySessionToken(match?.[1]);
-}
+import { requireAdminAuth } from "@/lib/server/admin-auth";
 
 /** List contact messages. */
 export async function GET(request: Request) {
-  if (!(await requireAuth(request))) {
+  if (!requireAdminAuth(request)) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
   const messages = await db.contactMessage.findMany({
@@ -20,12 +14,19 @@ export async function GET(request: Request) {
   return NextResponse.json({ success: true, messages });
 }
 
-/** Mark message as read/unread. */
+/** Mark message as read/unread — or all messages at once with { all: true }. */
 export async function PATCH(request: Request) {
-  if (!(await requireAuth(request))) {
+  if (!requireAdminAuth(request)) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
   const body = await request.json().catch(() => null);
+
+  // Mark ALL messages as read: { all: true }
+  if (body?.all === true) {
+    const result = await db.contactMessage.updateMany({ data: { isRead: true } });
+    return NextResponse.json({ success: true, updated: result.count });
+  }
+
   const id = typeof body?.id === "string" ? body.id : null;
   const isRead = typeof body?.isRead === "boolean" ? body.isRead : null;
   if (!id || isRead === null) {
@@ -41,7 +42,7 @@ export async function PATCH(request: Request) {
 
 /** Delete a message. */
 export async function DELETE(request: Request) {
-  if (!(await requireAuth(request))) {
+  if (!requireAdminAuth(request)) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
   const body = await request.json().catch(() => null);

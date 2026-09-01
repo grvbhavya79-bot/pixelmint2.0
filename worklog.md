@@ -244,3 +244,28 @@ Work Log:
 Stage Summary:
 - Admin password now: strong random value stored ONLY in .env (gitignored, untracked). Zero secrets in source or client bundles — fail-closed auth with no defaults.
 - Site security posture: rate-limited admin login (5/15min), HMAC-signed httpOnly session cookies with nonces, timing-safe comparisons, CSP + X-Frame-Options DENY, SSRF/private-IP blocking on shortener, per-IP rate limits on all public APIs.
+
+---
+Task ID: 7
+Agent: Super Z (main agent)
+Task: Remove fake details from admin dashboard + add new admin dashboard features.
+
+Work Log:
+- AUDITED: dashboard itself had no hardcoded fake data, but the DATABASE contained 335 fake ToolUsage records, 24 example.com test short links, 6 test messages (Test User / Audit Bot / E2E Test) from earlier automated verification runs. Also found mislabeled stat: API returned total message count under field name "unreadMessages".
+- PURGED all test data (toolUsage 335→0, shortUrls 24→0, clicks 6→0, messages 6→0) via scripts/purge-test-data.ts — dashboard now shows only genuine data with honest empty states.
+- REFACTORED: duplicated requireAuth in 4 admin routes → shared requireAdminAuth() in admin-auth.ts.
+- FIXED analytics: real totalMessages + unreadMessages counts (separate), added successRate (null→"—" when no data) and uniqueToolsUsed; stat cards 8→10.
+- NEW /api/admin/overview: real server health (runtime, uptime, RSS/heap memory, env, DB file size), config status as boolean flags only (never values), recent activity feed (12 events), recent failed processes (10).
+- NEW /api/admin/urls POST: create short links from admin (zod validation + same checkDestinationUrl SSRF guard as public endpoint; private-URL rejection verified).
+- NEW /api/admin/messages PATCH {all:true}: mark all messages read.
+- NEW /api/admin/export?type=tools|urls|messages: RFC-4180 CSV exports with proper Content-Disposition download headers.
+- REBUILT dashboard UI: header Refresh button + "Live" auto-refresh toggle (30s interval via stable ref) + last-updated stamp; toast notifications; Overview tab now includes Recent activity feed; URL tab includes create-link form (URL + custom code + expiry) with copy button and per-row copy button; Messages tab with All/Unread filter + unread badge + Mark all read (auto-hidden when none unread) + CSV export; NEW System tab (server health, config flags, error log); CSV export buttons on every tab.
+- FIXED dev server found dead (OOM-style crash) — restarted detached; all routes recovered 200.
+- Fixed TS errors: React 19 useRef requires initial arg; Bun global type → process.versions.bun.
+- E2E VERIFIED (curl + agent-browser): login works; overview returns real runtime/uptime/memory/config booleans; analytics zeros + successRate null; create link via UI form (banner + table row + export link present); SSRF 127.0.0.1 rejected 400; CSVs return correct headers/data + 401 without cookie; live toggle sets aria-pressed; messages filter All(0)/Unread(0) + empty states; System tab shows real values; zero console/page errors; track event → activity feed pipeline proven then test record removed.
+- Final DB state: 100% genuine (0 tool usage, 0 links, 0 messages). Test artifacts removed.
+- Gates: bun test 83/83, ESLint clean, tsc clean.
+
+Stage Summary:
+- Admin dashboard now shows ONLY real data (all fake/test records purged; mislabeled stats fixed).
+- New features: live auto-refresh, manual refresh + updated stamp, 10 stat cards (success rate, unread), recent activity feed, system health tab (runtime/uptime/memory/DB size/config flags), error log, create short link from admin (SSRF-safe), copy buttons, message filters + unread badge + mark-all-read, CSV exports on all tabs, toast feedback.
