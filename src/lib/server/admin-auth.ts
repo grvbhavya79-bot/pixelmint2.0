@@ -15,12 +15,26 @@ import { db } from "@/lib/db";
  * - Session tokens carry a random nonce (unique per login) and the
  *   passwordVersion at issue time, so changing the password instantly
  *   invalidates every previously issued session.
+ *
+ * Session lifetime ("ends when you leave the site"):
+ * - The cookie is a browser-session cookie (no maxAge): it is deleted
+ *   when the browser closes.
+ * - Tokens expire after SESSION_TTL_MS (30 min) and are renewed by a
+ *   heartbeat from the dashboard while it is open, so an abandoned tab
+ *   dies within 30 minutes.
+ * - When the dashboard is closed/navigated away from, it sends a beacon
+ *   to /api/admin/session/end which revokes the session nonce
+ *   immediately. A short grace window (SESSION_GRACE_MS) lets a page
+ *   reload in the same browser resurrect the session; after that the
+ *   revocation is permanent. Explicit sign-out revokes permanently.
  */
 
 export const ADMIN_COOKIE = "pm_admin";
 
 const ACCOUNT_ID = "primary";
-const SESSION_TTL_MS = 7 * 24 * 3600 * 1000;
+/** Idle timeout: tokens expire this long after the last renewal. */
+export const SESSION_TTL_MS = 30 * 60 * 1000;
+const SESSION_GRACE_MS = 90 * 1000;
 
 export interface AdminAccount {
   id: string;
@@ -135,41 +149,121 @@ export async function verifyAdminLogin(password: string): Promise<AdminAccount |
 
 /* ------------------------------ Session tokens ---------------------------- */
 
-export function createSessionToken(passwordVersion: number): string | null {
+export interface SessionInfo {
+  nonce: string;
+  expires: number;
+  passwordVersion: number;
+}
+
+/**
+ * Revocation registry: nonce -> revokedAt (ms). A revocation takes effect
+ * immediately; a request arriving within SESSION_GRACE_MS of revokedAt
+ * cancels it (covers page reloads and other still-open tabs). Revocations
+ * older than the grace window are permanent. Kept in memory — a server
+ * restart clears it, which is fail-safe because tokens still expire by TTL.
+ */
+const revokedNonces = new Map<string, number>();
+
+/**
+ * A revocation entry must outlive the token it kills: tokens expire at most
+ * SESSION_TTL_MS after they were minted, so an entry is safe to drop only
+ * after the grace window PLUS the TTL has elapsed.
+ */
+const REVOKE_RETENTION_MS = SESSION_TTL_MS + SESSION_GRACE_MS + 60_000;
+
+function sweepRevocations(now: number) {
+  for (const [n, t] of revokedNonces) {
+    if (now - t > REVOKE_RETENTION_MS) revokedNonces.delete(n);
+  }
+}
+
+/** Revoke a session nonce. Pass a custom `at` to simulate/backdate (tests). */
+export function revokeSession(nonce: string, at: number = Date.now()): void {
+  if (!nonce) return;
+  // Revocation is instant; the grace window is enforced at verify time.
+  revokedNonces.set(nonce, at);
+  if (revokedNonces.size > 1000) sweepRevocations(Date.now());
+}
+
+/** Hard revocation: no grace window, cannot be resurrected. */
+export function revokeSessionPermanently(nonce: string): void {
+  revokeSession(nonce, Date.now() - SESSION_GRACE_MS - 1000);
+}
+
+/**
+ * Returns true when the nonce was revoked so long ago that nothing can
+ * resurrect it; a recent revocation is returned as "not yet" because the
+ * verify path cancels it instead (see verifySessionToken).
+ */
+function isPermanentlyRevoked(nonce: string, now: number): boolean {
+  const revokedAt = revokedNonces.get(nonce);
+  if (revokedAt === undefined) return false;
+  return now - revokedAt > SESSION_GRACE_MS;
+}
+
+/** Cookie attributes for the admin session: browser-session scoped. */
+export function adminCookieOptions() {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    // Deliberately NO maxAge/expires: the cookie lives for the browser
+    // session only and disappears when the browser is closed.
+  };
+}
+
+export function createSessionToken(passwordVersion: number, nonce?: string): string | null {
   const s = secret();
   if (!s) return null;
   // Format: admin.<nonce>.<expiry-ms>.<passwordVersion>
-  const payload = `admin.${randomBytes(16).toString("hex")}.${Date.now() + SESSION_TTL_MS}.${passwordVersion}`;
+  const payload = `admin.${nonce ?? randomBytes(16).toString("hex")}.${Date.now() + SESSION_TTL_MS}.${passwordVersion}`;
   const sig = createHmac("sha256", s).update(payload).digest("hex");
   return `${Buffer.from(payload).toString("base64url")}.${sig}`;
 }
 
-export async function verifySessionToken(token: string | undefined | null): Promise<boolean> {
+export async function verifySessionToken(token: string | undefined | null): Promise<SessionInfo | null> {
   const s = secret();
-  if (!s || !token) return false;
+  if (!s || !token) return null;
   const [b64, sig] = token.split(".");
-  if (!b64 || !sig) return false;
+  if (!b64 || !sig) return null;
   try {
     const payload = Buffer.from(b64, "base64url").toString();
     const parts = payload.split(".");
-    if (parts.length !== 4 || parts[0] !== "admin") return false;
+    if (parts.length !== 4 || parts[0] !== "admin") return null;
     const expected = createHmac("sha256", s).update(payload).digest("hex");
-    if (expected.length !== sig.length) return false;
-    if (!timingSafeEqual(Buffer.from(expected), Buffer.from(sig))) return false;
+    if (expected.length !== sig.length) return null;
+    if (!timingSafeEqual(Buffer.from(expected), Buffer.from(sig))) return null;
     const expires = parseInt(parts[2], 10);
-    if (!Number.isFinite(expires) || Date.now() >= expires) return false;
+    if (!Number.isFinite(expires) || Date.now() >= expires) return null;
     const pv = parseInt(parts[3], 10);
-    if (!Number.isFinite(pv)) return false;
+    if (!Number.isFinite(pv)) return null;
     // Changing the password bumps the version, invalidating old sessions.
     const account = await getAdminAccount();
-    return account !== null && account.passwordVersion === pv;
+    if (!account || account.passwordVersion !== pv) return null;
+
+    // Beacon revocation: permanent after the grace window (entry is kept so
+    // the token stays dead); a request that arrives within the window means
+    // the session is still in active use (page reload / another open tab),
+    // so the revocation is cancelled instead.
+    const nonce = parts[1];
+    const now = Date.now();
+    if (isPermanentlyRevoked(nonce, now)) return null;
+    if (revokedNonces.has(nonce)) revokedNonces.delete(nonce); // still in grace: cancel revoke
+
+    return { nonce, expires, passwordVersion: pv };
   } catch {
-    return false;
+    return null;
   }
 }
 
-/** Shared guard for admin API routes — checks the signed session cookie. */
-export async function requireAdminAuth(request: Request): Promise<boolean> {
+/**
+ * Shared guard for admin API routes — checks the signed session cookie and
+ * returns the session info (nonce/expiry/version) or null. Truthiness of the
+ * returned object is enough for simple `if (!(await requireAdminAuth(...)))`
+ * checks.
+ */
+export async function requireAdminAuth(request: Request): Promise<SessionInfo | null> {
   const cookie = request.headers.get("cookie") ?? "";
   const match = cookie.match(new RegExp(`${ADMIN_COOKIE}=([^;]+)`));
   return verifySessionToken(match?.[1]);

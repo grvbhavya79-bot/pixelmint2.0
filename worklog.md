@@ -292,3 +292,23 @@ Stage Summary:
 - Panel customizable: username, display name ("Signed in as X"), panel title, tagline — persisted in DB, rendered across the dashboard.
 - Dashboard upgrades: 7/14/30/90-day analytics range with daily/weekly buckets, unified activity feed (tools + messages + link clicks), account info, bootstrap-password status banner.
 - Current login state: password = the previously issued strong env password (nghX…Ambw), display name "Bhavya G", panel title "Pixelmint Control Center", tagline "My tools, my rules — everything at a glance."
+
+---
+Task ID: 8
+Agent: Super Z (main agent)
+Task: Make the admin session end when the user leaves the site (instant-logout on site departure) — previously the login cookie lived for 7 days.
+
+Work Log:
+- Diagnosed: login route set pm_admin cookie with maxAge 7 days and session tokens carried a 7-day TTL — leaving the site/closing the browser kept the session alive for a week.
+- src/lib/server/admin-auth.ts: SESSION_TTL_MS 7d → 30 min (idle timeout); verifySessionToken/requireAdminAuth now return SessionInfo { nonce, expires, passwordVersion } (truthy object keeps every existing boolean call site working); added in-memory revocation registry with instant revoke + 90 s grace window (requests during grace cancel the revocation — covers F5/refresh and multi-tab), permanent revocations retained for TTL+grace+60 s so they cannot resurrect (REVOKE_RETENTION_MS; bug caught by test: deleting the entry on rejection resurrected the token); adminCookieOptions() → browser-session cookie (no maxAge/expires); createSessionToken(pv, nonce?) can renew with a stable nonce; exported SESSION_TTL_MS.
+- New routes: POST /api/admin/session/heartbeat (auth; re-issues fresh-expiry token with same nonce = sliding session; 401 when expired → dashboard returns to sign-in; rate limit adminHeartbeat 240/min) and POST /api/admin/session/end (beacon endpoint; revokes nonce instantly; no body parsing; 204 always; CSRF-safe via SameSite=Lax cookie).
+- login route: session cookie (no maxAge); DELETE (sign-out) now hard-revokes the nonce via revokeSessionPermanently before clearing the cookie — a copied token cannot be reused after sign-out. password route: re-issued cookie is session-scoped too.
+- Admin page: session keep-alive effect — immediate beat on mount, heartbeat every 45 s (also on focus/visible), navigator.sendBeacon on pagehide AND forced beacon in the unmount cleanup (covers SPA navigation away from /admin; fixed a bug where the `stopped` guard silenced the unmount beacon); heartbeat 401 resets to sign-in screen; login-screen + Settings→Account copy now documents the session policy.
+- Maintenance: prior session's E2E left the DB password out of sync with .env (hash one-way, so unrecoverable) → scripts/reset-admin-pw.ts reset the hash to the .env value (passwordVersion 6 → 7); dev server restarted twice (stale module instances + rate-limit buckets).
+- Tests: admin-account.test.ts updated for SessionInfo returns + new suite "admin session ends when you leave the site" (grace cancel, permanent revoke, hard revoke, session-cookie has no maxAge, heartbeat keeps nonce, 30-min TTL) — 102/102 passing.
+- E2E (scripts/e2e-session-end.sh + agent-browser): login Set-Cookie has no Max-Age/Expires + HttpOnly; heartbeat 200; beacon→request-during-grace→200 (refresh stays signed in); beacon→NO requests→401 after grace (leave-site kills session, browser-verified: SPA nav to /tools → 95 s → /admin shows "Admin sign-in"); re-login works; sign-out button = immediate 401 hard revoke; anonymous beacon 204. Lint/tsc clean, dev.log zero errors, screenshot download/admin-session-keepalive.png.
+
+Stage Summary:
+- Leaving the site now signs the admin out: tab close / browser exit / SPA or external navigation fires a beacon that revokes the session within moments (90 s grace only rescues a same-browser reload — F5 never logs you out); browser close also deletes the session cookie outright; idle/abandoned sessions expire after 30 min; explicit Sign out hard-revokes with no grace.
+- Session semantics: browser-session cookie (no maxAge) + sliding 30-min TTL renewed by a 45 s heartbeat while the dashboard is open + server-side nonce revocation; password changes still invalidate all sessions instantly.
+- Current login state: password = the .env ADMIN_PASSWORD value (nghX…Ambw) after the maintenance reset; browser left signed out.

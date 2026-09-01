@@ -230,6 +230,66 @@ export default function AdminPage() {
     return () => window.clearInterval(id);
   }, [autoRefresh]);
 
+  /* ------------------------- Session keep-alive ------------------------- */
+  // While the dashboard is open: renew the session every 45 s (sliding
+  // 30-minute expiry). When the tab is closed, the browser exits, or the
+  // user navigates away from the site: fire a beacon that revokes the
+  // session server-side — leaving the site signs you out.
+  useEffect(() => {
+    if (authed !== true) return;
+    let stopped = false;
+
+    const beat = async () => {
+      if (stopped) return;
+      try {
+        const res = await fetch("/api/admin/session/heartbeat", { method: "POST" });
+        if (res.status === 401 && !stopped) {
+          // Session expired while the tab was idle or frozen — sign in again.
+          setAuthed(false);
+          setStats(null);
+          setOverview(null);
+        }
+      } catch {
+        /* transient network error — the next tick retries */
+      }
+    };
+
+    const endSession = (force = false) => {
+      // `force` is used by the unmount cleanup: the beacon must fire even
+      // though the interval/listeners are being torn down. Sign-out and
+      // expired sessions are unaffected — the cookie is gone or dead by then.
+      if (stopped && !force) return;
+      try {
+        navigator.sendBeacon("/api/admin/session/end", "end");
+      } catch {
+        /* very old browser: the 30-min idle timeout still applies */
+      }
+    };
+
+    void beat(); // immediate renewal — also rescues a just-refreshed session
+    const id = window.setInterval(() => void beat(), 45_000);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") void beat();
+    };
+    const onFocus = () => void beat();
+    const onPageHide = () => endSession();
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("pagehide", onPageHide);
+
+    return () => {
+      stopped = true;
+      window.clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("pagehide", onPageHide);
+      // Covers SPA navigation from /admin to any other page (no pagehide
+      // event fires for client-side routing). Must be forced — the `stopped`
+      // flag would otherwise silence it.
+      endSession(true);
+    };
+  }, [authed]);
+
   // Re-fetch when the analytics range changes (after first paint).
   const rangeRef = useRef(rangeDays);
   useEffect(() => {
@@ -492,6 +552,7 @@ export default function AdminPage() {
           </form>
           <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
             After signing in you can change this password and customize the panel from the <strong>Settings</strong> tab.
+            The session lives only in this browser and ends automatically when you leave or close the site.
             Login attempts are rate-limited.
           </p>
         </div>
@@ -1101,6 +1162,12 @@ export default function AdminPage() {
                     <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
                       The <code className="rounded bg-muted px-1">ADMIN_PASSWORD</code> environment variable only set the
                       first password; the credential now lives in the database and is managed on this page.
+                    </p>
+                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                      <ShieldCheck size={12} className="mr-1 inline text-success" aria-hidden="true" />
+                      Session policy: the sign-in cookie lives only for this browser session, is renewed while the
+                      dashboard is open, and is revoked within moments of you leaving the site. Idle sessions
+                      expire after 30 minutes; changing the password signs out every other session immediately.
                     </p>
                   </div>
                 </>

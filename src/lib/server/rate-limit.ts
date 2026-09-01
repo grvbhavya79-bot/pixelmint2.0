@@ -44,6 +44,37 @@ export function rateLimit(key: string, limit: number, windowMs: number): RateLim
   return { allowed: true, remaining: limit - bucket.count, retryAfterSeconds: 0 };
 }
 
+/**
+ * Read a bucket WITHOUT modifying it (pre-check a lockout).
+ */
+export function peekLimit(key: string): { count: number; resetAt: number } | null {
+  const now = Date.now();
+  sweep(now);
+  const bucket = buckets.get(key);
+  if (!bucket || bucket.resetAt < now) return null;
+  return { count: bucket.count, resetAt: bucket.resetAt };
+}
+
+/**
+ * Record one FAILED attempt for a key. Only failures may be recorded —
+ * successful attempts never count toward a lockout (see clearFailures).
+ */
+export function recordFailure(key: string, windowMs: number): void {
+  const now = Date.now();
+  sweep(now);
+  const bucket = buckets.get(key);
+  if (!bucket || bucket.resetAt < now) {
+    buckets.set(key, { count: 1, resetAt: now + windowMs });
+    return;
+  }
+  bucket.count += 1;
+}
+
+/** Clear the failure history for a key — called on success. */
+export function clearFailures(key: string): void {
+  buckets.delete(key);
+}
+
 export function getClientIp(request: Request): string {
   const fwd = request.headers.get("x-forwarded-for");
   if (fwd) return fwd.split(",")[0].trim();
@@ -56,6 +87,8 @@ export const RATE_LIMITS = {
   shortenerCreate: { limit: 20, windowMs: 3_600_000 },
   shortenerResolve: { limit: 120, windowMs: 60_000 },
   currency: { limit: 60, windowMs: 60_000 },
-  adminLogin: { limit: 5, windowMs: 15 * 60_000 },
+  adminLogin: { limit: 10, windowMs: 15 * 60_000 },
   adminPasswordChange: { limit: 5, windowMs: 15 * 60_000 },
+  // Heartbeats arrive ~1/45 s while the dashboard is open; generous cap.
+  adminHeartbeat: { limit: 240, windowMs: 60_000 },
 } as const;

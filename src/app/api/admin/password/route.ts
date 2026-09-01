@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
   ADMIN_COOKIE, requireAdminAuth, createSessionToken, getAdminAccount, verifyPasswordHash,
   hashPassword, validatePasswordStrength, publicAccount, isBootstrapPasswordActive,
+  adminCookieOptions,
 } from "@/lib/server/admin-auth";
 import { db } from "@/lib/db";
 import { rateLimit, getClientIp, RATE_LIMITS } from "@/lib/server/rate-limit";
@@ -92,12 +93,8 @@ export async function POST(request: Request) {
       bootstrapPasswordActive: await isBootstrapPasswordActive(),
     },
   });
-  response.cookies.set(ADMIN_COOKIE, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 7 * 24 * 3600,
-  });
+  // Fresh browser-session cookie so the current admin stays signed in
+  // (same semantics as login: ends with the browser / site departure).
+  response.cookies.set(ADMIN_COOKIE, token, adminCookieOptions());
   return response;
 }
