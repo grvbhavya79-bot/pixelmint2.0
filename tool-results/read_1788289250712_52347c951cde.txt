@@ -1,0 +1,519 @@
+   340→    return (
+   341→      <div className="flex min-h-[70vh] items-center justify-center px-4">
+   342→        <div className="w-full max-w-sm rounded-2xl border bg-card p-6 shadow-card">
+   343→          <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-primary">
+   344→            <Lock size={22} />
+   345→          </span>
+   346→          <h1 className="mt-4 text-xl font-bold text-foreground">Admin sign-in</h1>
+   347→          <p className="mt-1 text-sm text-muted-foreground">Enter the administrator password to open the dashboard.</p>
+   348→          <form
+   349→            className="mt-5 space-y-3"
+   350→            onSubmit={(e) => {
+   351→              e.preventDefault();
+   352→              void login();
+   353→            }}
+   354→          >
+   355→            <div className="space-y-1.5">
+   356→              <Label htmlFor="admin-pw">Password</Label>
+   357→              <Input
+   358→                id="admin-pw"
+   359→                type="password"
+   360→                value={password}
+   361→                onChange={(e) => setPassword(e.target.value)}
+   362→                autoComplete="current-password"
+   363→                autoFocus
+   364→              />
+   365→            </div>
+   366→            {loginError && <p role="alert" className="text-sm text-destructive">{loginError}</p>}
+   367→            <Button type="submit" disabled={busy || !password} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+   368→              {busy ? <Loader2 size={15} className="mr-1.5 animate-spin" /> : <Lock size={14} className="mr-1.5" />}
+   369→              Sign in
+   370→            </Button>
+   371→          </form>
+   372→          <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
+   373→            The password is set with the <code className="rounded bg-muted px-1">ADMIN_PASSWORD</code> environment
+   374→            variable (see .env.example). Login attempts are rate-limited.
+   375→          </p>
+   376→        </div>
+   377→      </div>
+   378→    );
+   379→  }
+   380→
+   381→  /* ------------------------------ Dashboard ------------------------------- */
+   382→
+   383→  const statCards = stats
+   384→    ? [
+   385→        { label: "Total tool uses", value: stats.totalUses.toLocaleString(), icon: TrendingUp },
+   386→        { label: "Today", value: stats.dailyUses.toLocaleString(), icon: BarChart3 },
+   387→        { label: "This week", value: stats.weeklyUses.toLocaleString(), icon: BarChart3 },
+   388→        { label: "This month", value: stats.monthlyUses.toLocaleString(), icon: BarChart3 },
+   389→        {
+   390→          label: "Success rate",
+   391→          value: stats.successRate === null ? "—" : `${stats.successRate}%`,
+   392→          icon: Gauge,
+   393→        },
+   394→        { label: "Failed processes", value: stats.failedUses.toLocaleString(), icon: AlertTriangle },
+   395→        { label: "Short links", value: stats.totalShortUrls.toLocaleString(), icon: ExternalLink },
+   396→        { label: "Link clicks", value: stats.totalShortUrlClicks.toLocaleString(), icon: Zap },
+   397→        { label: "Messages", value: stats.totalMessages.toLocaleString(), icon: Mail },
+   398→        { label: "Unread messages", value: stats.unreadMessages.toLocaleString(), icon: MailOpen },
+   399→      ]
+   400→    : [];
+   401→
+   402→  const filteredMessages = messageFilter === "unread" ? messages.filter((m) => !m.isRead) : messages;
+   403→
+   404→  return (
+   405→    <div className="container-page space-y-6 py-10">
+   406→      {/* Toast */}
+   407→      {toast && (
+   408→        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-xl border bg-card px-4 py-3 text-sm font-medium text-foreground shadow-card-hover" role="status">
+   409→          <CheckCircle2 size={15} className="text-success" aria-hidden="true" /> {toast}
+   410→        </div>
+   411→      )}
+   412→
+   413→      <header className="flex flex-wrap items-center justify-between gap-3">
+   414→        <div>
+   415→          <h1 className="text-2xl font-bold tracking-tight text-foreground">Admin Dashboard</h1>
+   416→          <p className="text-sm text-muted-foreground">
+   417→            Live analytics, system health, URL shortener and contact inbox.
+   418→            {lastUpdated && (
+   419→              <span className="ml-1 text-xs">· Updated {timeAgo(lastUpdated.toISOString())}</span>
+   420→            )}
+   421→          </p>
+   422→        </div>
+   423→        <div className="flex flex-wrap items-center gap-2">
+   424→          <Button variant="outline" size="sm" onClick={() => void loadAll()} disabled={refreshing}>
+   425→            {refreshing ? <Loader2 size={14} className="mr-1.5 animate-spin" /> : <RefreshCw size={14} className="mr-1.5" />}
+   426→            Refresh
+   427→          </Button>
+   428→          <Button
+   429→            variant={autoRefresh ? "default" : "outline"}
+   430→            size="sm"
+   431→            onClick={() => setAutoRefresh((v) => !v)}
+   432→            className={autoRefresh ? "bg-primary text-primary-foreground hover:bg-primary/90" : ""}
+   433→            aria-pressed={autoRefresh}
+   434→          >
+   435→            <Activity size={14} className="mr-1.5" />
+   436→            Live {autoRefresh ? "on" : "off"}
+   437→          </Button>
+   438→          <Button variant="outline" onClick={() => void logout()}>
+   439→            <LogOut size={14} className="mr-1.5" /> Sign out
+   440→          </Button>
+   441→        </div>
+   442→      </header>
+   443→
+   444→      {stats === null ? (
+   445→        <div className="flex h-64 items-center justify-center">
+   446→          <Loader2 className="animate-spin text-primary" size={24} />
+   447→        </div>
+   448→      ) : (
+   449→        <>
+   450→          <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+   451→            {statCards.map((card) => (
+   452→              <div key={card.label} className="rounded-xl border bg-card p-4 shadow-card">
+   453→                <card.icon size={16} className="text-primary" aria-hidden="true" />
+   454→                <p className="mt-2 text-2xl font-bold text-foreground">{card.value}</p>
+   455→                <p className="text-xs text-muted-foreground">{card.label}</p>
+   456→              </div>
+   457→            ))}
+   458→          </div>
+   459→
+   460→          <Tabs defaultValue="overview">
+   461→            <TabsList>
+   462→              <TabsTrigger value="overview">Overview</TabsTrigger>
+   463→              <TabsTrigger value="urls">URL Shortener</TabsTrigger>
+   464→              <TabsTrigger value="messages">
+   465→                Messages
+   466→                {stats.unreadMessages > 0 && (
+   467→                  <span className="ml-1.5 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+   468→                    {stats.unreadMessages}
+   469→                  </span>
+   470→                )}
+   471→              </TabsTrigger>
+   472→              <TabsTrigger value="system">System</TabsTrigger>
+   473→            </TabsList>
+   474→
+   475→            {/* ================= Overview ================= */}
+   476→            <TabsContent value="overview" className="space-y-5">
+   477→              <div className="grid gap-5 lg:grid-cols-2">
+   478→                <div className="rounded-xl border bg-card p-5">
+   479→                  <h2 className="text-sm font-semibold text-foreground">Daily traffic (14 days)</h2>
+   480→                  <MiniBar data={stats.dailyTraffic.map((d) => ({ label: d.date.slice(5), value: d.count }))} />
+   481→                </div>
+   482→                <div className="rounded-xl border bg-card p-5">
+   483→                  <h2 className="text-sm font-semibold text-foreground">Popular categories (30 days)</h2>
+   484→                  <div className="mt-3">
+   485→                    {stats.categoryTraffic.length === 0 ? (
+   486→                      <p className="py-8 text-center text-sm text-muted-foreground">No category usage recorded yet.</p>
+   487→                    ) : (
+   488→                      <HBar data={stats.categoryTraffic.map((c) => ({ label: c.category, value: c.count }))} />
+   489→                    )}
+   490→                  </div>
+   491→                </div>
+   492→              </div>
+   493→
+   494→              <div className="grid gap-5 lg:grid-cols-2">
+   495→                <div className="rounded-xl border bg-card p-5">
+   496→                  <div className="flex items-center justify-between">
+   497→                    <h2 className="text-sm font-semibold text-foreground">Most used tools</h2>
+   498→                    <a href="/api/admin/export?type=tools" className="focus-ring inline-flex items-center gap-1 rounded text-xs font-medium text-primary hover:underline">
+   499→                      <Download size={12} aria-hidden="true" /> CSV
+   500→                    </a>
+   501→                  </div>
+   502→                  <ol className="mt-3 divide-y">
+   503→                    {stats.popularTools.length === 0 ? (
+   504→                      <li className="py-3 text-sm text-muted-foreground">No tool usage recorded yet.</li>
+   505→                    ) : (
+   506→                      stats.popularTools.map((tool, i) => {
+   507→                        const definition = getTool(tool.slug);
+   508→                        return (
+   509→                          <li key={tool.slug} className="flex items-center justify-between gap-3 py-2.5">
+   510→                            <span className="flex min-w-0 items-center gap-2.5 text-sm">
+   511→                              <span className="w-5 text-xs font-bold text-muted-foreground">{i + 1}.</span>
+   512→                              <span className="truncate font-medium text-foreground">{definition?.name ?? tool.slug}</span>
+   513→                            </span>
+   514→                            <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-semibold text-secondary-foreground">
+   515→                              {tool.count.toLocaleString()}
+   516→                            </span>
+   517→                          </li>
+   518→                        );
+   519→                      })
+   520→                    )}
+   521→                  </ol>
+   522→                </div>
+   523→
+   524→                <div className="rounded-xl border bg-card p-5">
+   525→                  <h2 className="text-sm font-semibold text-foreground">Recent activity</h2>
+   526→                  {overview && overview.recentActivity.length > 0 ? (
+   527→                    <ul className="mt-3 divide-y">
+   528→                      {overview.recentActivity.map((event, i) => (
+   529→                        <li key={i} className="flex items-center justify-between gap-3 py-2.5 text-sm">
+   530→                          <span className="flex min-w-0 items-center gap-2">
+   531→                            {event.status === "error" ? (
+   532→                              <AlertTriangle size={14} className="shrink-0 text-destructive" aria-hidden="true" />
+   533→                            ) : (
+   534→                              <CheckCircle2 size={14} className="shrink-0 text-success" aria-hidden="true" />
+   535→                            )}
+   536→                            <span className="truncate font-medium text-foreground">{event.toolName}</span>
+   537→                          </span>
+   538→                          <span className="shrink-0 text-xs text-muted-foreground">{timeAgo(event.at)}</span>
+   539→                        </li>
+   540→                      ))}
+   541→                    </ul>
+   542→                  ) : (
+   543→                    <p className="py-8 text-center text-sm text-muted-foreground">
+   544→                      No activity yet — events appear here as visitors use tools.
+   545→                    </p>
+   546→                  )}
+   547→                </div>
+   548→              </div>
+   549→            </TabsContent>
+   550→
+   551→            {/* ================= URL Shortener ================= */}
+   552→            <TabsContent value="urls" className="space-y-4">
+   553→              {/* Create link */}
+   554→              <div className="rounded-xl border bg-card p-5">
+   555→                <h2 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+   556→                  <Plus size={14} className="text-primary" aria-hidden="true" /> Create a short link
+   557→                </h2>
+   558→                <form
+   559→                  className="mt-3 grid gap-3 sm:grid-cols-[2fr_1fr_1fr_auto]"
+   560→                  onSubmit={(e) => {
+   561→                    e.preventDefault();
+   562→                    if (newUrl.trim().length >= 4) void createLink();
+   563→                  }}
+   564→                >
+   565→                  <div>
+   566→                    <Label htmlFor="new-url" className="sr-only">Destination URL</Label>
+   567→                    <Input
+   568→                      id="new-url"
+   569→                      type="url"
+   570→                      value={newUrl}
+   571→                      onChange={(e) => setNewUrl(e.target.value)}
+   572→                      placeholder="https://example.com/long-url"
+   573→                      required
+   574→                      className="w-full"
+   575→                    />
+   576→                  </div>
+   577→                  <div>
+   578→                    <Label htmlFor="new-code" className="sr-only">Custom code (optional)</Label>
+   579→                    <Input
+   580→                      id="new-code"
+   581→                      value={newCode}
+   582→                      onChange={(e) => setNewCode(e.target.value)}
+   583→                      placeholder="Custom code"
+   584→                      pattern="[a-zA-Z0-9_-]{4,32}"
+   585→                      title="4-32 characters: letters, numbers, dashes"
+   586→                    />
+   587→                  </div>
+   588→                  <div>
+   589→                    <Label htmlFor="new-expiry" className="sr-only">Expires in days (optional)</Label>
+   590→                    <Input
+   591→                      id="new-expiry"
+   592→                      type="number"
+   593→                      min={1}
+   594→                      max={3650}
+   595→                      value={newExpiry}
+   596→                      onChange={(e) => setNewExpiry(e.target.value)}
+   597→                      placeholder="Expires (days)"
+   598→                    />
+   599→                  </div>
+   600→                  <Button type="submit" disabled={creating || newUrl.trim().length < 4} className="bg-primary text-primary-foreground hover:bg-primary/90">
+   601→                    {creating ? <Loader2 size={14} className="mr-1.5 animate-spin" /> : <Plus size={14} className="mr-1.5" />}
+   602→                    Create
+   603→                  </Button>
+   604→                </form>
+   605→                {createError && <p role="alert" className="mt-2 text-sm text-destructive">{createError}</p>}
+   606→                {createdLink && (
+   607→                  <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-primary/30 bg-secondary/50 px-3 py-2">
+   608→                    <span className="font-mono text-sm font-semibold text-primary">{createdLink}</span>
+   609→                    <Button variant="ghost" size="sm" onClick={() => void copyText(createdLink, "Short link")} aria-label="Copy short link">
+   610→                      <Copy size={13} />
+   611→                    </Button>
+   612→                  </div>
+   613→                )}
+   614→              </div>
+   615→
+   616→              <div className="flex flex-wrap items-center justify-between gap-2">
+   617→                <div className="relative max-w-md grow">
+   618→                  <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+   619→                  <Input
+   620→                    value={urlSearch}
+   621→                    onChange={(e) => setUrlSearch(e.target.value)}
+   622→                    onKeyDown={(e) => e.key === "Enter" && void loadAll()}
+   623→                    placeholder="Search by code or destination…"
+   624→                    className="pl-9"
+   625→                  />
+   626→                </div>
+   627→                <a href="/api/admin/export?type=urls" className="focus-ring inline-flex items-center gap-1 rounded-lg border bg-card px-3 py-2 text-xs font-medium text-foreground shadow-card transition-colors hover:text-primary">
+   628→                  <Download size={12} aria-hidden="true" /> Export CSV
+   629→                </a>
+   630→              </div>
+   631→
+   632→              <div className="overflow-x-auto rounded-xl border bg-card">
+   633→                <table className="w-full min-w-[760px] text-sm">
+   634→                  <thead>
+   635→                    <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+   636→                      <th className="px-4 py-3 font-semibold">Short code</th>
+   637→                      <th className="px-4 py-3 font-semibold">Destination</th>
+   638→                      <th className="px-4 py-3 font-semibold">Clicks</th>
+   639→                      <th className="px-4 py-3 font-semibold">Expires</th>
+   640→                      <th className="px-4 py-3 font-semibold">Status</th>
+   641→                      <th className="px-4 py-3 text-right font-semibold">Actions</th>
+   642→                    </tr>
+   643→                  </thead>
+   644→                  <tbody className="divide-y">
+   645→                    {urls.length === 0 ? (
+   646→                      <tr>
+   647→                        <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">No short links yet — create one above.</td>
+   648→                      </tr>
+   649→                    ) : (
+   650→                      urls.map((url) => (
+   651→                        <tr key={url.id} className="text-xs sm:text-sm">
+   652→                          <td className="px-4 py-3 font-mono font-semibold text-primary">
+   653→                            <a href={`/s/${url.shortCode}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+   654→                              /s/{url.shortCode}
+   655→                            </a>
+   656→                          </td>
+   657→                          <td className="max-w-56 truncate px-4 py-3 text-muted-foreground" title={url.destinationUrl}>
+   658→                            {url.destinationUrl}
+   659→                          </td>
+   660→                          <td className="px-4 py-3 font-medium">{url.clickCount.toLocaleString()}</td>
+   661→                          <td className="px-4 py-3 text-muted-foreground">
+   662→                            {url.expiresAt ? new Date(url.expiresAt).toLocaleDateString("en-GB") : "Never"}
+   663→                          </td>
+   664→                          <td className="px-4 py-3">
+   665→                            <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold", url.isActive ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive")}>
+   666→                              {url.isActive ? "Active" : "Disabled"}
+   667→                            </span>
+   668→                          </td>
+   669→                          <td className="px-4 py-3">
+   670→                            <div className="flex justify-end gap-1">
+   671→                              <Button variant="ghost" size="sm" onClick={() => void copyText(`${typeof window !== "undefined" ? window.location.origin : ""}/s/${url.shortCode}`, "Short link")} aria-label="Copy short link">
+   672→                                <Copy size={14} />
+   673→                              </Button>
+   674→                              <Button variant="ghost" size="sm" onClick={() => void toggleUrl(url.id, !url.isActive)} aria-label={url.isActive ? "Disable link" : "Enable link"}>
+   675→                                {url.isActive ? <EyeOff size={14} /> : <Eye size={14} />}
+   676→                              </Button>
+   677→                              <Button variant="ghost" size="sm" onClick={() => void deleteUrl(url.id)} aria-label="Delete link" className="text-destructive hover:text-destructive">
+   678→                                <Trash2 size={14} />
+   679→                              </Button>
+   680→                            </div>
+   681→                          </td>
+   682→                        </tr>
+   683→                      ))
+   684→                    )}
+   685→                  </tbody>
+   686→                </table>
+   687→              </div>
+   688→            </TabsContent>
+   689→
+   690→            {/* ================= Messages ================= */}
+   691→            <TabsContent value="messages" className="space-y-4">
+   692→              <div className="flex flex-wrap items-center justify-between gap-2">
+   693→                <div className="flex rounded-lg border bg-card p-1" role="tablist" aria-label="Message filter">
+   694→                  <button
+   695→                    type="button"
+   696→                    role="tab"
+   697→                    aria-selected={messageFilter === "all"}
+   698→                    onClick={() => setMessageFilter("all")}
+   699→                    className={cn("focus-ring rounded-md px-3 py-1.5 text-xs font-medium transition-colors", messageFilter === "all" ? "bg-secondary text-secondary-foreground" : "text-muted-foreground hover:text-foreground")}
+   700→                  >
+   701→                    All ({messages.length})
+   702→                  </button>
+   703→                  <button
+   704→                    type="button"
+   705→                    role="tab"
+   706→                    aria-selected={messageFilter === "unread"}
+   707→                    onClick={() => setMessageFilter("unread")}
+   708→                    className={cn("focus-ring rounded-md px-3 py-1.5 text-xs font-medium transition-colors", messageFilter === "unread" ? "bg-secondary text-secondary-foreground" : "text-muted-foreground hover:text-foreground")}
+   709→                  >
+   710→                    Unread ({stats.unreadMessages})
+   711→                  </button>
+   712→                </div>
+   713→                <div className="flex items-center gap-2">
+   714→                  <a href="/api/admin/export?type=messages" className="focus-ring inline-flex items-center gap-1 rounded-lg border bg-card px-3 py-2 text-xs font-medium text-foreground shadow-card transition-colors hover:text-primary">
+   715→                    <Download size={12} aria-hidden="true" /> Export CSV
+   716→                  </a>
+   717→                  {stats.unreadMessages > 0 && (
+   718→                    <Button variant="outline" size="sm" onClick={() => void markAllRead()}>
+   719→                      <CheckCheck size={14} className="mr-1.5" /> Mark all read
+   720→                    </Button>
+   721→                  )}
+   722→                </div>
+   723→              </div>
+   724→
+   725→              <div className="space-y-3">
+   726→                {filteredMessages.length === 0 ? (
+   727→                  <p className="rounded-xl border border-dashed bg-card/50 p-8 text-center text-sm text-muted-foreground">
+   728→                    {messageFilter === "unread" ? "No unread messages." : "No messages yet."}
+   729→                  </p>
+   730→                ) : (
+   731→                  filteredMessages.map((message) => (
+   732→                    <article
+   733→                      key={message.id}
+   734→                      className={cn("rounded-xl border bg-card p-4", !message.isRead && "border-primary/40 bg-secondary/30")}
+   735→                    >
+   736→                      <div className="flex flex-wrap items-start justify-between gap-2">
+   737→                        <div>
+   738→                          <h3 className="text-sm font-semibold text-foreground">{message.subject}</h3>
+   739→                          <p className="text-xs text-muted-foreground">
+   740→                            {message.name} · <a href={`mailto:${message.email}`} className="text-primary hover:underline">{message.email}</a>{" "}
+   741→                            · {new Date(message.createdAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}
+   742→                          </p>
+   743→                        </div>
+   744→                        <div className="flex gap-1">
+   745→                          <Button variant="ghost" size="sm" onClick={() => void markRead(message.id, !message.isRead)}>
+   746→                            {message.isRead ? "Mark unread" : "Mark read"}
+   747→                          </Button>
+   748→                          <Button variant="ghost" size="sm" onClick={() => void deleteMessage(message.id)} aria-label="Delete message" className="text-destructive hover:text-destructive">
+   749→                            <Trash2 size={14} />
+   750→                          </Button>
+   751→                        </div>
+   752→                      </div>
+   753→                      <p className="mt-2.5 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{message.message}</p>
+   754→                    </article>
+   755→                  ))
+   756→                )}
+   757→              </div>
+   758→            </TabsContent>
+   759→
+   760→            {/* ================= System ================= */}
+   761→            <TabsContent value="system" className="space-y-5">
+   762→              {overview === null ? (
+   763→                <div className="flex h-40 items-center justify-center">
+   764→                  <Loader2 className="animate-spin text-primary" size={22} />
+   765→                </div>
+   766→              ) : (
+   767→                <>
+   768→                  <div className="grid gap-5 lg:grid-cols-2">
+   769→                    <div className="rounded-xl border bg-card p-5">
+   770→                      <h2 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+   771→                        <Server size={14} className="text-primary" aria-hidden="true" /> Server health
+   772→                      </h2>
+   773→                      <dl className="mt-3 space-y-2.5 text-sm">
+   774→                        <div className="flex justify-between gap-4">
+   775→                          <dt className="text-muted-foreground">Runtime</dt>
+   776→                          <dd className="font-medium text-foreground">{overview.server.runtime}</dd>
+   777→                        </div>
+   778→                        <div className="flex justify-between gap-4">
+   779→                          <dt className="text-muted-foreground">Uptime</dt>
+   780→                          <dd className="font-medium text-foreground">{overview.server.uptime}</dd>
+   781→                        </div>
+   782→                        <div className="flex justify-between gap-4">
+   783→                          <dt className="text-muted-foreground">Memory (RSS)</dt>
+   784→                          <dd className="font-medium text-foreground">{overview.server.memoryUsedMb ?? "—"}{overview.server.memoryUsedMb !== null ? " MB" : ""}</dd>
+   785→                        </div>
+   786→                        <div className="flex justify-between gap-4">
+   787→                          <dt className="text-muted-foreground">Heap used</dt>
+   788→                          <dd className="font-medium text-foreground">{overview.server.heapUsedMb ?? "—"}{overview.server.heapUsedMb !== null ? " MB" : ""}</dd>
+   789→                        </div>
+   790→                        <div className="flex justify-between gap-4">
+   791→                          <dt className="text-muted-foreground">Environment</dt>
+   792→                          <dd className="font-medium text-foreground">{overview.server.nodeEnv}</dd>
+   793→                        </div>
+   794→                        <div className="flex justify-between gap-4">
+   795→                          <dt className="text-muted-foreground">Database size</dt>
+   796→                          <dd className="font-medium text-foreground">{overview.server.dbSizeBytes !== null ? formatBytes(overview.server.dbSizeBytes) : "—"}</dd>
+   797→                        </div>
+   798→                        <div className="flex justify-between gap-4">
+   799→                          <dt className="text-muted-foreground">Unique tools used</dt>
+   800→                          <dd className="font-medium text-foreground">{stats?.uniqueToolsUsed ?? "—"}</dd>
+   801→                        </div>
+   802→                      </dl>
+   803→                    </div>
+   804→
+   805→                    <div className="rounded-xl border bg-card p-5">
+   806→                      <h2 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+   807→                        <Database size={14} className="text-primary" aria-hidden="true" /> Configuration status
+   808→                      </h2>
+   809→                      <p className="mt-1 text-xs text-muted-foreground">Boolean status only — values are never exposed to the dashboard.</p>
+   810→                      <ul className="mt-3 space-y-2.5 text-sm">
+   811→                        {[
+   812→                          { label: "Admin password set (ADMIN_PASSWORD)", ok: overview.config.adminPasswordSet, hint: "Required for admin login" },
+   813→                          { label: "Session secret set (ADMIN_SECRET)", ok: overview.config.adminSecretSet, hint: "Signs admin session cookies" },
+   814→                          { label: "Site URL set (NEXT_PUBLIC_SITE_URL)", ok: overview.config.siteUrlSet, hint: "Canonical URLs & sitemap" },
+   815→                          { label: "Email delivery configured", ok: overview.config.emailConfigured, hint: "Contact form notifications" },
+   816→                        ].map((item) => (
+   817→                          <li key={item.label} className="flex items-start justify-between gap-4">
+   818→                            <div>
+   819→                              <p className="font-medium text-foreground">{item.label}</p>
+   820→                              <p className="text-xs text-muted-foreground">{item.hint}</p>
+   821→                            </div>
+   822→                            <span className={cn("mt-0.5 flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold", item.ok ? "bg-success/10 text-success" : "bg-amber-500/10 text-amber-600")}>
+   823→                              {item.ok ? <CheckCircle2 size={11} aria-hidden="true" /> : <AlertTriangle size={11} aria-hidden="true" />}
+   824→                              {item.ok ? "Set" : "Not set"}
+   825→                            </span>
+   826→                          </li>
+   827→                        ))}
+   828→                      </ul>
+   829→                    </div>
+   830→                  </div>
+   831→
+   832→                  <div className="rounded-xl border bg-card p-5">
+   833→                    <h2 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+   834→                      <AlertTriangle size={14} className="text-destructive" aria-hidden="true" /> Recent failed processes
+   835→                    </h2>
+   836→                    {overview.recentErrors.length === 0 ? (
+   837→                      <p className="mt-3 text-sm text-muted-foreground">No failed tool processes recorded — all clear.</p>
+   838→                    ) : (
+   839→                      <ul className="mt-3 divide-y">
+   840→                        {overview.recentErrors.map((err, i) => (
+   841→                          <li key={i} className="flex items-center justify-between gap-3 py-2.5 text-sm">
+   842→                            <span className="truncate font-medium text-foreground">{err.toolName}</span>
+   843→                            <span className="shrink-0 text-xs text-muted-foreground">{timeAgo(err.at)}</span>
+   844→                          </li>
+   845→                        ))}
+   846→                      </ul>
+   847→                    )}
+   848→                  </div>
+   849→                </>
+   850→              )}
+   851→            </TabsContent>
+   852→          </Tabs>
+   853→        </>
+   854→      )}
+   855→    </div>
+   856→  );
+   857→}
+   858→

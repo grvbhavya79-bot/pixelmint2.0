@@ -4,7 +4,7 @@ import { requireAdminAuth } from "@/lib/server/admin-auth";
 
 /** List contact messages. */
 export async function GET(request: Request) {
-  if (!requireAdminAuth(request)) {
+  if (!(await requireAdminAuth(request))) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
   const messages = await db.contactMessage.findMany({
@@ -16,7 +16,7 @@ export async function GET(request: Request) {
 
 /** Mark message as read/unread — or all messages at once with { all: true }. */
 export async function PATCH(request: Request) {
-  if (!requireAdminAuth(request)) {
+  if (!(await requireAdminAuth(request))) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
   const body = await request.json().catch(() => null);
@@ -42,7 +42,7 @@ export async function PATCH(request: Request) {
 
 /** Delete a message. */
 export async function DELETE(request: Request) {
-  if (!requireAdminAuth(request)) {
+  if (!(await requireAdminAuth(request))) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
   const body = await request.json().catch(() => null);

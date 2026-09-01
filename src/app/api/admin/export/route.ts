@@ -26,7 +26,7 @@ function csvResponse(csv: string, filename: string): NextResponse {
 }
 
 export async function GET(request: Request) {
-  if (!requireAdminAuth(request)) {
+  if (!(await requireAdminAuth(request))) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
 

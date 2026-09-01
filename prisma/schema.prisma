@@ -56,3 +56,20 @@ model SystemSetting {
   key   String @id
   value String
 }
+
+// Admin account: credentials + dashboard customization (single row, id "primary").
+// ADMIN_PASSWORD env only bootstraps this account on first login; afterwards the
+// stored scrypt hash is authoritative and the password is managed from Settings.
+model AdminAccount {
+  id                String    @id @default("primary")
+  username          String    @default("admin")
+  displayName       String    @default("Administrator")
+  panelTitle        String    @default("Admin Dashboard")
+  panelTagline      String    @default("")
+  passwordHash      String
+  passwordVersion   Int       @default(1)
+  passwordChangedAt DateTime  @default(now())
+  lastLoginAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}

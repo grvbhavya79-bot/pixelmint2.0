@@ -6,7 +6,7 @@ import { checkDestinationUrl } from "@/lib/server/url-safety";
 
 /** List short URLs with optional search. */
 export async function GET(request: Request) {
-  if (!requireAdminAuth(request)) {
+  if (!(await requireAdminAuth(request))) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
   const search = new URL(request.url).searchParams.get("q")?.trim() ?? "";
@@ -42,7 +42,7 @@ const createSchema = z.object({
 
 /** Create a short link from the admin dashboard (bypasses public rate limit). */
 export async function POST(request: Request) {
-  if (!requireAdminAuth(request)) {
+  if (!(await requireAdminAuth(request))) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
 
@@ -109,7 +109,7 @@ export async function POST(request: Request) {
 
 /** Toggle active status. */
 export async function PATCH(request: Request) {
-  if (!requireAdminAuth(request)) {
+  if (!(await requireAdminAuth(request))) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
   const body = await request.json().catch(() => null);
@@ -128,7 +128,7 @@ export async function PATCH(request: Request) {
 
 /** Delete a short URL. */
 export async function DELETE(request: Request) {
-  if (!requireAdminAuth(request)) {
+  if (!(await requireAdminAuth(request))) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
   const body = await request.json().catch(() => null);

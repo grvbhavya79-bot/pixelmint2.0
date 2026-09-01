@@ -1,0 +1,272 @@
+     1→# ToolBox100 — Worklog
+     2→
+     3→---
+     4→Task ID: 1
+     5→Agent: Super Z (main agent)
+     6→Task: Build ToolBox100 — complete production-ready online tools platform with 100 fully functional tools, original brand, admin dashboard, URL shortener, SEO, PWA and tests.
+     7→
+     8→Work Log:
+     9→- Initialized fullstack environment (Next.js 16 + TS + Tailwind 4 + shadcn/ui + Prisma).
+    10→- Installed processing deps: @cantoo/pdf-lib (encryption-capable pdf-lib fork), pdfjs-dist@4, docx, exceljs, pptxgenjs, mammoth, fflate, qrcode, jsqr, tesseract.js, marked, dompurify, sql-formatter, prettier, terser.
+    11→- Designed original brand: SVG logo (gradient tile + geometric T + cyan precision dot), design tokens per spec (#2563EB primary, #0F172A dark, #F8FAFC bg), light/dark/system themes.
+    12→- Built centralized tool registry (src/lib/tools) with 100 tool definitions: PDF 25, Image 20, Document 10, File 10, Developer 15, Generators 10, Calculators 10 — each with slug/name/description/tags/icon/component/props/FAQs; instant search + related-tool scoring + FAQ generation.
+    13→- Implemented 72 code-split tool components covering all 100 tools (params reuse: converters, formatters, counters share components).
+    14→- Client-side processing engine: pdf-lib + pdf.js (merge/split/compress/convert/rotate/watermark/sign/protect/unlock/OCR), canvas (compress/resize/crop/convert/bg-remove with real flood-fill algorithm/filters/BMP+GIF encoders written from scratch), fflate (ZIP with path-traversal protection), Terser/Prettier/sql-formatter (dev tools), tesseract.js (OCR), jsQR (QR reader).
+    15→- Shared block-layout PDF renderer (office/render-pdf.ts) powering Text→PDF, Word→PDF (mammoth), HTML→PDF, PPT→PDF (XML extraction), Excel→PDF (exceljs).
+    16→- Server APIs: /api/track (anonymous analytics), /api/contact (zod validation + honeypot + rate limit + Resend-compatible email path + DB storage), /api/shortener + /s/[code] (302 redirects, click counting, expiry, malicious-URL rejection), /api/currency (live frankfurter.dev rates with er-api fallback + 10-min cache), /api/admin/* (HMAC cookie auth, analytics aggregation, URL manager, message inbox).
+    17→- Admin dashboard at /admin: stat cards, 14-day traffic chart, category chart, popular tools, URL shortener CRUD table, contact inbox.
+    18→- Pages: homepage (hero + big search + categories + popular + all-tools browser + features + recents), /tools, /categories(+/[category]), /popular, /favorites, /about, /contact (real form), /privacy, /terms, 404 with tool suggestions.
+    19→- Per-tool SEO: unique metadata, canonical, OG/Twitter, JSON-LD (SoftwareApplication + FAQPage + HowTo), sitemap.ts, robots.ts, manifest.ts; PWA icons generated via sharp script; conservative service worker.
+    20→- Security: magic-byte file validation, size limits per category, rate limiting per IP, filename sanitization, signed httpOnly admin cookie, security headers in next.config, no file-upload endpoints for client-side tools.
+    21→- Tests (bun test): 82 passing — registry integrity (exactly 100 tools, category counts, unique slugs, component mapping, FAQ coverage), calculators (percentage/age/BMI/EMI/GST/discount/time/date), text tools, color math, unit conversion, PDF engine (merge/split/rotate/watermark/protect/unlock round-trips), URL safety, rate limiter, minifiers/formatters.
+    22→- Fixed during verification: Markdown lucide icon missing (→FileCode), eslint --fix corrupted unicode escape, @cantoo/pdf-lib async embedFont/embedPng/embedJpg (awaited), Turbopack OOM when compiling all 100 routes (added experimental.turbopackMemoryLimit=2200), React Compiler lint errors (rewrote hooks with useSyncExternalStore for favorites/recents, moved effects into handlers), TS strict errors (all clean).
+    23→
+    24→Stage Summary:
+    25→- Deliverable: complete ToolBox100 platform at /home/z/my-project (dev server on :3000).
+    26→- Verified via curl: all 100 tool pages return 200; all APIs work (short link redirect 302 with click count, malicious URLs rejected, live currency rates fetched, contact stored, admin analytics returning data).
+    27→- Verified via headless browser (agent-browser): homepage renders, hero search filters, case converter converts live, image compressor processed a real upload (68.6 KB → 19.6 KB, −71.4%), PDF merge merged two real PDFs client-side with download button, EMI calculator math exact, currency tool shows live USD/INR with timestamp, Ctrl+K palette with recents, dark mode toggle, mobile hamburger menu, sticky footer (0px gap on short pages), no console errors.
+    28→- Quality gates: ESLint clean · bun test 82/82 pass · tsc --noEmit clean for src/.
+    29→- Admin password (dev default): admin123 via ADMIN_PASSWORD env (.env.example documents all variables).
+    30→
+    31→---
+    32→Task ID: 2
+    33→Agent: Super Z (main agent)
+    34→Task: Production audit, functional testing, bug fixing, security/SEO review and deployment preparation of existing ToolBox100 project.
+    35→
+    36→Work Log:
+    37→- Ran full inspection: registry (exactly 100 tools), all routes, package.json, security modules, API routes.
+    38→- Baseline quality gates: bun test 82/82 pass, ESLint clean; production build initially FAILED.
+    39→- Fixed build blockers: (1) removed dead examples/ dir referencing uninstalled socket.io-client; (2) removed invalid turbopack.memoryLimit config key; (3) scoped tsconfig to src/ (scripts/tests use Bun APIs).
+    40→- Built a Playwright browser audit harness (scripts/audit-*.cjs) with download interception and output verification (parse PDF/DOCX/ZIP/images, check pages/sizes/formats/content). Key harness lessons: wait for React onChange prop + networkidle before upload; isolate each test in a fresh browser context.
+    41→- Browser-verified ALL 100 tools with real files: 107 functional tests across batches A (core PDF), B (PDF+image), C1 (file+document), C2 (developer+generators+calculators), D (variants + negative tests + responsive). All PASS.
+    42→- CRITICAL FIX: 9 tools were completely broken (JPG/PNG/Images-to-PDF, all 6 dedicated image converters) — registry passed MIME strings ("image/jpeg") where components expect sniffed types ("jpeg"), so every upload was rejected. Fixed registry data.
+    43→- REAL FIX: Favicon Generator "Download all as ZIP" was a dead button (stale closure: zipEntries captured as null). Rebuilt using ResultPanel additionalResults mechanism; verified 9-file ZIP download.
+    44→- MARKUP FIX: ~40 tools rendered bare <li> outside <ul> (invalid HTML) — FileListRow now renders <div>; fixed mismatched tags in zip-tool.
+    45→- Security hardening: added X-Frame-Options: DENY + full CSP (self + jsdelivr for tesseract WASM/lang models + blob: for pdf.js workers, data:/blob: for images, connect-src for currency APIs). Verified merge/compress/OCR/pdf.js-worker all work under CSP with zero violations. Confirmed no secrets in client chunks (only UI text).
+    46→- SEO audit script (scripts/audit-seo.ts): 100 unique titles, 100 unique descriptions, canonicals, OG/Twitter, JSON-LD, H1s on every tool page; sitemap 115 URLs (all 100 tools); robots.txt correct (admin/api/s disallowed).
+    47→- Created missing .env.example documenting every variable with graceful-degradation notes.
+    48→- E2E API verification under production server: shortener (create, custom code, 302 redirect, click counting visible in admin, 404 unknown, 429 rate limit, SSRF/private-URL rejection), contact (valid/invalid/rate-limited, honeypot), admin (401 gate, timing-safe login, dashboard analytics/messages/urls), currency (live frankfurter.dev rates), track.
+    49→- Negative tests: PDF into image tool → friendly rejection; corrupt PDF → error panel, no crash; empty/invalid JSON → disabled button/friendly error; calculator invalid input → no crash.
+    50→- Responsive: no horizontal overflow at 375px/768px; dark mode verified; PWA assets (sw.js, manifest, icons, og-image) all 200; homepage console clean.
+    51→- Final gates: bun test 82/82, ESLint clean, production build succeeds (132 routes), production start verified.
+    52→
+    53→Stage Summary:
+    54→- 100/100 tools genuinely working and browser-verified with real files and parsed outputs.
+    55→- 9 broken tools fixed, 1 dead button fixed, build unblocked, security headers added, .env.example created.
+    56→- Production-ready: build → standalone start verified; deployment notes in .env.example.
+    57→
+    58→---
+    59→Task ID: 3
+    60→Agent: Super Z (main agent)
+    61→Task: Rebrand the 100-tool platform to "Pixelmint.fun" — premium SaaS rebrand keeping every existing tool working end-to-end, plus blog, AI tools, and SEO overhaul.
+    62→
+    63→Work Log:
+    64→- Restored prior ToolBox100 state from git (HEAD~1) after an erroneous studio-style redesign; verified zero diff vs audited baseline, then applied the Pixelmint rebrand on top.
+    65→- Design system: light-first palette (off-white #F7FAF8 bg, charcoal #15241D text, mint #10B986/#40E6B1 primary, acid accents), dark mode preserved; Inter (body) + Space Grotesk (display) via next/font; pixel-grid textures, card-lift micro-interactions, check-pop success animation, reduced-motion safe.
+    66→- New animated pixel-P logo (CSS staggered assemble + sparkle pulse) + regenerated favicon/PWA icons/OG image via sharp script.
+    67→- Header: 11-item tiered nav (All Tools, PDF, Image, File Converters, Text, Productivity, Developer, AI Tools, Blog, About, Contact), prominent "What do you want to do today?" search input, mobile slide-out; verified no overflow at 375/768/1440/1920.
+    68→- Homepage: hero (headline "Every tool. One smart place." + big autocomplete search + smart dropzone that detects dropped file types and suggests matching tools + 8 popular shortcuts), categories grid (8), featured 13 tools, all-tools browser, Why (6 benefits), How It Works (3 steps), FAQ accordion + FAQPage schema, final CTA.
+    69→- Added AI Tools category with 3 genuinely working tools (AI Text Summarizer, AI Writing Improver, AI Idea Generator) — server-side z-ai-web-dev-sdk via /api/ai (zod validation, 12/min rate limit, 10k char cap, friendly errors); total tools now 103.
+    70→- Blog hub: /blog index + /blog/[slug] with 5 full SEO articles, Article schema, internal tool links, related posts; tool pages now include "From the blog" suggestions.
+    71→- About page (mission + 6 values + maker), Contact page with category dropdown (5 categories) — API extended, category stored as subject prefix; Cookie Policy page added; footer rebuilt with tagline, categories, popular tools, company links incl. cookies.
+    72→- SEO overhaul: unique titles/descriptions, canonicals, OG/Twitter, BreadcrumbList schema added to all 103 tool pages, sitemap with 126 URLs (103 tools + 8 categories + 5 posts + 10 static), robots, redirects /<category-slug>/<tool-slug> → /tools/<tool-slug> (308 verified).
+    73→- Brand sweep: every ToolBox100 string replaced (metadata, JSON-LD, PDF/DOCX/XLSX producer strings, ZIP names, sample text, admin secret, email subjects); zero references remain.
+    74→- Infra fixes during verification: dev server OOM-killed twice (Turbopack grew to 2.8GB on 4GB box) — killed leftover chrome processes, lowered turbopackMemoryLimit to 1536, detached restart; fixed missing lucide icon imports and trackToolUse import; fixed duplicate title suffix.
+    75→- Updated registry tests for 103 tools / 8 categories + new AI-tools test.
+    76→
+    77→Stage Summary:
+    78→- 103/103 tools browser-verified end-to-end with real files: batches A 10/10, B 27+1 WARN, C 21/21, C2 33/33, D 15/15; 3 AI tools verified with real AI output (427-char summary, exactly 10 ideas, professional rewrite).
+    79→- Contact form E2E: category "[Bug report]" prefix stored in DB; AI API + shortener + currency + admin all 200.
+    80→- Quality gates: ESLint clean, bun test 83/83, all routes 200, responsive at 4 breakpoints, no console errors.
+    81→- Site fully rebranded as Pixelmint.fun premium tools SaaS with zero loss of functionality.
+    82→
+    83→---
+    84→Task ID: 4
+    85→Agent: Super Z (main agent)
+    86→Task: Final verification session — confirm Pixelmint.fun platform is fully operational end-to-end after context continuation.
+    87→
+    88→Work Log:
+    89→- Confirmed working tree clean (all Pixelmint rebrand work committed) and dev server healthy on :3000.
+    90→- Verified branding: homepage title "Pixelmint.fun — Every Tool. One Smart Place. | 100+ Free Online Tools".
+    91→- Verified 103 tool pages indexed on /tools; AI tool pages (ai-text-summarizer etc.) return 200.
+    92→- Quality gates re-run: bun test 83/83 pass (1540 expect calls), ESLint clean (0 warnings).
+    93→- Route sweep: /, /tools, /categories, /blog (+ all 5 real post slugs), /about, /contact, /privacy, /terms, /cookies, /popular, /favorites, /sitemap.xml (126 URLs), /robots.txt, /manifest.webmanifest — all 200.
+    94→- API sweep: /api/ai (task=summarize returns real AI output), /api/shortener (creates short links), /api/currency (live frankfurter rates, USD base), /api/admin/* correctly 401-gated.
+    95→- Verified 308 redirects: /pdf-tools/merge-pdf → /tools/merge-pdf.
+    96→- Browser verification (agent-browser): homepage renders with zero console/page errors; EMI calculator live-computes exact values (₹12,667.58 for ₹1,000,000 @ 9% / 10y — matches closed-form formula).
+    97→
+    98→Stage Summary:
+    99→- Pixelmint.fun platform confirmed fully operational: 103 working tools, blog, AI tools, admin, SEO (126-URL sitemap), all quality gates green.
+   100→- Earlier test "failures" this session were caller-side mistakes (wrong field name `action` vs `task` for AI API; wrong category slug prefix for redirect test) — no product defects found.
+   101→- No code changes required this session; state is committed and stable.
+   102→
+   103→---
+   104→Task ID: 5
+   105→Agent: Super Z (main agent)
+   106→Task: Fix messy header; add owner email Grvbhavya79@gmail.com; embed Google Map on contact page.
+   107→
+   108→Work Log:
+   109→- Diagnosed header messiness via VLM analysis of 1366/1920px screenshots: 11 flat nav links = "wall of text", truncated search placeholder ("What do you wa…"), uneven gaps.
+   110→- Rewrote site-header.tsx: 5 short primary links (All Tools, PDF, Image, AI, Blog) + "More" dropdown (shadcn DropdownMenu) holding File Converters, Text Tools, Developer, Productivity, About Us, Contact — each with mint icon tile + label + one-line description. Search placeholder shortened to "Search tools…". Mobile menu regrouped into Browse / Categories / Company sections (2-col grid).
+   111→- Active-state logic: primary links and the More trigger highlight via pathname.startsWith; verified PDF→ACTIVE on /categories/pdf-tools and More→ACTIVE on /about.
+   112→- Email: replaced hello@pixelmint.fun with Grvbhavya79@gmail.com in contact page (mailto), about page maker card, cookies policy, layout.tsx Organization JSON-LD; added mailto link line in footer brand column (regex-tester sample text left as demo data).
+   113→- Google Map: added "Where to find us" card below contact grid — iframe embed https://maps.google.com/maps?q=Madhubani,+Bihar+847226,+India&z=13&output=embed (lazy, 340px, a11y title) + "Open in Google Maps" external link; added CSP frame-src 'self' https://www.google.com https://maps.google.com to next.config.ts.
+   114→- Infra: dev server was OOM-killed repeatedly (Turbopack 2.8GB RSS on 4GB box, confirmed via dmesg); restarted detached with setsid double-fork; killed stale chrome to free memory.
+   115→- Verified in browser: VLM rates new header "clean/uncluttered, balanced" at 1366px; dropdown opens with all 6 items, navigates correctly; map renders real tiles (Jainagar, Bihar 847226 pin, bilingual labels) with zero CSP violations; email visible on contact/about/footer; no console/page errors; no horizontal overflow at 375px.
+   116→
+   117→Stage Summary:
+   118→- Header redesigned from 11 cramped links to 5+More tiered nav — clean at all breakpoints (375/768/1366/1920).
+   119→- Owner email Grvbhavya79@gmail.com live in 5 locations (contact, about, footer, cookies, JSON-LD).
+   120→- Google Map of Madhubani, Bihar 847226 embedded on contact page under CSP.
+   121→- Gates: ESLint clean on changed files, bun test 83/83, tsc --noEmit clean; routes 200.
+   122→
+   123→---
+   124→Task ID: 6
+   125→Agent: Super Z (main agent)
+   126→Task: Add About Us & Contact to visible header nav; fix slow page loads.
+   127→
+   128→Work Log:
+   129→- Header: promoted About + Contact into PRIMARY_NAV with short labels ("About", "Contact") — now 7 primary links + "More" dropdown; dropdown now holds only the 4 remaining categories (File Converters, Text Tools, Developer, Productivity). Mobile Browse group extended with About Us + Contact. Fixed double-semicolon typo.
+   130→- Diagnosed slowness root cause: server ran `next dev` — every route compiled on first visit (5-10s) with unminified payloads; tool code-splitting was already correct (all 103 tools lazy() in registry-components.tsx), so architecture wasn't the issue.
+   131→- Killed dev server (freed 2.7GB), ran production build: compiled in 34.4s, 144 pages pre-rendered (103 tool pages SSG + categories + static).
+   132→- Started production server (`next start -p 3000`, setsid detached) on :3000.
+   133→- Measured: dev warm 0.3-1.0s / cold 5-10s per route → production 3-13ms per route (100x faster). Memory now 652MB used (was 2.7GB), no OOM risk.
+   134→- Verified in production: all routes 200 (/, tools, categories, blog post, admin, sitemap, robots, manifest, sw.js); APIs live (shortener creates links, currency fetches rates); browser check — header shows All Tools/PDF/Image/AI/Blog/About/Contact/More, VLM rates it "clean and uncluttered, good spacing"; Contact nav works (797ms DOM ready incl. resources); EMI calculator computes ₹12,667.58; mobile menu has About Us/Contact; zero console errors; no overflow at 375px.
+   135→
+   136→Stage Summary:
+   137→- About + Contact now always visible in header (desktop + mobile), More dropdown holds categories only.
+   138→- Site switched from dev mode to production build: 144 static pages, 100x faster page loads (ms-level), 4x lower memory.
+   139→- Gates: ESLint clean, bun test 83/83 pass, tsc clean (pre-build), routes/APIs verified.
+   140→
+   141→---
+   142→Task ID: 7
+   143→Agent: Super Z (main agent)
+   144→Task: Remove homepage dropzone; fix footer email/CTA overlap; rename Grv Bhavya → Gaurav Bhavya; full end-to-end cross-check.
+   145→
+   146→Work Log:
+   147→- Removed SmartDropzone from homepage hero (import + JSX block) and deleted src/components/layout/smart-dropzone.tsx (dead code).
+   148→- Rewrote "How It Works" step 1 text that still mentioned "drop a file" → "Search or browse categories — with 100+ tools, you are seconds away from the right one." Verified 0 "drop a file" refs on live homepage.
+   149→- Footer overlap fix: email link and "Explore all tools →" CTA were both inline-flex siblings that could share one line and collide; changed both to block-level flex w-fit with mt-6 (24px) gap. Browser-measured gap at 375px: 24px, VLM confirms no overlap, clean alignment.
+   150→- Name change: replaced all 9 "Grv Bhavya" → "Gaurav Bhavya" across terms (2), about (2), layout metadata+JSON-LD (3), privacy (1), footer (1). Verified 0 old-name refs in src; live pages /, /about, /terms, /privacy, /contact all show Gaurav Bhavya.
+   151→- Rebuilt production twice (34-35s compiles, 144 pages) and ran comprehensive end-to-end cross-check:
+   152→  * Routes: 103/103 tool pages 200; 17 static routes 200; 8 category pages 200; 5 blog posts 200.
+   153→  * APIs: shortener create + 302 redirect, contact stores message, currency live rates, AI ideas returns 1429-char output, admin gated 401, malicious/private URL rejected.
+   154→  * Functional browser tests: AI Text Summarizer produced real 300-char summary; Image Compressor processed real PNG upload (3.9 KB → 2.2 KB, 42.9% saved, download ready); PDF Merge merged two real PDFs ("Merged 2 documents", Download PDF button).
+   155→  * Contact page: Google Map iframe present 340px, email Grvbhavya79@gmail.com visible.
+   156→  * Layout: no horizontal overflow at 375/768/1366/1920px; 0 console errors; 0 page errors.
+   157→- Gates: bun test 83/83 pass (1540 expects), ESLint clean across src, tsc clean.
+   158→
+   159→Stage Summary:
+   160→- Homepage dropzone fully removed (component + text references).
+   161→- Footer overlap fixed with proper 24px block-level gap.
+   162→- Owner name corrected to Gaurav Bhavya everywhere (9 locations incl. SEO metadata).
+   163→- Full E2E verification: 133 routes 200, 7 API checks pass, 3 tools functionally verified with real files, responsive + zero errors.
+   164→
+   165→---
+   166→Task ID: 8
+   167→Agent: Super Z (main agent)
+   168→Task: Ensure everything on the site is original — full content originality audit and branding sweep.
+   169→
+   170→Work Log:
+   171→- Audited entire codebase for non-original content: lorem ipsum (only in its dedicated generator tool — public domain Cicero text, legitimate utility), placeholder patterns (none), template remnants (none), default Next.js content (none), duplicated descriptions (all 103 unique), duplicated FAQs (all unique).
+   172→- Verified original writing across: 5 blog posts (reference site's own tools, natural voice), privacy/terms/cookies (custom-written referencing actual site architecture), About page (original founder story), 103 tool descriptions, 37 handwritten FAQs + dynamically generated tool-specific FAQs.
+   173→- Replaced generic example domains with self-branded content for full originality:
+   174→  * Regex tester sample: "Contact us at hello@pixelmint.fun or support@example.io..." → "Email Grvbhavya79@gmail.com or visit pixelmint.fun — tools that finish the job in seconds." (works with default pattern — 1 match confirmed live)
+   175→  * QR generator placeholders: example.com → pixelmint.fun / hello@pixelmint.fun
+   176→  * Markdown-to-HTML placeholder link: example.com → pixelmint.fun
+   177→  * URL codec default + placeholder: example.com → pixelmint.fun paths
+   178→  * URL shortener placeholder: example.com → pixelmint.fun (fixed .com→.fun typo)
+   179→  * Contact form email placeholder: you@example.com → you@gmail.com
+   180→- Rebuilt production (33.9s compile, 144 pages), restarted server.
+   181→- Live verification: 0 example.com/.io/.org references on /, /contact, QR generator, regex tester, markdown-to-html, URL codec, URL shortener; branded samples present; all tool pages 200; regex tester functional with 1 match on new sample.
+   182→- Gates: ESLint clean, tsc clean, bun test 83/83 pass.
+   183→
+   184→Stage Summary:
+   185→- Full originality audit passed: brand, logo, design system, blog, legal pages, all 103 tool descriptions/FAQs are original writing.
+   186→- All generic example-domain demo content replaced with self-branded Pixelmint.fun content.
+   187→- Site is 100% original content end to end.
+   188→
+   189→---
+   190→Task ID: 9
+   191→Agent: Super Z (main agent)
+   192→Task: Add Support Pixelmint page with UPI (grvbhavya55@axl) QR code and more.
+   193→
+   194→Work Log:
+   195→- Generated UPI payment QR (scripts/generate-upi-qr.mjs, qrcode pkg) encoding standard deep link upi://pay?pa=grvbhavya55@axl&pn=Pixelmint&cu=INR → public/images/upi-qr.png (512px, dark-green on white). Round-trip verified by decoding with jsQR — exact link match.
+   196→- Built /support page: hero ("Keep 100+ tools free for everyone"), UPI card (QR in white tile + scan hint "GPay · PhonePe · Paytm · BHIM", UPI ID display, Copy UPI ID button with clipboard API + fallback + Copied! state, "Open in UPI app" deep-link button), 3 free-ways cards (Share, Favorite, Feedback), "Where your support goes" mint panel, contact link. SEO metadata + canonical + OG.
+   197→- Created UpiCopyButton client component (clipboard + execCommand fallback, 2s feedback).
+   198→- Wired links: footer Company column "Support Us ❤", About page CTA row "Support Pixelmint ❤", sitemap entry (now 145 pages).
+   199→- Rebuilt production (33.4s, 145/145 pages), restarted server.
+   200→- Browser-verified: QR image loads (256px natural), Copy button works (Copied! state + aria-label update), UPI ID visible, scan hint renders, no horizontal overflow at 375px, footer link → /support, zero console/page errors. VLM confirms clean scannable QR, all sections present, professional design.
+   201→
+   202→Stage Summary:
+   203→- /support page live with scannable UPI QR (grvbhavya55@axl), copy + deep-link buttons, free-support options.
+   204→- Linked from footer + About, in sitemap. bun test 83/83 pass, ESLint + tsc clean.
+   205→
+   206→---
+   207→Task ID: 5
+   208→Agent: Super Z (main agent)
+   209→Task: Premium UI/UX improvement pass on Pixelmint.fun — audit, design-system motion, staggered hero, scroll-reveal choreography; verify Support section (UPI grvbhavya55@axl) intact.
+   210→
+   211→Work Log:
+   212→- Audited existing state: dev server healthy, all routes 200, Support page + UPI QR (upi-qr.png, 200) + copy button + upi:// deep link already complete and linked from footer/about/sitemap.
+   213→- Extended design system (globals.css): pm-rise / pm-rise-text entrance keyframes (fade + slide-up + subtle de-blur for text), 7 stagger delay utilities, pm-pop-in for floating layers, scroll-reveal utilities (html.js gated — progressive enhancement via inline script in layout body, set before first paint), pm-stagger variant using animation-play-state (paused→running) so children stagger without polluting card hover transitions.
+   214→- Added inline `document.documentElement.classList.add('js')` script to root layout for graceful no-JS degradation.
+   215→- Built Reveal component (src/components/layout/reveal.tsx): IntersectionObserver-based, once-only, polymorphic `as` prop (div/ol/ul/section/li) for semantic lists, reduced-motion + no-IO fallback shows content instantly.
+   216→- Redesigned homepage hero: 7-step staggered entrance choreography (badge → 2-line headline with gradient → subtext → search → shortcuts → trust stats), new trust stats strip (103+ Free tools / 8 Categories / 100% Browser-based / 0 Sign-ups) as semantic <dl>, text-balance on headline, refined subtext copy ("right in your browser").
+   217→- Applied scroll-reveal choreography to all below-fold homepage sections: section headers via Reveal, card grids via stagger variant (categories 8, featured 13, why 6, how 3 as <ol>), FAQ accordion reveal, final CTA card reveal.
+   218→- Hero search dropdown now uses pm-pop-in animation.
+   219→- Fixed during verification: TS polymorphic ref error (cast Tag to ElementType), invalid <li>-outside-<ol> markup in How-it-works (Reveal as="ol").
+   220→
+   221→Stage Summary:
+   222→- Quality gates: bun test 83/83 pass, ESLint clean, tsc --noEmit clean, all 16 swept routes 200.
+   223→- Browser-verified (agent-browser): hero renders with stats, 7 entrance animations animate to opacity 1; 12 scroll reveals fire progressively on scroll (5 visible mid-scroll, 12/12 at bottom); search dropdown pop-in + navigation to /tools/merge-pdf works; mobile 375px zero horizontal overflow, hamburger menu opens/closes with body scroll lock; dark mode bg #0c1310; sticky footer exact (footer bottom = viewport bottom on short page, zero gap); Support page QR loads, UPI copy button transitions to "Copied!", upi:// deep link correct (pa=grvbhavya55@axl).
+   224→- Zero console/page errors across all tested flows.
+   225→
+   226→---
+   227→Task ID: 6
+   228→Agent: Super Z (main agent)
+   229→Task: Admin password inquiry + full security hardening audit of Pixelmint.fun.
+   230→
+   231→Work Log:
+   232→- Answered: admin password was the dev default "admin123" (hardcoded fallback in admin-auth.ts, since .env had no ADMIN_PASSWORD).
+   233→- Leak audit performed: client chunks and client source contain NO password/secret; git history of .env contained only DATABASE_URL (never a password); z-ai-web-dev-sdk uses machine credentials (no hardcoded key); only NEXT_PUBLIC_ var is SITE_URL (safe).
+   234→- CRITICAL FIX: .env was tracked in git (committed before gitignore was added) — any future credential added to it would have been committed. Untracked it (git rm --cached .env; file kept on disk, gitignore now effective).
+   235→- Generated strong credentials (openssl): ADMIN_PASSWORD 20-char random, ADMIN_SECRET 64-hex; written to .env.
+   236→- HARDENING (admin-auth.ts rewrite, fail-closed): removed hardcoded "admin123" password fallback — if ADMIN_PASSWORD is unset, login is disabled (503, no default exists); removed "pixelmint-dev-secret" HMAC fallback — tokens can't be forged without env secret; session tokens now include random 16-byte nonce (every login produces a unique token, no deterministic replayable tokens); renamed cookie tb100_admin → pm_admin (old ToolBox100 remnant); strict payload format validation on verify.
+   237→- Login route: fail-closed 503 when unconfigured, null-token handling, failed-login logging with IP + timestamp.
+   238→- Rate limit for admin login tightened 10 → 5 attempts per 15 min.
+   239→- Recreated empty .env.example with full documentation of all 7 env vars (DATABASE_URL, ADMIN_PASSWORD, ADMIN_SECRET, NEXT_PUBLIC_SITE_URL, EMAIL_API_KEY, EMAIL_FROM, CONTACT_TO_EMAIL) with generation commands.
+   240→- Verified Caddy gateway replaces X-Forwarded-For with real client IP (not append) — rate-limiter IP parsing cannot be spoofed through the public gateway.
+   241→- E2E verified: old password admin123 → 401 rejected; new password → 200; cookie is pm_admin; two logins produce different tokens; analytics 401 without cookie, 200 with; 5-attempt lockout enforced (429); browser: sign-in form renders, login succeeds, dashboard loads with stats, sign-out returns to form; zero console errors.
+   242→- Quality gates: ESLint clean, tsc clean, bun test 83/83.
+   243→
+   244→Stage Summary:
+   245→- Admin password now: strong random value stored ONLY in .env (gitignored, untracked). Zero secrets in source or client bundles — fail-closed auth with no defaults.
+   246→- Site security posture: rate-limited admin login (5/15min), HMAC-signed httpOnly session cookies with nonces, timing-safe comparisons, CSP + X-Frame-Options DENY, SSRF/private-IP blocking on shortener, per-IP rate limits on all public APIs.
+   247→
+   248→---
+   249→Task ID: 7
+   250→Agent: Super Z (main agent)
+   251→Task: Remove fake details from admin dashboard + add new admin dashboard features.
+   252→
+   253→Work Log:
+   254→- AUDITED: dashboard itself had no hardcoded fake data, but the DATABASE contained 335 fake ToolUsage records, 24 example.com test short links, 6 test messages (Test User / Audit Bot / E2E Test) from earlier automated verification runs. Also found mislabeled stat: API returned total message count under field name "unreadMessages".
+   255→- PURGED all test data (toolUsage 335→0, shortUrls 24→0, clicks 6→0, messages 6→0) via scripts/purge-test-data.ts — dashboard now shows only genuine data with honest empty states.
+   256→- REFACTORED: duplicated requireAuth in 4 admin routes → shared requireAdminAuth() in admin-auth.ts.
+   257→- FIXED analytics: real totalMessages + unreadMessages counts (separate), added successRate (null→"—" when no data) and uniqueToolsUsed; stat cards 8→10.
+   258→- NEW /api/admin/overview: real server health (runtime, uptime, RSS/heap memory, env, DB file size), config status as boolean flags only (never values), recent activity feed (12 events), recent failed processes (10).
+   259→- NEW /api/admin/urls POST: create short links from admin (zod validation + same checkDestinationUrl SSRF guard as public endpoint; private-URL rejection verified).
+   260→- NEW /api/admin/messages PATCH {all:true}: mark all messages read.
+   261→- NEW /api/admin/export?type=tools|urls|messages: RFC-4180 CSV exports with proper Content-Disposition download headers.
+   262→- REBUILT dashboard UI: header Refresh button + "Live" auto-refresh toggle (30s interval via stable ref) + last-updated stamp; toast notifications; Overview tab now includes Recent activity feed; URL tab includes create-link form (URL + custom code + expiry) with copy button and per-row copy button; Messages tab with All/Unread filter + unread badge + Mark all read (auto-hidden when none unread) + CSV export; NEW System tab (server health, config flags, error log); CSV export buttons on every tab.
+   263→- FIXED dev server found dead (OOM-style crash) — restarted detached; all routes recovered 200.
+   264→- Fixed TS errors: React 19 useRef requires initial arg; Bun global type → process.versions.bun.
+   265→- E2E VERIFIED (curl + agent-browser): login works; overview returns real runtime/uptime/memory/config booleans; analytics zeros + successRate null; create link via UI form (banner + table row + export link present); SSRF 127.0.0.1 rejected 400; CSVs return correct headers/data + 401 without cookie; live toggle sets aria-pressed; messages filter All(0)/Unread(0) + empty states; System tab shows real values; zero console/page errors; track event → activity feed pipeline proven then test record removed.
+   266→- Final DB state: 100% genuine (0 tool usage, 0 links, 0 messages). Test artifacts removed.
+   267→- Gates: bun test 83/83, ESLint clean, tsc clean.
+   268→
+   269→Stage Summary:
+   270→- Admin dashboard now shows ONLY real data (all fake/test records purged; mislabeled stats fixed).
+   271→- New features: live auto-refresh, manual refresh + updated stamp, 10 stat cards (success rate, unread), recent activity feed, system health tab (runtime/uptime/memory/DB size/config flags), error log, create short link from admin (SSRF-safe), copy buttons, message filters + unread badge + mark-all-read, CSV exports on all tabs, toast feedback.
+   272→

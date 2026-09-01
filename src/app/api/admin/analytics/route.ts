@@ -2,15 +2,22 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireAdminAuth } from "@/lib/server/admin-auth";
 
+const ALLOWED_WINDOWS = [7, 14, 30, 90] as const;
+const DAY_MS = 86_400_000;
+
 export async function GET(request: Request) {
-  if (!requireAdminAuth(request)) {
+  if (!(await requireAdminAuth(request))) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
 
+  const rawDays = Number(new URL(request.url).searchParams.get("days"));
+  const days = (ALLOWED_WINDOWS as readonly number[]).includes(rawDays) ? rawDays : 30;
+
   const now = new Date();
-  const dayAgo = new Date(now.getTime() - 86400000);
-  const weekAgo = new Date(now.getTime() - 7 * 86400000);
-  const monthAgo = new Date(now.getTime() - 30 * 86400000);
+  const dayAgo = new Date(now.getTime() - DAY_MS);
+  const weekAgo = new Date(now.getTime() - 7 * DAY_MS);
+  const monthAgo = new Date(now.getTime() - 30 * DAY_MS);
+  const windowAgo = new Date(now.getTime() - days * DAY_MS);
 
   const [
     totalUses,
@@ -34,24 +41,35 @@ export async function GET(request: Request) {
     db.toolUsage.findMany({ select: { slug: true }, distinct: ["slug"] }),
     db.contactMessage.count(),
     db.contactMessage.count({ where: { isRead: false } }),
-    db.toolUsage.groupBy({ by: ["slug"], _count: { slug: true }, orderBy: { _count: { slug: "desc" } }, take: 10 }),
+    db.toolUsage.groupBy({
+      by: ["slug"],
+      _count: { slug: true },
+      where: { createdAt: { gte: windowAgo } },
+      orderBy: { _count: { slug: "desc" } },
+      take: 10,
+    }),
     db.toolUsage.findMany({
-      where: { createdAt: { gte: new Date(now.getTime() - 14 * 86400000) } },
+      where: { createdAt: { gte: windowAgo } },
       select: { createdAt: true },
     }),
-    db.toolUsage.findMany({ where: { createdAt: { gte: monthAgo } }, select: { slug: true } }),
+    db.toolUsage.findMany({ where: { createdAt: { gte: windowAgo } }, select: { slug: true } }),
     db.shortUrl.aggregate({ _count: true, _sum: { clickCount: true } }),
   ]);
 
-  // bucket daily traffic into last 14 days
+  // Bucket traffic: daily for windows up to 30 days, weekly above that.
+  const bucketMs = days > 30 ? 7 * DAY_MS : DAY_MS;
+  const bucketCount = Math.ceil(days / (bucketMs / DAY_MS));
+  const windowStart = now.getTime() - days * DAY_MS;
   const trafficMap = new Map<string, number>();
-  for (let i = 13; i >= 0; i--) {
-    const d = new Date(now.getTime() - i * 86400000);
+  for (let i = 0; i < bucketCount; i++) {
+    const d = new Date(windowStart + i * bucketMs);
     trafficMap.set(d.toISOString().slice(0, 10), 0);
   }
   for (const usage of dailyTrafficRaw) {
-    const key = usage.createdAt.toISOString().slice(0, 10);
-    if (trafficMap.has(key)) trafficMap.set(key, (trafficMap.get(key) ?? 0) + 1);
+    const idx = Math.floor((usage.createdAt.getTime() - windowStart) / bucketMs);
+    if (idx < 0 || idx >= bucketCount) continue;
+    const key = new Date(windowStart + idx * bucketMs).toISOString().slice(0, 10);
+    trafficMap.set(key, (trafficMap.get(key) ?? 0) + 1);
   }
 
   // map slug → category
@@ -85,6 +103,7 @@ export async function GET(request: Request) {
       categoryTraffic: [...catCount.entries()]
         .sort((a, b) => b[1] - a[1])
         .map(([category, count]) => ({ category, count })),
+      windowDays: days,
     },
   });
 }

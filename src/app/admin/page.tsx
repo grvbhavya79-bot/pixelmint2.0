@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import {
   Activity, BarChart3, CheckCheck, Copy, Database, ExternalLink, Eye, EyeOff, Gauge,
   Loader2, Lock, LogOut, Mail, MailOpen, MessageSquare, Plus, RefreshCw, Search,
-  Server, Trash2, TrendingUp, Download, Zap, AlertTriangle, CheckCircle2, X,
+  Server, Trash2, TrendingUp, Download, Zap, AlertTriangle, CheckCircle2,
+  KeyRound, Save, Settings as SettingsIcon, ShieldCheck, UserCog,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getTool } from "@/lib/tools/registry";
 import { cn } from "@/lib/utils";
@@ -91,6 +93,24 @@ interface Stats {
   popularTools: { slug: string; count: number }[];
   dailyTraffic: { date: string; count: number }[];
   categoryTraffic: { category: string; count: number }[];
+  windowDays: number;
+}
+
+interface AdminSettings {
+  username: string;
+  displayName: string;
+  panelTitle: string;
+  panelTagline: string;
+  passwordChangedAt: string;
+  lastLoginAt: string | null;
+  bootstrapPasswordActive: boolean;
+}
+
+interface ActivityEvent {
+  type: "tool" | "message" | "click";
+  label: string;
+  detail: string;
+  at: string;
 }
 
 interface Overview {
@@ -103,12 +123,14 @@ interface Overview {
     dbSizeBytes: number | null;
   };
   config: {
-    adminPasswordSet: boolean;
+    adminAccountActive: boolean;
     adminSecretSet: boolean;
     siteUrlSet: boolean;
     emailConfigured: boolean;
+    bootstrapPasswordActive: boolean;
   };
-  recentActivity: { slug: string; toolName: string; status: string; at: string }[];
+  account: AdminSettings | null;
+  recentActivity: ActivityEvent[];
   recentErrors: { slug: string; toolName: string; at: string }[];
 }
 
@@ -149,6 +171,8 @@ export default function AdminPage() {
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [messageFilter, setMessageFilter] = useState<"all" | "unread">("all");
   const [toast, setToast] = useState<string | null>(null);
+  const [settings, setSettings] = useState<AdminSettings | null>(null);
+  const [rangeDays, setRangeDays] = useState<7 | 14 | 30 | 90>(30);
   const router = useRouter();
   const loadAllRef = useRef<(() => Promise<void>) | undefined>(undefined);
 
@@ -159,11 +183,12 @@ export default function AdminPage() {
 
   const loadAll = useCallback(async () => {
     setRefreshing(true);
-    const [statsRes, overviewRes, urlsRes, messagesRes] = await Promise.all([
-      fetch("/api/admin/analytics"),
+    const [statsRes, overviewRes, urlsRes, messagesRes, settingsRes] = await Promise.all([
+      fetch(`/api/admin/analytics?days=${rangeDays}`),
       fetch("/api/admin/overview"),
       fetch(`/api/admin/urls${urlSearch ? `?q=${encodeURIComponent(urlSearch)}` : ""}`),
       fetch("/api/admin/messages"),
+      fetch("/api/admin/settings"),
     ]);
     if (statsRes.status === 401) {
       setAuthed(false);
@@ -174,14 +199,16 @@ export default function AdminPage() {
     const overviewJson = await overviewRes.json();
     const urlsJson = await urlsRes.json();
     const messagesJson = await messagesRes.json();
+    const settingsJson = await settingsRes.json();
     if (statsJson.success) setStats(statsJson.stats);
     if (overviewJson.success) setOverview(overviewJson.overview);
     if (urlsJson.success) setUrls(urlsJson.urls);
     if (messagesJson.success) setMessages(messagesJson.messages);
+    if (settingsJson.success) setSettings(settingsJson.settings);
     setLastUpdated(new Date());
     setAuthed((a) => (a === false ? false : true));
     setRefreshing(false);
-  }, [urlSearch]);
+  }, [urlSearch, rangeDays]);
 
   // Keep a stable ref for the auto-refresh interval.
   useEffect(() => {
@@ -202,6 +229,15 @@ export default function AdminPage() {
     const id = window.setInterval(() => void loadAllRef.current?.(), 30_000);
     return () => window.clearInterval(id);
   }, [autoRefresh]);
+
+  // Re-fetch when the analytics range changes (after first paint).
+  const rangeRef = useRef(rangeDays);
+  useEffect(() => {
+    if (rangeRef.current !== rangeDays) {
+      rangeRef.current = rangeDays;
+      void loadAllRef.current?.();
+    }
+  }, [rangeDays]);
 
   const login = async () => {
     setBusy(true);
@@ -326,6 +362,91 @@ export default function AdminPage() {
     await loadAll();
   };
 
+  /* ---------------------------- Settings actions --------------------------- */
+
+  const [profileForm, setProfileForm] = useState({
+    username: "",
+    displayName: "",
+    panelTitle: "",
+    panelTagline: "",
+  });
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+
+  // Sync the profile form whenever fresh settings arrive from the server.
+  useEffect(() => {
+    if (settings) {
+      setProfileForm({
+        username: settings.username,
+        displayName: settings.displayName,
+        panelTitle: settings.panelTitle,
+        panelTagline: settings.panelTagline,
+      });
+    }
+  }, [settings]);
+
+  const saveProfile = async () => {
+    setSavingProfile(true);
+    setProfileError(null);
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: profileForm.username.trim() || undefined,
+          displayName: profileForm.displayName.trim() || undefined,
+          panelTitle: profileForm.panelTitle.trim() || undefined,
+          panelTagline: profileForm.panelTagline.trim() || undefined,
+        }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error ?? "Could not save settings");
+      setSettings(json.settings);
+      setProfileForm({
+        username: json.settings.username,
+        displayName: json.settings.displayName,
+        panelTitle: json.settings.panelTitle,
+        panelTagline: json.settings.panelTagline,
+      });
+      showToast("Panel settings saved");
+    } catch (err) {
+      setProfileError(err instanceof Error ? err.message : "Could not save settings");
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  /* ---------------------------- Password actions --------------------------- */
+
+  const [pwForm, setPwForm] = useState({ current: "", next: "", confirm: "" });
+  const [changingPw, setChangingPw] = useState(false);
+  const [pwError, setPwError] = useState<string | null>(null);
+
+  const changePassword = async () => {
+    if (pwForm.next !== pwForm.confirm) {
+      setPwError("New passwords do not match.");
+      return;
+    }
+    setChangingPw(true);
+    setPwError(null);
+    try {
+      const res = await fetch("/api/admin/password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword: pwForm.current, newPassword: pwForm.next }),
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error ?? "Could not change password");
+      setSettings(json.settings);
+      setPwForm({ current: "", next: "", confirm: "" });
+      showToast("Password changed — other sessions signed out");
+    } catch (err) {
+      setPwError(err instanceof Error ? err.message : "Could not change password");
+    } finally {
+      setChangingPw(false);
+    }
+  };
+
   /* -------------------------------- Sign-in ------------------------------- */
 
   if (authed === null) {
@@ -370,8 +491,8 @@ export default function AdminPage() {
             </Button>
           </form>
           <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
-            The password is set with the <code className="rounded bg-muted px-1">ADMIN_PASSWORD</code> environment
-            variable (see .env.example). Login attempts are rate-limited.
+            After signing in you can change this password and customize the panel from the <strong>Settings</strong> tab.
+            Login attempts are rate-limited.
           </p>
         </div>
       </div>
@@ -412,9 +533,16 @@ export default function AdminPage() {
 
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Admin Dashboard</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            {settings?.panelTitle?.trim() || "Admin Dashboard"}
+          </h1>
           <p className="text-sm text-muted-foreground">
-            Live analytics, system health, URL shortener and contact inbox.
+            {settings?.panelTagline?.trim() || "Live analytics, system health, URL shortener and contact inbox."}
+            {settings?.displayName?.trim() && (
+              <span className="ml-1">
+                · Signed in as <span className="font-medium text-foreground">{settings.displayName.trim()}</span>
+              </span>
+            )}
             {lastUpdated && (
               <span className="ml-1 text-xs">· Updated {timeAgo(lastUpdated.toISOString())}</span>
             )}
@@ -469,18 +597,44 @@ export default function AdminPage() {
                   </span>
                 )}
               </TabsTrigger>
+              <TabsTrigger value="settings">Settings</TabsTrigger>
               <TabsTrigger value="system">System</TabsTrigger>
             </TabsList>
 
             {/* ================= Overview ================= */}
             <TabsContent value="overview" className="space-y-5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-xs text-muted-foreground">
+                  Charts and tool rankings reflect the selected range.
+                </p>
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="range-select" className="text-xs text-muted-foreground">Range</Label>
+                  <Select
+                    value={String(rangeDays)}
+                    onValueChange={(v) => setRangeDays(Number(v) as 7 | 14 | 30 | 90)}
+                  >
+                    <SelectTrigger id="range-select" className="h-8 w-[130px] text-xs" aria-label="Analytics date range">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="7">Last 7 days</SelectItem>
+                      <SelectItem value="14">Last 14 days</SelectItem>
+                      <SelectItem value="30">Last 30 days</SelectItem>
+                      <SelectItem value="90">Last 90 days</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
               <div className="grid gap-5 lg:grid-cols-2">
                 <div className="rounded-xl border bg-card p-5">
-                  <h2 className="text-sm font-semibold text-foreground">Daily traffic (14 days)</h2>
+                  <h2 className="text-sm font-semibold text-foreground">
+                    {stats.windowDays > 30 ? "Weekly" : "Daily"} traffic ({stats.windowDays} days)
+                  </h2>
                   <MiniBar data={stats.dailyTraffic.map((d) => ({ label: d.date.slice(5), value: d.count }))} />
                 </div>
                 <div className="rounded-xl border bg-card p-5">
-                  <h2 className="text-sm font-semibold text-foreground">Popular categories (30 days)</h2>
+                  <h2 className="text-sm font-semibold text-foreground">Popular categories ({stats.windowDays} days)</h2>
                   <div className="mt-3">
                     {stats.categoryTraffic.length === 0 ? (
                       <p className="py-8 text-center text-sm text-muted-foreground">No category usage recorded yet.</p>
@@ -494,7 +648,7 @@ export default function AdminPage() {
               <div className="grid gap-5 lg:grid-cols-2">
                 <div className="rounded-xl border bg-card p-5">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-sm font-semibold text-foreground">Most used tools</h2>
+                    <h2 className="text-sm font-semibold text-foreground">Most used tools ({stats.windowDays} days)</h2>
                     <a href="/api/admin/export?type=tools" className="focus-ring inline-flex items-center gap-1 rounded text-xs font-medium text-primary hover:underline">
                       <Download size={12} aria-hidden="true" /> CSV
                     </a>
@@ -528,12 +682,21 @@ export default function AdminPage() {
                       {overview.recentActivity.map((event, i) => (
                         <li key={i} className="flex items-center justify-between gap-3 py-2.5 text-sm">
                           <span className="flex min-w-0 items-center gap-2">
-                            {event.status === "error" ? (
-                              <AlertTriangle size={14} className="shrink-0 text-destructive" aria-hidden="true" />
+                            {event.type === "tool" ? (
+                              event.detail === "error" ? (
+                                <AlertTriangle size={14} className="shrink-0 text-destructive" aria-hidden="true" />
+                              ) : (
+                                <CheckCircle2 size={14} className="shrink-0 text-success" aria-hidden="true" />
+                              )
+                            ) : event.type === "message" ? (
+                              <Mail size={14} className="shrink-0 text-primary" aria-hidden="true" />
                             ) : (
-                              <CheckCircle2 size={14} className="shrink-0 text-success" aria-hidden="true" />
+                              <Zap size={14} className="shrink-0 text-amber-500" aria-hidden="true" />
                             )}
-                            <span className="truncate font-medium text-foreground">{event.toolName}</span>
+                            <span className="truncate font-medium text-foreground">{event.label}</span>
+                            {event.type !== "tool" && event.detail && (
+                              <span className="hidden max-w-40 truncate text-xs text-muted-foreground sm:inline">{event.detail}</span>
+                            )}
                           </span>
                           <span className="shrink-0 text-xs text-muted-foreground">{timeAgo(event.at)}</span>
                         </li>
@@ -541,7 +704,7 @@ export default function AdminPage() {
                     </ul>
                   ) : (
                     <p className="py-8 text-center text-sm text-muted-foreground">
-                      No activity yet — events appear here as visitors use tools.
+                      No activity yet — tool runs, messages and link clicks appear here.
                     </p>
                   )}
                 </div>
@@ -757,6 +920,193 @@ export default function AdminPage() {
               </div>
             </TabsContent>
 
+            {/* ================= Settings ================= */}
+            <TabsContent value="settings" className="space-y-5">
+              {settings === null ? (
+                <div className="flex h-40 items-center justify-center">
+                  <Loader2 className="animate-spin text-primary" size={22} />
+                </div>
+              ) : (
+                <>
+                  {settings.bootstrapPasswordActive && (
+                    <div
+                      className="flex items-start gap-2.5 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-700 dark:text-amber-400"
+                      role="status"
+                    >
+                      <ShieldCheck size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
+                      <div>
+                        <p className="font-semibold">Environment password still active</p>
+                        <p className="mt-0.5 text-xs leading-relaxed">
+                          You are still signing in with the password from the <code className="rounded bg-amber-500/15 px-1">ADMIN_PASSWORD</code>
+                          environment variable. Set your own password below to make this dashboard the only place it is managed.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid gap-5 lg:grid-cols-2">
+                    {/* Profile & branding */}
+                    <div className="rounded-xl border bg-card p-5">
+                      <h2 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                        <UserCog size={14} className="text-primary" aria-hidden="true" /> Panel profile &amp; branding
+                      </h2>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Names shown around this dashboard only — nothing on the public site changes.
+                      </p>
+                      <form
+                        className="mt-4 space-y-3.5"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          void saveProfile();
+                        }}
+                      >
+                        <div className="space-y-1.5">
+                          <Label htmlFor="set-username">Username</Label>
+                          <Input
+                            id="set-username"
+                            value={profileForm.username}
+                            onChange={(e) => setProfileForm((f) => ({ ...f, username: e.target.value }))}
+                            maxLength={32}
+                            pattern="[a-zA-Z0-9_-]{3,32}"
+                            title="3-32 characters: letters, numbers, dashes"
+                            autoComplete="off"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="set-name">Display name</Label>
+                          <Input
+                            id="set-name"
+                            value={profileForm.displayName}
+                            onChange={(e) => setProfileForm((f) => ({ ...f, displayName: e.target.value }))}
+                            maxLength={60}
+                            placeholder="e.g. Bhavya"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="set-title">Panel title</Label>
+                          <Input
+                            id="set-title"
+                            value={profileForm.panelTitle}
+                            onChange={(e) => setProfileForm((f) => ({ ...f, panelTitle: e.target.value }))}
+                            maxLength={60}
+                            placeholder="Admin Dashboard"
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="set-tagline">Tagline</Label>
+                          <Input
+                            id="set-tagline"
+                            value={profileForm.panelTagline}
+                            onChange={(e) => setProfileForm((f) => ({ ...f, panelTagline: e.target.value }))}
+                            maxLength={140}
+                            placeholder="Live analytics, system health, URL shortener and contact inbox."
+                          />
+                        </div>
+                        {profileError && <p role="alert" className="text-sm text-destructive">{profileError}</p>}
+                        <Button
+                          type="submit"
+                          disabled={savingProfile}
+                          className="bg-primary text-primary-foreground hover:bg-primary/90"
+                        >
+                          {savingProfile ? <Loader2 size={14} className="mr-1.5 animate-spin" /> : <Save size={14} className="mr-1.5" />}
+                          Save changes
+                        </Button>
+                      </form>
+                    </div>
+
+                    {/* Change password */}
+                    <div className="rounded-xl border bg-card p-5">
+                      <h2 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                        <KeyRound size={14} className="text-primary" aria-hidden="true" /> Change password
+                      </h2>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Minimum 10 characters with at least one letter and one number. Changing it signs out every other
+                        session — this one stays signed in.
+                      </p>
+                      <form
+                        className="mt-4 space-y-3.5"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          void changePassword();
+                        }}
+                      >
+                        <div className="space-y-1.5">
+                          <Label htmlFor="pw-current">Current password</Label>
+                          <Input
+                            id="pw-current"
+                            type="password"
+                            value={pwForm.current}
+                            onChange={(e) => setPwForm((f) => ({ ...f, current: e.target.value }))}
+                            autoComplete="current-password"
+                            required
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="pw-next">New password</Label>
+                          <Input
+                            id="pw-next"
+                            type="password"
+                            value={pwForm.next}
+                            onChange={(e) => setPwForm((f) => ({ ...f, next: e.target.value }))}
+                            autoComplete="new-password"
+                            minLength={10}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label htmlFor="pw-confirm">Confirm new password</Label>
+                          <Input
+                            id="pw-confirm"
+                            type="password"
+                            value={pwForm.confirm}
+                            onChange={(e) => setPwForm((f) => ({ ...f, confirm: e.target.value }))}
+                            autoComplete="new-password"
+                            required
+                          />
+                        </div>
+                        {pwError && <p role="alert" className="text-sm text-destructive">{pwError}</p>}
+                        <Button
+                          type="submit"
+                          disabled={changingPw || !pwForm.current || !pwForm.next || !pwForm.confirm}
+                          className="bg-primary text-primary-foreground hover:bg-primary/90"
+                        >
+                          {changingPw ? <Loader2 size={14} className="mr-1.5 animate-spin" /> : <KeyRound size={14} className="mr-1.5" />}
+                          Update password
+                        </Button>
+                      </form>
+                    </div>
+                  </div>
+
+                  {/* Account summary */}
+                  <div className="rounded-xl border bg-card p-5">
+                    <h2 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+                      <ShieldCheck size={14} className="text-primary" aria-hidden="true" /> Account
+                    </h2>
+                    <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-3">
+                      <div className="rounded-lg bg-muted/50 p-3">
+                        <dt className="text-xs text-muted-foreground">Username</dt>
+                        <dd className="mt-0.5 font-semibold text-foreground">{settings.username}</dd>
+                      </div>
+                      <div className="rounded-lg bg-muted/50 p-3">
+                        <dt className="text-xs text-muted-foreground">Password last changed</dt>
+                        <dd className="mt-0.5 font-semibold text-foreground">{timeAgo(settings.passwordChangedAt)}</dd>
+                      </div>
+                      <div className="rounded-lg bg-muted/50 p-3">
+                        <dt className="text-xs text-muted-foreground">Last sign-in</dt>
+                        <dd className="mt-0.5 font-semibold text-foreground">
+                          {settings.lastLoginAt ? timeAgo(settings.lastLoginAt) : "—"}
+                        </dd>
+                      </div>
+                    </dl>
+                    <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+                      The <code className="rounded bg-muted px-1">ADMIN_PASSWORD</code> environment variable only set the
+                      first password; the credential now lives in the database and is managed on this page.
+                    </p>
+                  </div>
+                </>
+              )}
+            </TabsContent>
+
             {/* ================= System ================= */}
             <TabsContent value="system" className="space-y-5">
               {overview === null ? (
@@ -809,10 +1159,11 @@ export default function AdminPage() {
                       <p className="mt-1 text-xs text-muted-foreground">Boolean status only — values are never exposed to the dashboard.</p>
                       <ul className="mt-3 space-y-2.5 text-sm">
                         {[
-                          { label: "Admin password set (ADMIN_PASSWORD)", ok: overview.config.adminPasswordSet, hint: "Required for admin login" },
+                          { label: "Admin account active", ok: overview.config.adminAccountActive, hint: "Password managed in Settings" },
                           { label: "Session secret set (ADMIN_SECRET)", ok: overview.config.adminSecretSet, hint: "Signs admin session cookies" },
                           { label: "Site URL set (NEXT_PUBLIC_SITE_URL)", ok: overview.config.siteUrlSet, hint: "Canonical URLs & sitemap" },
                           { label: "Email delivery configured", ok: overview.config.emailConfigured, hint: "Contact form notifications" },
+                          { label: "Env bootstrap password retired", ok: !overview.config.bootstrapPasswordActive, hint: "Dashboard owns the credential" },
                         ].map((item) => (
                           <li key={item.label} className="flex items-start justify-between gap-4">
                             <div>

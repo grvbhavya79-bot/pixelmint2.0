@@ -1,0 +1,858 @@
+     1→     1→"use client";
+     2→     2→
+     3→     3→import { useCallback, useEffect, useRef, useState } from "react";
+     4→     4→import { useRouter } from "next/navigation";
+     5→     5→import {
+     6→     6→  Activity, BarChart3, CheckCheck, Copy, Database, ExternalLink, Eye, EyeOff, Gauge,
+     7→     7→  Loader2, Lock, LogOut, Mail, MailOpen, MessageSquare, Plus, RefreshCw, Search,
+     8→     8→  Server, Trash2, TrendingUp, Download, Zap, AlertTriangle, CheckCircle2, X,
+     9→     9→} from "lucide-react";
+    10→    10→import { Button } from "@/components/ui/button";
+    11→    11→import { Input } from "@/components/ui/input";
+    12→    12→import { Label } from "@/components/ui/label";
+    13→    13→import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+    14→    14→import { getTool } from "@/lib/tools/registry";
+    15→    15→import { cn } from "@/lib/utils";
+    16→    16→
+    17→    17→/* -------------------------------- Charts --------------------------------- */
+    18→    18→
+    19→    19→function MiniBar({ data }: { data: { label: string; value: number }[] }) {
+    20→    20→  const max = Math.max(1, ...data.map((d) => d.value));
+    21→    21→  return (
+    22→    22→    <div className="flex h-36 items-end gap-1" role="img" aria-label="Bar chart">
+    23→    23→      {data.map((d, i) => (
+    24→    24→        <div key={i} className="group relative flex-1">
+    25→    25→          <div
+    26→    26→            className={cn("w-full rounded-t transition-all", d.value > 0 ? "bg-primary/80 group-hover:bg-primary" : "bg-muted")}
+    27→    27→            style={{ height: `${Math.max(3, (d.value / max) * 130)}px` }}
+    28→    28→          />
+    29→    29→          <span className="pointer-events-none absolute -top-7 left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded bg-foreground px-1.5 py-0.5 text-[10px] text-background group-hover:block">
+    30→    30→            {d.label}: {d.value}
+    31→    31→          </span>
+    32→    32→        </div>
+    33→    33→      ))}
+    34→    34→    </div>
+    35→    35→  );
+    36→    36→}
+    37→    37→
+    38→    38→function HBar({ data }: { data: { label: string; value: number }[] }) {
+    39→    39→  const max = Math.max(1, ...data.map((d) => d.value));
+    40→    40→  return (
+    41→    41→    <ul className="space-y-2.5" role="img" aria-label="Horizontal bar chart">
+    42→    42→      {data.map((d) => (
+    43→    43→        <li key={d.label}>
+    44→    44→          <div className="flex justify-between text-xs">
+    45→    45→            <span className="font-medium text-foreground">{d.label}</span>
+    46→    46→            <span className="text-muted-foreground">{d.value.toLocaleString()}</span>
+    47→    47→          </div>
+    48→    48→          <div className="mt-1 h-2 overflow-hidden rounded-full bg-muted">
+    49→    49→            <div className="h-full rounded-full bg-primary" style={{ width: `${(d.value / max) * 100}%` }} />
+    50→    50→          </div>
+    51→    51→        </li>
+    52→    52→      ))}
+    53→    53→    </ul>
+    54→    54→  );
+    55→    55→}
+    56→    56→
+    57→    57→/* ------------------------------ Time helpers ------------------------------ */
+    58→    58→
+    59→    59→function timeAgo(iso: string): string {
+    60→    60→  const seconds = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+    61→    61→  if (seconds < 60) return "just now";
+    62→    62→  const minutes = Math.floor(seconds / 60);
+    63→    63→  if (minutes < 60) return `${minutes}m ago`;
+    64→    64→  const hours = Math.floor(minutes / 60);
+    65→    65→  if (hours < 24) return `${hours}h ago`;
+    66→    66→  const days = Math.floor(hours / 24);
+    67→    67→  if (days < 30) return `${days}d ago`;
+    68→    68→  return new Date(iso).toLocaleDateString("en-GB");
+    69→    69→}
+    70→    70→
+    71→    71→function formatBytes(bytes: number): string {
+    72→    72→  if (bytes < 1024) return `${bytes} B`;
+    73→    73→  if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+    74→    74→  return `${(bytes / 1048576).toFixed(1)} MB`;
+    75→    75→}
+    76→    76→
+    77→    77→/* ------------------------------- Types ------------------------------------ */
+    78→    78→
+    79→    79→interface Stats {
+    80→    80→  totalUses: number;
+    81→    81→  dailyUses: number;
+    82→    82→  weeklyUses: number;
+    83→    83→  monthlyUses: number;
+    84→    84→  failedUses: number;
+    85→    85→  successRate: number | null;
+    86→    86→  uniqueToolsUsed: number;
+    87→    87→  totalShortUrls: number;
+    88→    88→  totalShortUrlClicks: number;
+    89→    89→  totalMessages: number;
+    90→    90→  unreadMessages: number;
+    91→    91→  popularTools: { slug: string; count: number }[];
+    92→    92→  dailyTraffic: { date: string; count: number }[];
+    93→    93→  categoryTraffic: { category: string; count: number }[];
+    94→    94→}
+    95→    95→
+    96→    96→interface Overview {
+    97→    97→  server: {
+    98→    98→    runtime: string;
+    99→    99→    uptime: string;
+   100→   100→    memoryUsedMb: number | null;
+   101→   101→    heapUsedMb: number | null;
+   102→   102→    nodeEnv: string;
+   103→   103→    dbSizeBytes: number | null;
+   104→   104→  };
+   105→   105→  config: {
+   106→   106→    adminPasswordSet: boolean;
+   107→   107→    adminSecretSet: boolean;
+   108→   108→    siteUrlSet: boolean;
+   109→   109→    emailConfigured: boolean;
+   110→   110→  };
+   111→   111→  recentActivity: { slug: string; toolName: string; status: string; at: string }[];
+   112→   112→  recentErrors: { slug: string; toolName: string; at: string }[];
+   113→   113→}
+   114→   114→
+   115→   115→interface ShortUrlRow {
+   116→   116→  id: string;
+   117→   117→  shortCode: string;
+   118→   118→  destinationUrl: string;
+   119→   119→  clickCount: number;
+   120→   120→  isActive: boolean;
+   121→   121→  expiresAt: string | null;
+   122→   122→  createdAt: string;
+   123→   123→}
+   124→   124→
+   125→   125→interface MessageRow {
+   126→   126→  id: string;
+   127→   127→  name: string;
+   128→   128→  email: string;
+   129→   129→  subject: string;
+   130→   130→  message: string;
+   131→   131→  isRead: boolean;
+   132→   132→  createdAt: string;
+   133→   133→}
+   134→   134→
+   135→   135→/* ------------------------------- Dashboard -------------------------------- */
+   136→   136→
+   137→   137→export default function AdminPage() {
+   138→   138→  const [authed, setAuthed] = useState<boolean | null>(null);
+   139→   139→  const [password, setPassword] = useState("");
+   140→   140→  const [loginError, setLoginError] = useState<string | null>(null);
+   141→   141→  const [busy, setBusy] = useState(false);
+   142→   142→  const [stats, setStats] = useState<Stats | null>(null);
+   143→   143→  const [overview, setOverview] = useState<Overview | null>(null);
+   144→   144→  const [urls, setUrls] = useState<ShortUrlRow[]>([]);
+   145→   145→  const [messages, setMessages] = useState<MessageRow[]>([]);
+   146→   146→  const [urlSearch, setUrlSearch] = useState("");
+   147→   147→  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+   148→   148→  const [refreshing, setRefreshing] = useState(false);
+   149→   149→  const [autoRefresh, setAutoRefresh] = useState(false);
+   150→   150→  const [messageFilter, setMessageFilter] = useState<"all" | "unread">("all");
+   151→   151→  const [toast, setToast] = useState<string | null>(null);
+   152→   152→  const router = useRouter();
+   153→   153→  const loadAllRef = useRef<(() => Promise<void>) | undefined>(undefined);
+   154→   154→
+   155→   155→  const showToast = useCallback((msg: string) => {
+   156→   156→    setToast(msg);
+   157→   157→    window.setTimeout(() => setToast(null), 2600);
+   158→   158→  }, []);
+   159→   159→
+   160→   160→  const loadAll = useCallback(async () => {
+   161→   161→    setRefreshing(true);
+   162→   162→    const [statsRes, overviewRes, urlsRes, messagesRes] = await Promise.all([
+   163→   163→      fetch("/api/admin/analytics"),
+   164→   164→      fetch("/api/admin/overview"),
+   165→   165→      fetch(`/api/admin/urls${urlSearch ? `?q=${encodeURIComponent(urlSearch)}` : ""}`),
+   166→   166→      fetch("/api/admin/messages"),
+   167→   167→    ]);
+   168→   168→    if (statsRes.status === 401) {
+   169→   169→      setAuthed(false);
+   170→   170→      setRefreshing(false);
+   171→   171→      return;
+   172→   172→    }
+   173→   173→    const statsJson = await statsRes.json();
+   174→   174→    const overviewJson = await overviewRes.json();
+   175→   175→    const urlsJson = await urlsRes.json();
+   176→   176→    const messagesJson = await messagesRes.json();
+   177→   177→    if (statsJson.success) setStats(statsJson.stats);
+   178→   178→    if (overviewJson.success) setOverview(overviewJson.overview);
+   179→   179→    if (urlsJson.success) setUrls(urlsJson.urls);
+   180→   180→    if (messagesJson.success) setMessages(messagesJson.messages);
+   181→   181→    setLastUpdated(new Date());
+   182→   182→    setAuthed((a) => (a === false ? false : true));
+   183→   183→    setRefreshing(false);
+   184→   184→  }, [urlSearch]);
+   185→   185→
+   186→   186→  // Keep a stable ref for the auto-refresh interval.
+   187→   187→  useEffect(() => {
+   188→   188→    loadAllRef.current = loadAll;
+   189→   189→  }, [loadAll]);
+   190→   190→
+   191→   191→  const firstLoad = useRef(true);
+   192→   192→  useEffect(() => {
+   193→   193→    if (firstLoad.current) {
+   194→   194→      firstLoad.current = false;
+   195→   195→      void loadAll();
+   196→   196→    }
+   197→   197→  }, [loadAll]);
+   198→   198→
+   199→   199→  // Auto-refresh every 30s when enabled.
+   200→   200→  useEffect(() => {
+   201→   201→    if (!autoRefresh) return;
+   202→   202→    const id = window.setInterval(() => void loadAllRef.current?.(), 30_000);
+   203→   203→    return () => window.clearInterval(id);
+   204→   204→  }, [autoRefresh]);
+   205→   205→
+   206→   206→  const login = async () => {
+   207→   207→    setBusy(true);
+   208→   208→    setLoginError(null);
+   209→   209→    try {
+   210→   210→      const res = await fetch("/api/admin/login", {
+   211→   211→        method: "POST",
+   212→   212→        headers: { "Content-Type": "application/json" },
+   213→   213→        body: JSON.stringify({ password }),
+   214→   214→      });
+   215→   215→      const json = await res.json();
+   216→   216→      if (!json.success) throw new Error(json.error ?? "Login failed");
+   217→   217→      setAuthed(true);
+   218→   218→      setPassword("");
+   219→   219→      await loadAll();
+   220→   220→    } catch (err) {
+   221→   221→      setLoginError(err instanceof Error ? err.message : "Login failed");
+   222→   222→    } finally {
+   223→   223→      setBusy(false);
+   224→   224→    }
+   225→   225→  };
+   226→   226→
+   227→   227→  const logout = async () => {
+   228→   228→    await fetch("/api/admin/login", { method: "DELETE" });
+   229→   229→    setAuthed(false);
+   230→   230→    setStats(null);
+   231→   231→    setOverview(null);
+   232→   232→    router.refresh();
+   233→   233→  };
+   234→   234→
+   235→   235→  /* ------------------------------ URL actions ----------------------------- */
+   236→   236→
+   237→   237→  const [newUrl, setNewUrl] = useState("");
+   238→   238→  const [newCode, setNewCode] = useState("");
+   239→   239→  const [newExpiry, setNewExpiry] = useState("");
+   240→   240→  const [creating, setCreating] = useState(false);
+   241→   241→  const [createError, setCreateError] = useState<string | null>(null);
+   242→   242→  const [createdLink, setCreatedLink] = useState<string | null>(null);
+   243→   243→
+   244→   244→  const createLink = async () => {
+   245→   245→    setCreating(true);
+   246→   246→    setCreateError(null);
+   247→   247→    setCreatedLink(null);
+   248→   248→    try {
+   249→   249→      const res = await fetch("/api/admin/urls", {
+   250→   250→        method: "POST",
+   251→   251→        headers: { "Content-Type": "application/json" },
+   252→   252→        body: JSON.stringify({
+   253→   253→          url: newUrl,
+   254→   254→          customCode: newCode.trim() || undefined,
+   255→   255→          expiresInDays: newExpiry ? Number(newExpiry) : undefined,
+   256→   256→        }),
+   257→   257→      });
+   258→   258→      const json = await res.json();
+   259→   259→      if (!json.success) throw new Error(json.error ?? "Failed to create link");
+   260→   260→      setCreatedLink(json.link.shortUrl);
+   261→   261→      setNewUrl("");
+   262→   262→      setNewCode("");
+   263→   263→      setNewExpiry("");
+   264→   264→      await loadAll();
+   265→   265→    } catch (err) {
+   266→   266→      setCreateError(err instanceof Error ? err.message : "Failed to create link");
+   267→   267→    } finally {
+   268→   268→      setCreating(false);
+   269→   269→    }
+   270→   270→  };
+   271→   271→
+   272→   272→  const copyText = async (text: string, label: string) => {
+   273→   273→    try {
+   274→   274→      await navigator.clipboard.writeText(text);
+   275→   275→      showToast(`${label} copied`);
+   276→   276→    } catch {
+   277→   277→      showToast("Copy failed — select the text manually");
+   278→   278→    }
+   279→   279→  };
+   280→   280→
+   281→   281→  const toggleUrl = async (id: string, isActive: boolean) => {
+   282→   282→    await fetch("/api/admin/urls", {
+   283→   283→      method: "PATCH",
+   284→   284→      headers: { "Content-Type": "application/json" },
+   285→   285→      body: JSON.stringify({ id, isActive }),
+   286→   286→    });
+   287→   287→    await loadAll();
+   288→   288→  };
+   289→   289→
+   290→   290→  const deleteUrl = async (id: string) => {
+   291→   291→    await fetch("/api/admin/urls", {
+   292→   292→      method: "DELETE",
+   293→   293→      headers: { "Content-Type": "application/json" },
+   294→   294→      body: JSON.stringify({ id }),
+   295→   295→    });
+   296→   296→    await loadAll();
+   297→   297→  };
+   298→   298→
+   299→   299→  /* ---------------------------- Message actions --------------------------- */
+   300→   300→
+   301→   301→  const markRead = async (id: string, isRead: boolean) => {
+   302→   302→    await fetch("/api/admin/messages", {
+   303→   303→      method: "PATCH",
+   304→   304→      headers: { "Content-Type": "application/json" },
+   305→   305→      body: JSON.stringify({ id, isRead }),
+   306→   306→    });
+   307→   307→    await loadAll();
+   308→   308→  };
+   309→   309→
+   310→   310→  const markAllRead = async () => {
+   311→   311→    await fetch("/api/admin/messages", {
+   312→   312→      method: "PATCH",
+   313→   313→      headers: { "Content-Type": "application/json" },
+   314→   314→      body: JSON.stringify({ all: true }),
+   315→   315→    });
+   316→   316→    showToast("All messages marked as read");
+   317→   317→    await loadAll();
+   318→   318→  };
+   319→   319→
+   320→   320→  const deleteMessage = async (id: string) => {
+   321→   321→    await fetch("/api/admin/messages", {
+   322→   322→      method: "DELETE",
+   323→   323→      headers: { "Content-Type": "application/json" },
+   324→   324→      body: JSON.stringify({ id }),
+   325→   325→    });
+   326→   326→    await loadAll();
+   327→   327→  };
+   328→   328→
+   329→   329→  /* -------------------------------- Sign-in ------------------------------- */
+   330→   330→
+   331→   331→  if (authed === null) {
+   332→   332→    return (
+   333→   333→      <div className="flex min-h-[60vh] items-center justify-center">
+   334→   334→        <Loader2 className="animate-spin text-primary" size={26} />
+   335→   335→      </div>
+   336→   336→    );
+   337→   337→  }
+   338→   338→
+   339→   339→  if (!authed) {
+   340→   340→    return (
+   341→   341→      <div className="flex min-h-[70vh] items-center justify-center px-4">
+   342→   342→        <div className="w-full max-w-sm rounded-2xl border bg-card p-6 shadow-card">
+   343→   343→          <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-secondary text-primary">
+   344→   344→            <Lock size={22} />
+   345→   345→          </span>
+   346→   346→          <h1 className="mt-4 text-xl font-bold text-foreground">Admin sign-in</h1>
+   347→   347→          <p className="mt-1 text-sm text-muted-foreground">Enter the administrator password to open the dashboard.</p>
+   348→   348→          <form
+   349→   349→            className="mt-5 space-y-3"
+   350→   350→            onSubmit={(e) => {
+   351→   351→              e.preventDefault();
+   352→   352→              void login();
+   353→   353→            }}
+   354→   354→          >
+   355→   355→            <div className="space-y-1.5">
+   356→   356→              <Label htmlFor="admin-pw">Password</Label>
+   357→   357→              <Input
+   358→   358→                id="admin-pw"
+   359→   359→                type="password"
+   360→   360→                value={password}
+   361→   361→                onChange={(e) => setPassword(e.target.value)}
+   362→   362→                autoComplete="current-password"
+   363→   363→                autoFocus
+   364→   364→              />
+   365→   365→            </div>
+   366→   366→            {loginError && <p role="alert" className="text-sm text-destructive">{loginError}</p>}
+   367→   367→            <Button type="submit" disabled={busy || !password} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+   368→   368→              {busy ? <Loader2 size={15} className="mr-1.5 animate-spin" /> : <Lock size={14} className="mr-1.5" />}
+   369→   369→              Sign in
+   370→   370→            </Button>
+   371→   371→          </form>
+   372→   372→          <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
+   373→   373→            The password is set with the <code className="rounded bg-muted px-1">ADMIN_PASSWORD</code> environment
+   374→   374→            variable (see .env.example). Login attempts are rate-limited.
+   375→   375→          </p>
+   376→   376→        </div>
+   377→   377→      </div>
+   378→   378→    );
+   379→   379→  }
+   380→   380→
+   381→   381→  /* ------------------------------ Dashboard ------------------------------- */
+   382→   382→
+   383→   383→  const statCards = stats
+   384→   384→    ? [
+   385→   385→        { label: "Total tool uses", value: stats.totalUses.toLocaleString(), icon: TrendingUp },
+   386→   386→        { label: "Today", value: stats.dailyUses.toLocaleString(), icon: BarChart3 },
+   387→   387→        { label: "This week", value: stats.weeklyUses.toLocaleString(), icon: BarChart3 },
+   388→   388→        { label: "This month", value: stats.monthlyUses.toLocaleString(), icon: BarChart3 },
+   389→   389→        {
+   390→   390→          label: "Success rate",
+   391→   391→          value: stats.successRate === null ? "—" : `${stats.successRate}%`,
+   392→   392→          icon: Gauge,
+   393→   393→        },
+   394→   394→        { label: "Failed processes", value: stats.failedUses.toLocaleString(), icon: AlertTriangle },
+   395→   395→        { label: "Short links", value: stats.totalShortUrls.toLocaleString(), icon: ExternalLink },
+   396→   396→        { label: "Link clicks", value: stats.totalShortUrlClicks.toLocaleString(), icon: Zap },
+   397→   397→        { label: "Messages", value: stats.totalMessages.toLocaleString(), icon: Mail },
+   398→   398→        { label: "Unread messages", value: stats.unreadMessages.toLocaleString(), icon: MailOpen },
+   399→   399→      ]
+   400→   400→    : [];
+   401→   401→
+   402→   402→  const filteredMessages = messageFilter === "unread" ? messages.filter((m) => !m.isRead) : messages;
+   403→   403→
+   404→   404→  return (
+   405→   405→    <div className="container-page space-y-6 py-10">
+   406→   406→      {/* Toast */}
+   407→   407→      {toast && (
+   408→   408→        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-xl border bg-card px-4 py-3 text-sm font-medium text-foreground shadow-card-hover" role="status">
+   409→   409→          <CheckCircle2 size={15} className="text-success" aria-hidden="true" /> {toast}
+   410→   410→        </div>
+   411→   411→      )}
+   412→   412→
+   413→   413→      <header className="flex flex-wrap items-center justify-between gap-3">
+   414→   414→        <div>
+   415→   415→          <h1 className="text-2xl font-bold tracking-tight text-foreground">Admin Dashboard</h1>
+   416→   416→          <p className="text-sm text-muted-foreground">
+   417→   417→            Live analytics, system health, URL shortener and contact inbox.
+   418→   418→            {lastUpdated && (
+   419→   419→              <span className="ml-1 text-xs">· Updated {timeAgo(lastUpdated.toISOString())}</span>
+   420→   420→            )}
+   421→   421→          </p>
+   422→   422→        </div>
+   423→   423→        <div className="flex flex-wrap items-center gap-2">
+   424→   424→          <Button variant="outline" size="sm" onClick={() => void loadAll()} disabled={refreshing}>
+   425→   425→            {refreshing ? <Loader2 size={14} className="mr-1.5 animate-spin" /> : <RefreshCw size={14} className="mr-1.5" />}
+   426→   426→            Refresh
+   427→   427→          </Button>
+   428→   428→          <Button
+   429→   429→            variant={autoRefresh ? "default" : "outline"}
+   430→   430→            size="sm"
+   431→   431→            onClick={() => setAutoRefresh((v) => !v)}
+   432→   432→            className={autoRefresh ? "bg-primary text-primary-foreground hover:bg-primary/90" : ""}
+   433→   433→            aria-pressed={autoRefresh}
+   434→   434→          >
+   435→   435→            <Activity size={14} className="mr-1.5" />
+   436→   436→            Live {autoRefresh ? "on" : "off"}
+   437→   437→          </Button>
+   438→   438→          <Button variant="outline" onClick={() => void logout()}>
+   439→   439→            <LogOut size={14} className="mr-1.5" /> Sign out
+   440→   440→          </Button>
+   441→   441→        </div>
+   442→   442→      </header>
+   443→   443→
+   444→   444→      {stats === null ? (
+   445→   445→        <div className="flex h-64 items-center justify-center">
+   446→   446→          <Loader2 className="animate-spin text-primary" size={24} />
+   447→   447→        </div>
+   448→   448→      ) : (
+   449→   449→        <>
+   450→   450→          <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+   451→   451→            {statCards.map((card) => (
+   452→   452→              <div key={card.label} className="rounded-xl border bg-card p-4 shadow-card">
+   453→   453→                <card.icon size={16} className="text-primary" aria-hidden="true" />
+   454→   454→                <p className="mt-2 text-2xl font-bold text-foreground">{card.value}</p>
+   455→   455→                <p className="text-xs text-muted-foreground">{card.label}</p>
+   456→   456→              </div>
+   457→   457→            ))}
+   458→   458→          </div>
+   459→   459→
+   460→   460→          <Tabs defaultValue="overview">
+   461→   461→            <TabsList>
+   462→   462→              <TabsTrigger value="overview">Overview</TabsTrigger>
+   463→   463→              <TabsTrigger value="urls">URL Shortener</TabsTrigger>
+   464→   464→              <TabsTrigger value="messages">
+   465→   465→                Messages
+   466→   466→                {stats.unreadMessages > 0 && (
+   467→   467→                  <span className="ml-1.5 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-primary-foreground">
+   468→   468→                    {stats.unreadMessages}
+   469→   469→                  </span>
+   470→   470→                )}
+   471→   471→              </TabsTrigger>
+   472→   472→              <TabsTrigger value="system">System</TabsTrigger>
+   473→   473→            </TabsList>
+   474→   474→
+   475→   475→            {/* ================= Overview ================= */}
+   476→   476→            <TabsContent value="overview" className="space-y-5">
+   477→   477→              <div className="grid gap-5 lg:grid-cols-2">
+   478→   478→                <div className="rounded-xl border bg-card p-5">
+   479→   479→                  <h2 className="text-sm font-semibold text-foreground">Daily traffic (14 days)</h2>
+   480→   480→                  <MiniBar data={stats.dailyTraffic.map((d) => ({ label: d.date.slice(5), value: d.count }))} />
+   481→   481→                </div>
+   482→   482→                <div className="rounded-xl border bg-card p-5">
+   483→   483→                  <h2 className="text-sm font-semibold text-foreground">Popular categories (30 days)</h2>
+   484→   484→                  <div className="mt-3">
+   485→   485→                    {stats.categoryTraffic.length === 0 ? (
+   486→   486→                      <p className="py-8 text-center text-sm text-muted-foreground">No category usage recorded yet.</p>
+   487→   487→                    ) : (
+   488→   488→                      <HBar data={stats.categoryTraffic.map((c) => ({ label: c.category, value: c.count }))} />
+   489→   489→                    )}
+   490→   490→                  </div>
+   491→   491→                </div>
+   492→   492→              </div>
+   493→   493→
+   494→   494→              <div className="grid gap-5 lg:grid-cols-2">
+   495→   495→                <div className="rounded-xl border bg-card p-5">
+   496→   496→                  <div className="flex items-center justify-between">
+   497→   497→                    <h2 className="text-sm font-semibold text-foreground">Most used tools</h2>
+   498→   498→                    <a href="/api/admin/export?type=tools" className="focus-ring inline-flex items-center gap-1 rounded text-xs font-medium text-primary hover:underline">
+   499→   499→                      <Download size={12} aria-hidden="true" /> CSV
+   500→   500→                    </a>
+   501→   501→                  </div>
+   502→   502→                  <ol className="mt-3 divide-y">
+   503→   503→                    {stats.popularTools.length === 0 ? (
+   504→   504→                      <li className="py-3 text-sm text-muted-foreground">No tool usage recorded yet.</li>
+   505→   505→                    ) : (
+   506→   506→                      stats.popularTools.map((tool, i) => {
+   507→   507→                        const definition = getTool(tool.slug);
+   508→   508→                        return (
+   509→   509→                          <li key={tool.slug} className="flex items-center justify-between gap-3 py-2.5">
+   510→   510→                            <span className="flex min-w-0 items-center gap-2.5 text-sm">
+   511→   511→                              <span className="w-5 text-xs font-bold text-muted-foreground">{i + 1}.</span>
+   512→   512→                              <span className="truncate font-medium text-foreground">{definition?.name ?? tool.slug}</span>
+   513→   513→                            </span>
+   514→   514→                            <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-semibold text-secondary-foreground">
+   515→   515→                              {tool.count.toLocaleString()}
+   516→   516→                            </span>
+   517→   517→                          </li>
+   518→   518→                        );
+   519→   519→                      })
+   520→   520→                    )}
+   521→   521→                  </ol>
+   522→   522→                </div>
+   523→   523→
+   524→   524→                <div className="rounded-xl border bg-card p-5">
+   525→   525→                  <h2 className="text-sm font-semibold text-foreground">Recent activity</h2>
+   526→   526→                  {overview && overview.recentActivity.length > 0 ? (
+   527→   527→                    <ul className="mt-3 divide-y">
+   528→   528→                      {overview.recentActivity.map((event, i) => (
+   529→   529→                        <li key={i} className="flex items-center justify-between gap-3 py-2.5 text-sm">
+   530→   530→                          <span className="flex min-w-0 items-center gap-2">
+   531→   531→                            {event.status === "error" ? (
+   532→   532→                              <AlertTriangle size={14} className="shrink-0 text-destructive" aria-hidden="true" />
+   533→   533→                            ) : (
+   534→   534→                              <CheckCircle2 size={14} className="shrink-0 text-success" aria-hidden="true" />
+   535→   535→                            )}
+   536→   536→                            <span className="truncate font-medium text-foreground">{event.toolName}</span>
+   537→   537→                          </span>
+   538→   538→                          <span className="shrink-0 text-xs text-muted-foreground">{timeAgo(event.at)}</span>
+   539→   539→                        </li>
+   540→   540→                      ))}
+   541→   541→                    </ul>
+   542→   542→                  ) : (
+   543→   543→                    <p className="py-8 text-center text-sm text-muted-foreground">
+   544→   544→                      No activity yet — events appear here as visitors use tools.
+   545→   545→                    </p>
+   546→   546→                  )}
+   547→   547→                </div>
+   548→   548→              </div>
+   549→   549→            </TabsContent>
+   550→   550→
+   551→   551→            {/* ================= URL Shortener ================= */}
+   552→   552→            <TabsContent value="urls" className="space-y-4">
+   553→   553→              {/* Create link */}
+   554→   554→              <div className="rounded-xl border bg-card p-5">
+   555→   555→                <h2 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+   556→   556→                  <Plus size={14} className="text-primary" aria-hidden="true" /> Create a short link
+   557→   557→                </h2>
+   558→   558→                <form
+   559→   559→                  className="mt-3 grid gap-3 sm:grid-cols-[2fr_1fr_1fr_auto]"
+   560→   560→                  onSubmit={(e) => {
+   561→   561→                    e.preventDefault();
+   562→   562→                    if (newUrl.trim().length >= 4) void createLink();
+   563→   563→                  }}
+   564→   564→                >
+   565→   565→                  <div>
+   566→   566→                    <Label htmlFor="new-url" className="sr-only">Destination URL</Label>
+   567→   567→                    <Input
+   568→   568→                      id="new-url"
+   569→   569→                      type="url"
+   570→   570→                      value={newUrl}
+   571→   571→                      onChange={(e) => setNewUrl(e.target.value)}
+   572→   572→                      placeholder="https://example.com/long-url"
+   573→   573→                      required
+   574→   574→                      className="w-full"
+   575→   575→                    />
+   576→   576→                  </div>
+   577→   577→                  <div>
+   578→   578→                    <Label htmlFor="new-code" className="sr-only">Custom code (optional)</Label>
+   579→   579→                    <Input
+   580→   580→                      id="new-code"
+   581→   581→                      value={newCode}
+   582→   582→                      onChange={(e) => setNewCode(e.target.value)}
+   583→   583→                      placeholder="Custom code"
+   584→   584→                      pattern="[a-zA-Z0-9_-]{4,32}"
+   585→   585→                      title="4-32 characters: letters, numbers, dashes"
+   586→   586→                    />
+   587→   587→                  </div>
+   588→   588→                  <div>
+   589→   589→                    <Label htmlFor="new-expiry" className="sr-only">Expires in days (optional)</Label>
+   590→   590→                    <Input
+   591→   591→                      id="new-expiry"
+   592→   592→                      type="number"
+   593→   593→                      min={1}
+   594→   594→                      max={3650}
+   595→   595→                      value={newExpiry}
+   596→   596→                      onChange={(e) => setNewExpiry(e.target.value)}
+   597→   597→                      placeholder="Expires (days)"
+   598→   598→                    />
+   599→   599→                  </div>
+   600→   600→                  <Button type="submit" disabled={creating || newUrl.trim().length < 4} className="bg-primary text-primary-foreground hover:bg-primary/90">
+   601→   601→                    {creating ? <Loader2 size={14} className="mr-1.5 animate-spin" /> : <Plus size={14} className="mr-1.5" />}
+   602→   602→                    Create
+   603→   603→                  </Button>
+   604→   604→                </form>
+   605→   605→                {createError && <p role="alert" className="mt-2 text-sm text-destructive">{createError}</p>}
+   606→   606→                {createdLink && (
+   607→   607→                  <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg border border-primary/30 bg-secondary/50 px-3 py-2">
+   608→   608→                    <span className="font-mono text-sm font-semibold text-primary">{createdLink}</span>
+   609→   609→                    <Button variant="ghost" size="sm" onClick={() => void copyText(createdLink, "Short link")} aria-label="Copy short link">
+   610→   610→                      <Copy size={13} />
+   611→   611→                    </Button>
+   612→   612→                  </div>
+   613→   613→                )}
+   614→   614→              </div>
+   615→   615→
+   616→   616→              <div className="flex flex-wrap items-center justify-between gap-2">
+   617→   617→                <div className="relative max-w-md grow">
+   618→   618→                  <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+   619→   619→                  <Input
+   620→   620→                    value={urlSearch}
+   621→   621→                    onChange={(e) => setUrlSearch(e.target.value)}
+   622→   622→                    onKeyDown={(e) => e.key === "Enter" && void loadAll()}
+   623→   623→                    placeholder="Search by code or destination…"
+   624→   624→                    className="pl-9"
+   625→   625→                  />
+   626→   626→                </div>
+   627→   627→                <a href="/api/admin/export?type=urls" className="focus-ring inline-flex items-center gap-1 rounded-lg border bg-card px-3 py-2 text-xs font-medium text-foreground shadow-card transition-colors hover:text-primary">
+   628→   628→                  <Download size={12} aria-hidden="true" /> Export CSV
+   629→   629→                </a>
+   630→   630→              </div>
+   631→   631→
+   632→   632→              <div className="overflow-x-auto rounded-xl border bg-card">
+   633→   633→                <table className="w-full min-w-[760px] text-sm">
+   634→   634→                  <thead>
+   635→   635→                    <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+   636→   636→                      <th className="px-4 py-3 font-semibold">Short code</th>
+   637→   637→                      <th className="px-4 py-3 font-semibold">Destination</th>
+   638→   638→                      <th className="px-4 py-3 font-semibold">Clicks</th>
+   639→   639→                      <th className="px-4 py-3 font-semibold">Expires</th>
+   640→   640→                      <th className="px-4 py-3 font-semibold">Status</th>
+   641→   641→                      <th className="px-4 py-3 text-right font-semibold">Actions</th>
+   642→   642→                    </tr>
+   643→   643→                  </thead>
+   644→   644→                  <tbody className="divide-y">
+   645→   645→                    {urls.length === 0 ? (
+   646→   646→                      <tr>
+   647→   647→                        <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">No short links yet — create one above.</td>
+   648→   648→                      </tr>
+   649→   649→                    ) : (
+   650→   650→                      urls.map((url) => (
+   651→   651→                        <tr key={url.id} className="text-xs sm:text-sm">
+   652→   652→                          <td className="px-4 py-3 font-mono font-semibold text-primary">
+   653→   653→                            <a href={`/s/${url.shortCode}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+   654→   654→                              /s/{url.shortCode}
+   655→   655→                            </a>
+   656→   656→                          </td>
+   657→   657→                          <td className="max-w-56 truncate px-4 py-3 text-muted-foreground" title={url.destinationUrl}>
+   658→   658→                            {url.destinationUrl}
+   659→   659→                          </td>
+   660→   660→                          <td className="px-4 py-3 font-medium">{url.clickCount.toLocaleString()}</td>
+   661→   661→                          <td className="px-4 py-3 text-muted-foreground">
+   662→   662→                            {url.expiresAt ? new Date(url.expiresAt).toLocaleDateString("en-GB") : "Never"}
+   663→   663→                          </td>
+   664→   664→                          <td className="px-4 py-3">
+   665→   665→                            <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-semibold", url.isActive ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive")}>
+   666→   666→                              {url.isActive ? "Active" : "Disabled"}
+   667→   667→                            </span>
+   668→   668→                          </td>
+   669→   669→                          <td className="px-4 py-3">
+   670→   670→                            <div className="flex justify-end gap-1">
+   671→   671→                              <Button variant="ghost" size="sm" onClick={() => void copyText(`${typeof window !== "undefined" ? window.location.origin : ""}/s/${url.shortCode}`, "Short link")} aria-label="Copy short link">
+   672→   672→                                <Copy size={14} />
+   673→   673→                              </Button>
+   674→   674→                              <Button variant="ghost" size="sm" onClick={() => void toggleUrl(url.id, !url.isActive)} aria-label={url.isActive ? "Disable link" : "Enable link"}>
+   675→   675→                                {url.isActive ? <EyeOff size={14} /> : <Eye size={14} />}
+   676→   676→                              </Button>
+   677→   677→                              <Button variant="ghost" size="sm" onClick={() => void deleteUrl(url.id)} aria-label="Delete link" className="text-destructive hover:text-destructive">
+   678→   678→                                <Trash2 size={14} />
+   679→   679→                              </Button>
+   680→   680→                            </div>
+   681→   681→                          </td>
+   682→   682→                        </tr>
+   683→   683→                      ))
+   684→   684→                    )}
+   685→   685→                  </tbody>
+   686→   686→                </table>
+   687→   687→              </div>
+   688→   688→            </TabsContent>
+   689→   689→
+   690→   690→            {/* ================= Messages ================= */}
+   691→   691→            <TabsContent value="messages" className="space-y-4">
+   692→   692→              <div className="flex flex-wrap items-center justify-between gap-2">
+   693→   693→                <div className="flex rounded-lg border bg-card p-1" role="tablist" aria-label="Message filter">
+   694→   694→                  <button
+   695→   695→                    type="button"
+   696→   696→                    role="tab"
+   697→   697→                    aria-selected={messageFilter === "all"}
+   698→   698→                    onClick={() => setMessageFilter("all")}
+   699→   699→                    className={cn("focus-ring rounded-md px-3 py-1.5 text-xs font-medium transition-colors", messageFilter === "all" ? "bg-secondary text-secondary-foreground" : "text-muted-foreground hover:text-foreground")}
+   700→   700→                  >
+   701→   701→                    All ({messages.length})
+   702→   702→                  </button>
+   703→   703→                  <button
+   704→   704→                    type="button"
+   705→   705→                    role="tab"
+   706→   706→                    aria-selected={messageFilter === "unread"}
+   707→   707→                    onClick={() => setMessageFilter("unread")}
+   708→   708→                    className={cn("focus-ring rounded-md px-3 py-1.5 text-xs font-medium transition-colors", messageFilter === "unread" ? "bg-secondary text-secondary-foreground" : "text-muted-foreground hover:text-foreground")}
+   709→   709→                  >
+   710→   710→                    Unread ({stats.unreadMessages})
+   711→   711→                  </button>
+   712→   712→                </div>
+   713→   713→                <div className="flex items-center gap-2">
+   714→   714→                  <a href="/api/admin/export?type=messages" className="focus-ring inline-flex items-center gap-1 rounded-lg border bg-card px-3 py-2 text-xs font-medium text-foreground shadow-card transition-colors hover:text-primary">
+   715→   715→                    <Download size={12} aria-hidden="true" /> Export CSV
+   716→   716→                  </a>
+   717→   717→                  {stats.unreadMessages > 0 && (
+   718→   718→                    <Button variant="outline" size="sm" onClick={() => void markAllRead()}>
+   719→   719→                      <CheckCheck size={14} className="mr-1.5" /> Mark all read
+   720→   720→                    </Button>
+   721→   721→                  )}
+   722→   722→                </div>
+   723→   723→              </div>
+   724→   724→
+   725→   725→              <div className="space-y-3">
+   726→   726→                {filteredMessages.length === 0 ? (
+   727→   727→                  <p className="rounded-xl border border-dashed bg-card/50 p-8 text-center text-sm text-muted-foreground">
+   728→   728→                    {messageFilter === "unread" ? "No unread messages." : "No messages yet."}
+   729→   729→                  </p>
+   730→   730→                ) : (
+   731→   731→                  filteredMessages.map((message) => (
+   732→   732→                    <article
+   733→   733→                      key={message.id}
+   734→   734→                      className={cn("rounded-xl border bg-card p-4", !message.isRead && "border-primary/40 bg-secondary/30")}
+   735→   735→                    >
+   736→   736→                      <div className="flex flex-wrap items-start justify-between gap-2">
+   737→   737→                        <div>
+   738→   738→                          <h3 className="text-sm font-semibold text-foreground">{message.subject}</h3>
+   739→   739→                          <p className="text-xs text-muted-foreground">
+   740→   740→                            {message.name} · <a href={`mailto:${message.email}`} className="text-primary hover:underline">{message.email}</a>{" "}
+   741→   741→                            · {new Date(message.createdAt).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" })}
+   742→   742→                          </p>
+   743→   743→                        </div>
+   744→   744→                        <div className="flex gap-1">
+   745→   745→                          <Button variant="ghost" size="sm" onClick={() => void markRead(message.id, !message.isRead)}>
+   746→   746→                            {message.isRead ? "Mark unread" : "Mark read"}
+   747→   747→                          </Button>
+   748→   748→                          <Button variant="ghost" size="sm" onClick={() => void deleteMessage(message.id)} aria-label="Delete message" className="text-destructive hover:text-destructive">
+   749→   749→                            <Trash2 size={14} />
+   750→   750→                          </Button>
+   751→   751→                        </div>
+   752→   752→                      </div>
+   753→   753→                      <p className="mt-2.5 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground">{message.message}</p>
+   754→   754→                    </article>
+   755→   755→                  ))
+   756→   756→                )}
+   757→   757→              </div>
+   758→   758→            </TabsContent>
+   759→   759→
+   760→   760→            {/* ================= System ================= */}
+   761→   761→            <TabsContent value="system" className="space-y-5">
+   762→   762→              {overview === null ? (
+   763→   763→                <div className="flex h-40 items-center justify-center">
+   764→   764→                  <Loader2 className="animate-spin text-primary" size={22} />
+   765→   765→                </div>
+   766→   766→              ) : (
+   767→   767→                <>
+   768→   768→                  <div className="grid gap-5 lg:grid-cols-2">
+   769→   769→                    <div className="rounded-xl border bg-card p-5">
+   770→   770→                      <h2 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+   771→   771→                        <Server size={14} className="text-primary" aria-hidden="true" /> Server health
+   772→   772→                      </h2>
+   773→   773→                      <dl className="mt-3 space-y-2.5 text-sm">
+   774→   774→                        <div className="flex justify-between gap-4">
+   775→   775→                          <dt className="text-muted-foreground">Runtime</dt>
+   776→   776→                          <dd className="font-medium text-foreground">{overview.server.runtime}</dd>
+   777→   777→                        </div>
+   778→   778→                        <div className="flex justify-between gap-4">
+   779→   779→                          <dt className="text-muted-foreground">Uptime</dt>
+   780→   780→                          <dd className="font-medium text-foreground">{overview.server.uptime}</dd>
+   781→   781→                        </div>
+   782→   782→                        <div className="flex justify-between gap-4">
+   783→   783→                          <dt className="text-muted-foreground">Memory (RSS)</dt>
+   784→   784→                          <dd className="font-medium text-foreground">{overview.server.memoryUsedMb ?? "—"}{overview.server.memoryUsedMb !== null ? " MB" : ""}</dd>
+   785→   785→                        </div>
+   786→   786→                        <div className="flex justify-between gap-4">
+   787→   787→                          <dt className="text-muted-foreground">Heap used</dt>
+   788→   788→                          <dd className="font-medium text-foreground">{overview.server.heapUsedMb ?? "—"}{overview.server.heapUsedMb !== null ? " MB" : ""}</dd>
+   789→   789→                        </div>
+   790→   790→                        <div className="flex justify-between gap-4">
+   791→   791→                          <dt className="text-muted-foreground">Environment</dt>
+   792→   792→                          <dd className="font-medium text-foreground">{overview.server.nodeEnv}</dd>
+   793→   793→                        </div>
+   794→   794→                        <div className="flex justify-between gap-4">
+   795→   795→                          <dt className="text-muted-foreground">Database size</dt>
+   796→   796→                          <dd className="font-medium text-foreground">{overview.server.dbSizeBytes !== null ? formatBytes(overview.server.dbSizeBytes) : "—"}</dd>
+   797→   797→                        </div>
+   798→   798→                        <div className="flex justify-between gap-4">
+   799→   799→                          <dt className="text-muted-foreground">Unique tools used</dt>
+   800→   800→                          <dd className="font-medium text-foreground">{stats?.uniqueToolsUsed ?? "—"}</dd>
+   801→   801→                        </div>
+   802→   802→                      </dl>
+   803→   803→                    </div>
+   804→   804→
+   805→   805→                    <div className="rounded-xl border bg-card p-5">
+   806→   806→                      <h2 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+   807→   807→                        <Database size={14} className="text-primary" aria-hidden="true" /> Configuration status
+   808→   808→                      </h2>
+   809→   809→                      <p className="mt-1 text-xs text-muted-foreground">Boolean status only — values are never exposed to the dashboard.</p>
+   810→   810→                      <ul className="mt-3 space-y-2.5 text-sm">
+   811→   811→                        {[
+   812→   812→                          { label: "Admin password set (ADMIN_PASSWORD)", ok: overview.config.adminPasswordSet, hint: "Required for admin login" },
+   813→   813→                          { label: "Session secret set (ADMIN_SECRET)", ok: overview.config.adminSecretSet, hint: "Signs admin session cookies" },
+   814→   814→                          { label: "Site URL set (NEXT_PUBLIC_SITE_URL)", ok: overview.config.siteUrlSet, hint: "Canonical URLs & sitemap" },
+   815→   815→                          { label: "Email delivery configured", ok: overview.config.emailConfigured, hint: "Contact form notifications" },
+   816→   816→                        ].map((item) => (
+   817→   817→                          <li key={item.label} className="flex items-start justify-between gap-4">
+   818→   818→                            <div>
+   819→   819→                              <p className="font-medium text-foreground">{item.label}</p>
+   820→   820→                              <p className="text-xs text-muted-foreground">{item.hint}</p>
+   821→   821→                            </div>
+   822→   822→                            <span className={cn("mt-0.5 flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold", item.ok ? "bg-success/10 text-success" : "bg-amber-500/10 text-amber-600")}>
+   823→   823→                              {item.ok ? <CheckCircle2 size={11} aria-hidden="true" /> : <AlertTriangle size={11} aria-hidden="true" />}
+   824→   824→                              {item.ok ? "Set" : "Not set"}
+   825→   825→                            </span>
+   826→   826→                          </li>
+   827→   827→                        ))}
+   828→   828→                      </ul>
+   829→   829→                    </div>
+   830→   830→                  </div>
+   831→   831→
+   832→   832→                  <div className="rounded-xl border bg-card p-5">
+   833→   833→                    <h2 className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+   834→   834→                      <AlertTriangle size={14} className="text-destructive" aria-hidden="true" /> Recent failed processes
+   835→   835→                    </h2>
+   836→   836→                    {overview.recentErrors.length === 0 ? (
+   837→   837→                      <p className="mt-3 text-sm text-muted-foreground">No failed tool processes recorded — all clear.</p>
+   838→   838→                    ) : (
+   839→   839→                      <ul className="mt-3 divide-y">
+   840→   840→                        {overview.recentErrors.map((err, i) => (
+   841→   841→                          <li key={i} className="flex items-center justify-between gap-3 py-2.5 text-sm">
+   842→   842→                            <span className="truncate font-medium text-foreground">{err.toolName}</span>
+   843→   843→                            <span className="shrink-0 text-xs text-muted-foreground">{timeAgo(err.at)}</span>
+   844→   844→                          </li>
+   845→   845→                        ))}
+   846→   846→                      </ul>
+   847→   847→                    )}
+   848→   848→                  </div>
+   849→   849→                </>
+   850→   850→              )}
+   851→   851→            </TabsContent>
+   852→   852→          </Tabs>
+   853→   853→        </>
+   854→   854→      )}
+   855→   855→    </div>
+   856→   856→  );
+   857→   857→}
+   858→   858→
