@@ -10,8 +10,8 @@ import { db } from "@/lib/db";
  *   after that the stored hash is authoritative and the password is
  *   managed from the dashboard (Settings tab).
  * - If no account exists AND no ADMIN_PASSWORD is set, login is disabled.
- * - The HMAC signing secret comes from ADMIN_SECRET (or falls back to
- *   ADMIN_PASSWORD). If neither is set, no token can be created/verified.
+ * - The HMAC signing secret comes from ADMIN_SECRET. If it is not set,
+ *   no token can be created or verified.
  * - Session tokens carry a random nonce (unique per login) and the
  *   passwordVersion at issue time, so changing the password instantly
  *   invalidates every previously issued session.
@@ -51,7 +51,8 @@ export interface AdminAccount {
 }
 
 function secret(): string | null {
-  return process.env.ADMIN_SECRET || process.env.ADMIN_PASSWORD || null;
+  const configured = process.env.ADMIN_SECRET;
+  return configured && configured.length >= 32 ? configured : null;
 }
 
 /* ------------------------- Password hashing (scrypt) ---------------------- */
