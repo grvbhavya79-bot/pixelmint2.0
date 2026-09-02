@@ -51,8 +51,8 @@ export interface AdminAccount {
 }
 
 function secret(): string | null {
-  const configured = process.env.ADMIN_SECRET;
-  return configured && configured.length >= 32 ? configured : null;
+  const configured = process.env.ADMIN_SECRET?.trim();
+  return configured || null;
 }
 
 /* ------------------------- Password hashing (scrypt) ---------------------- */
